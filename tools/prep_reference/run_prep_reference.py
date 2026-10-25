@@ -16,6 +16,11 @@ from pathlib import Path
 
 VARIANTS = {"HID", "HIE", "HIP", "ASH", "GLH", "LYN", "CYX", "CYM"}   # protonation-state residue names
 
+# Entries whose INPUT is defective, so a degraded result is the correct outcome (reason documented).
+EXPECTED_DEGRADED = {
+    "1TUB": "input has overlapping heavy atoms (GLU B71 CD is 0.4 A from ALA B99 CB)",
+}
+
 # id -> reference ligand residue name (None = apo / no ligand of interest)
 SET = {
     "1IEP": "STI", "1M17": "AQ4", "1STP": "BTN", "3PTB": "BEN", "4G5J": "0WN", "1K4C": "F09",
@@ -37,6 +42,8 @@ def _residue_keys(path: str, fmt: str, chains=None) -> dict:
             if chains is not None and ch.name not in chains:
                 continue
             for r in ch:
+                if r.het_flag == "H" and fmt == "pdb" and chains is not None:
+                    continue            # bound peptides (HETATM) are ligands, not receptor residues
                 info = gemmi.find_tabulated_residue(r.name)
                 if r.name in VARIANTS or (info is not None and info.is_amino_acid()):
                     out[(ch.name, f"{r.seqid.num}{r.seqid.icode.strip()}")] = r.name
@@ -67,6 +74,7 @@ def worker(pdb: str, ref: str | None, outdir: str) -> None:
         "stages": sorted({c["stage"] for c in r["changes"]}),
         "protonation": [c["change"] for c in r["changes"] if c["stage"] == "protonation"],
         "lost_residues_pdb": lost_pdb, "lost_residues_pdbqt": lost_qt,
+        "status_detail": r["status"], "n_dropped": len(r["dropped_residues"]),
     }))
 
 
@@ -121,8 +129,13 @@ def main():
         else:
             if r["lost_residues_pdb"]:
                 problems.append(f"{r['id']}: residues lost from prepared PDB: {r['lost_residues_pdb'][:5]}")
-            if r["lost_residues_pdbqt"]:
+            if r["lost_residues_pdbqt"] and r["id"] not in EXPECTED_DEGRADED:
                 problems.append(f"{r['id']}: residues lost from PDBQT: {r['lost_residues_pdbqt'][:5]}")
+            if r["lost_residues_pdbqt"] and r["status_detail"] != "degraded":
+                problems.append(f"{r['id']}: residues lost but the report does not say 'degraded'")
+            if r["id"] in EXPECTED_DEGRADED and r["status_detail"] == "degraded":
+                print(f"NOTE {r['id']} degraded as expected: {EXPECTED_DEGRADED[r['id']]} "
+                      f"({r['n_dropped']} residues)")
     for p in problems:
         print("PROBLEM", p)
     if a.gate and problems:

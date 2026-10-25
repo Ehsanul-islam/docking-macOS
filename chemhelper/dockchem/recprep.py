@@ -68,6 +68,7 @@ class _Report:
         self.changes: list[dict] = []
         self.warnings: list[str] = []
         self.tools: list[dict] = []
+        self.dropped: list[dict] = []        # residues absent from the PDBQT: makes the result "degraded"
 
     def change(self, stage, residue, change, reason, tool):
         self.changes.append({"stage": stage, "residue": residue, "change": change,
@@ -87,8 +88,12 @@ def _heavy(res) -> int:
 
 
 def _is_polymer(res) -> bool:
+    if res.name in hetatm.MODIFIED:
+        return True
     info = gemmi.find_tabulated_residue(res.name)
-    return (info is not None and info.is_amino_acid()) or res.name in hetatm.MODIFIED
+    # A HETATM record with a standard amino-acid name is a bound peptide (e.g. the Gly-Tyr inhibitor in
+    # 3CPA), not part of the receptor chain.
+    return info is not None and info.is_amino_acid() and res.het_flag != "H"
 
 
 def _min_dist(res, pos_list) -> float:
@@ -431,6 +436,7 @@ def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
     for (ch, num, name), n in dropped.items():
         rep.warn(f"{ch}:{name}{num} left out of the PDBQT: no bundled Meeko template "
                  f"({n} atoms); Meeko would otherwise download it from RCSB")
+        rep.dropped.append({"residue": f"{ch}:{name}{num}", "reason": "no bundled Meeko template"})
     if not dropped and not renamed:
         return src
     dst.write_text("\n".join(lines) + "\n")
@@ -480,6 +486,7 @@ def _meeko(pdb_path: Path, base: Path, opts, rep):
         deleted = True
         for key in names:
             rep.warn(f"residue {key} left out of the PDBQT: no Meeko template matched (clashes or unusual atoms)")
+            rep.dropped.append({"residue": key, "reason": "no Meeko template matched (clashes or unusual atoms)"})
         r = r2
     rep.tools.append(record("meeko", _ver("meeko"), {"flex": opts.flex_residues, "delete_bad_res": deleted}))
     if opts.flex_residues:
@@ -493,22 +500,54 @@ def _meeko(pdb_path: Path, base: Path, opts, rep):
     return out, None
 
 
-H_CONTACT_CUTOFF = 1.3     # non-adjacent-residue contact at or below this is read as a bond by Meeko
+BOND_ALLOWANCE = 1.2       # Meeko perceives a bond when d < allowance * (r1 + r2) (meeko.polymer)
 
 
-def _close_contacts(pdb_text: str, cutoff: float = H_CONTACT_CUTOFF) -> list[str]:
+def _contact_pairs(pdb_text: str) -> list[tuple]:
+    """Inter-residue atom pairs that Meeko would read as covalent bonds, using Meeko's own rule, as
+    ((chain, resname, seq, icode, atom), (...), dist)."""
+    from meeko.utils.covalent_radius_table import covalent_radius
     st = gemmi.read_pdb_string(pdb_text)
     ns = gemmi.NeighborSearch(st[0], st.cell, 5).populate()
-    cs = gemmi.ContactSearch(cutoff)
+    cs = gemmi.ContactSearch(2 * BOND_ALLOWANCE * max(covalent_radius.values()))
     cs.ignore = gemmi.ContactSearch.Ignore.AdjacentResidues
     out = []
     for r in cs.find_contacts(ns):
         a, b = r.partner1, r.partner2
         if a.atom.name == "SG" and b.atom.name == "SG":      # disulfide
             continue
-        out.append(f"{a.chain.name}:{a.residue.name}{a.residue.seqid.num}.{a.atom.name} - "
-                   f"{b.chain.name}:{b.residue.name}{b.residue.seqid.num}.{b.atom.name} ({r.dist:.2f} A)")
+        ea, eb = a.atom.element.name, b.atom.element.name       # table is keyed by element symbol
+        if ea not in covalent_radius or eb not in covalent_radius:
+            continue
+        if r.dist >= BOND_ALLOWANCE * (covalent_radius[ea] + covalent_radius[eb]):
+            continue
+        ident = lambda p: (p.chain.name, p.residue.name, p.residue.seqid.num,
+                           p.residue.seqid.icode.strip(), p.atom.name)
+        out.append((ident(a), ident(b), r.dist))
     return out
+
+
+def _close_contacts(pdb_text: str) -> list[str]:
+    return [f"{a[0]}:{a[1]}{a[2]}.{a[4]} - {b[0]}:{b[1]}{b[2]}.{b[4]} ({d:.2f} A)"
+            for a, b, d in _contact_pairs(pdb_text)]
+
+
+def _strip_clashing_hydrogens(pdb_text: str, rep) -> tuple[str, int]:
+    """Last resort: drop only the hydrogens that sit on top of other atoms, so Meeko can still match the
+    residue (a deleted residue is far worse than a missing hydrogen). Every removal is reported."""
+    drop = set()
+    for a, b, _ in _contact_pairs(pdb_text):
+        for p in (a, b):
+            if p[4].startswith("H"):
+                drop.add((p[0], f"{p[2]}{p[3]}", p[4]))
+                break                       # one hydrogen per contact is enough
+    if not drop:
+        return pdb_text, 0
+    kept = [l for l in pdb_text.splitlines()
+            if not (l.startswith("ATOM") and (l[21], l[22:27].strip(), l[12:16].strip()) in drop)]
+    for ch, num, name in sorted(drop):
+        rep.change("hydrogen_repair", f"{ch}:{num}", f"removed {name}", "could not be repositioned without moving heavy atoms", "dockchem")
+    return "\n".join(kept) + "\n", len(drop)
 
 
 def _clashes(pdb_text, rep):
@@ -727,12 +766,14 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                 rep.warn(f"{len(bad)} implausibly close contact(s) after hydrogen placement, first: {bad[0]}")
                 if _minimize(prot, final, rep, REPAIR_K):
                     rep.changes[-1].update(stage="hydrogen_repair",
-                                           reason=f"{len(bad)} contact(s) <= {H_CONTACT_CUTOFF} A would be read as bonds by Meeko")
-                    left = _close_contacts(final.read_text())
-                    if left:
-                        rep.warn(f"{len(left)} close contact(s) remain after repair, first: {left[0]}")
+                                           reason=f"{len(bad)} contact(s) would be read as covalent bonds by Meeko")
                 else:
                     final.write_text(prot_text)
+                text, n = _strip_clashing_hydrogens(final.read_text(), rep)
+                if n:
+                    final.write_text(text)
+                    rep.warn(f"{n} hydrogen(s) removed because they sit on top of other atoms and could not be "
+                             "repositioned without moving heavy atoms (listed in the Prep Report)")
         _clashes(final.read_text(), rep)
 
         # merge kept hetero groups back for Meeko
@@ -768,5 +809,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "atoms_before": atoms_before, "atoms_after": atoms_after,
         "net_charge_estimate": charge, "chains": chains, "list_version": hetatm.LIST_VERSION,
         "site_residues": sorted(site_res_ids),
+        # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
+        "status": "degraded" if rep.dropped else "ok", "dropped_residues": rep.dropped,
     }
     return ReceptorResult(final, rigid, flex, ligands, report)

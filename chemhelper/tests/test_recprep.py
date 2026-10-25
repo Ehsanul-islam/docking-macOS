@@ -251,3 +251,33 @@ def test_helper_subprocesses_run_offline(tmp_path):
     from dockchem.recprep import _run
     r = _run([sys.executable, "-c", "import os,urllib.request as u;print(u.getproxies().get('https'))"], tmp_path)
     assert r.stdout.strip() == "http://127.0.0.1:9"
+
+
+def test_dropped_residues_are_recorded_for_degraded_status(tmp_path):
+    from dockchem.recprep import _Report, _drop_untemplated
+    src = tmp_path / "in.pdb"
+    src.write_text("ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+                   "ATOM      2  N   XYZ A   2       3.000   0.000   0.000  1.00  0.00           N\n")
+    rep = _Report()
+    _drop_untemplated(src, tmp_path / "out.pdb", rep)
+    assert rep.dropped == [{"residue": "A:XYZ2", "reason": "no bundled Meeko template"}]
+
+
+def test_clean_run_reports_ok_status(prepared):
+    assert prepared.report["status"] == "ok" and prepared.report["dropped_residues"] == []
+
+
+def test_hetatm_amino_acid_is_ligand_not_receptor(tmp_path):
+    """3CPA regression: a bound Gly-Tyr inhibitor (HETATM) must not join the protein chain."""
+    st = peptide_structure()
+    ch = st[0][0]
+    donor = ch[3]
+    import copy as _c
+    het = _c.copy(donor); het.seqid = gemmi.SeqId(501, " "); het.het_flag = "H"
+    for a in het:
+        a.pos = gemmi.Position(a.pos.x + 30, a.pos.y, a.pos.z)
+    ch.add_residue(het)
+    p = tmp_path / "t.pdb"; st.write_pdb(str(p))
+    r = prepare_receptor(p, tmp_path / "o")
+    out = gemmi.read_pdb_string(r.pdb.read_text())
+    assert len(out[0]) == 1 and max(res.seqid.num for res in out[0][0]) < 100      # 501 not in the chain
