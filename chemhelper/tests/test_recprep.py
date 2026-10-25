@@ -391,3 +391,79 @@ def test_pdb2pqr_crash_on_truncated_n_terminal_proline_falls_back_to_pdbfixer_re
     assert any("missing heavy atoms were added by PDBFixer" in w for w in res.report["warnings"])
     pro = [l for l in open(res.pdb) if l[17:20] == "PRO" and l[22:26].strip() == "1"]
     assert {"CG", "CD"} <= {l[12:16].strip() for l in pro}
+
+
+# ---- site-aware triage of what cannot be written to the receptor ------------------------------------
+
+def _with_extra(*extras):
+    """decorated structure plus hetero groups placed relative to the ligand: (resname, [(name, el, (dx,dy,dz))], seq)."""
+    from fixtures import _add_het
+    st = decorated_structure()
+    ch = st[0][0]
+    lig = next(r for r in ch if r.name == "LIG")
+    o = lig["C1"][0].pos
+    for resname, atoms, seq, far in extras:
+        base = (o.x + 40, o.y, o.z) if far else (o.x, o.y, o.z)
+        _add_het(ch, resname, [(n, el, (base[0] + d[0], base[1] + d[1], base[2] + d[2])) for n, el, d in atoms], seq)
+    return st
+
+
+HEME = ("HEM", [("FE", "Fe", (2, -3, 0)), ("NA", "N", (3.5, -3, 0)), ("C1A", "C", (4.5, -2, 0)), ("C2A", "C", (4.5, -4, 0))], 501, False)
+
+
+def test_metal_cofactor_at_the_site_is_refused_with_the_reason(tmp_path):
+    from dockchem.errors import UnusableStructure
+    src = tmp_path / "heme.pdb"
+    _with_extra(HEME).write_pdb(str(src))
+    with pytest.raises(UnusableStructure, match="HEM.*metal complex") as e:
+        prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG"))
+    rpc = e.value.to_rpc()["data"]["assessment"]
+    assert rpc["findings"][0]["code"] == "unsupported_site_cofactor" and "A:HEM501" in rpc["findings"][0]["residues"]
+
+
+def test_override_prepares_it_anyway_and_reports_degraded_at_site(tmp_path):
+    src = tmp_path / "heme.pdb"
+    _with_extra(HEME).write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG", allow_unusable=True))
+    d = [x for x in res.report["dropped_residues"] if "HEM" in x["residue"]]
+    assert d and d[0]["at_site"] is True and d[0]["distance_to_site"] <= 8
+    assert res.report["status"] == "degraded"
+    assert any("prepared on request although the binding site contains" in w for w in res.report["warnings"])
+
+
+def test_single_iron_ion_is_supported_cobalt_is_not(tmp_path):
+    from dockchem.errors import UnusableStructure
+    fe = ("FE2", [("FE", "Fe", (2, -3, 0))], 502, False)
+    src = tmp_path / "fe.pdb"
+    _with_extra(fe).write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG"))
+    assert res.report["status"] == "ok"
+    assert any(l[17:20] == "FE2" and l[77:79].strip() == "Fe" for l in open(res.pdbqt))
+    co = ("CO", [("CO", "Co", (2, -3, 0))], 503, False)
+    src2 = tmp_path / "co.pdb"
+    _with_extra(co).write_pdb(str(src2))
+    with pytest.raises(UnusableStructure, match="Co has no AutoDock atom type"):
+        prepare_receptor(src2, tmp_path / "o2", ReceptorPrepOptions(reference_ligand="LIG"))
+
+
+def test_far_left_out_sugar_is_noted_and_status_stays_ok(tmp_path):
+    nag = ("NAG", [("C1", "C", (0, 0, 0)), ("C2", "C", (1.5, 0, 0)), ("O3", "O", (2.2, 1.2, 0))], 504, True)
+    src = tmp_path / "nag.pdb"
+    _with_extra(nag).write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG"))
+    d = [x for x in res.report["dropped_residues"] if "NAG" in x["residue"]]
+    assert d and d[0]["at_site"] is False and d[0]["distance_to_site"] > 30
+    assert res.report["status"] == "ok"
+
+
+def test_without_a_site_nothing_can_be_judged_so_it_stays_degraded(tmp_path):
+    st = peptide_structure()
+    for r in st[0][0]:
+        if r.seqid.num == 8:
+            for i in reversed(range(len(r))):
+                if r[i].name != "N":
+                    del r[i]
+    src = tmp_path / "stub.pdb"
+    st.write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert res.report["dropped_residues"][0]["at_site"] is None and res.report["status"] == "degraded"

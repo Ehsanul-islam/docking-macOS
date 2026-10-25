@@ -188,6 +188,41 @@ def _is_backbone_stub(res) -> str | None:
     return None
 
 
+AD4_METALS = {"Mg": "Mg", "Ca": "Ca", "Mn": "Mn", "Fe": "Fe", "Zn": "Zn"}   # Meeko's AD4 typing (ad4_types.json)
+ORGANIC = {"C", "N", "O", "S", "P", "F", "Cl", "Br", "I", "B"}
+SITE_IMPACT_RADIUS = 8.0     # A: something left out this close to the site can change a docking result
+
+
+def _unsupported_reason(res) -> str | None:
+    """Why a kept hetero group cannot be written to the receptor PDBQT, or None if it can."""
+    els = {a.element.name for a in res if a.element.name != "H"}
+    odd = els - ORGANIC
+    if not odd:
+        return None
+    if len(res) == 1:
+        el = next(iter(els))
+        return None if el in AD4_METALS else f"{el} has no AutoDock atom type"
+    return f"{res.name} is a metal complex ({', '.join(sorted(odd))}); metal cofactors cannot be represented yet"
+
+
+def _annotate_dropped(rep, model, site_pos) -> None:
+    """Add distance_to_site / at_site to every left-out residue. Without a site nothing can be judged: unknown."""
+    index = {}
+    for ch in model:
+        for res in ch:
+            index.setdefault((ch.name, f"{res.seqid.num}{res.seqid.icode.strip()}"), []).append(res)
+    for d in rep.dropped:
+        chain, _, rest = d["residue"].partition(":")
+        m = re.search(r"(-?\d+[A-Za-z]?)$", rest)
+        found = index.get((chain, m.group(1))) if m else None
+        if site_pos and found:
+            dist = min(_min_dist(r, site_pos) for r in found)
+            d["distance_to_site"] = round(dist, 1)
+            d["at_site"] = dist <= SITE_IMPACT_RADIUS
+        else:
+            d["distance_to_site"], d["at_site"] = None, None
+
+
 def _find_reference(model, spec):
     if not spec:
         return []
@@ -637,6 +672,12 @@ def _settle_pending_het(rep, out: Path | None, serial: int = 0) -> None:
             continue
         try:
             seq = int(re.match(r"-?\d+", num).group())
+            if len(lines) == 1 and lines[0][76:78].strip().capitalize() in AD4_METALS:    # single ion with an AD4 type
+                el = lines[0][76:78].strip().capitalize()
+                serial = recwriter.append_hetero(out, ch, name, seq, [(lines[0][12:16].strip() or el, (
+                    float(lines[0][30:38]), float(lines[0][38:46]), float(lines[0][46:54])), AD4_METALS[el])], serial)
+                typed.append(f"{ch}:{name}{num}")
+                continue
             atoms, warns = recwriter.type_hetero_group("\n".join(lines) + "\nEND\n", name, ch, seq)
             serial = recwriter.append_hetero(out, ch, name, seq, atoms, serial)
             typed.append(f"{ch}:{name}{num}")
@@ -1000,6 +1041,19 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             else:
                 rep.change("hetatm", rid, f"removed ({cls})", "additive / outside site / unselected chain", "gemmi+hetatm")
 
+    blockers = [(c, r, why) for c, r in het_out if (why := _unsupported_reason(r))
+                and site_pos and _min_dist(r, site_pos) <= SITE_IMPACT_RADIUS]
+    if blockers:
+        names = ", ".join(f"{_rid(c, r)} ({why})" for c, r, why in blockers[:4])
+        msg = (f"the binding site contains a group that this version cannot represent: {names}. Docking into a "
+               "pocket missing it would give misleading results")
+        if not opts.allow_unusable:
+            raise UnusableStructure(msg + " (set allow_unusable to prepare it anyway)", {
+                "verdict": "unusable", "summary": msg,
+                "findings": [{"severity": "block", "code": "unsupported_site_cofactor", "message": msg,
+                              "residues": [_rid(c, r) for c, r, _ in blockers]}], "stats": {}})
+        rep.warn("prepared on request although " + msg)
+
     # write ligands before editing
     for lig in ligands:
         lig_st = gemmi.Structure()
@@ -1194,6 +1248,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         rigid, flex = _write_pdbqt(meeko_in, outdir / "receptor", opts, rep)
         stagecheck.check_pdbqt(meeko_in.read_text(), rigid, rep.dropped, flex)
 
+    _annotate_dropped(rep, model, site_pos)
     final_model = gemmi.read_pdb_string(final.read_text())[0]
     atoms_after = sum(len(r) for ch in final_model for r in ch)
     charge = 0
@@ -1208,7 +1263,9 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "net_charge_estimate": charge, "chains": chains, "list_version": hetatm.LIST_VERSION,
         "site_residues": sorted(site_res_ids),
         # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
-        "status": "degraded" if rep.dropped else "ok", "dropped_residues": rep.dropped,
+        # Left-out residues far from the site (sugars, stubs) do not change what is docked: noted, status stays ok.
+        "status": "degraded" if any(d.get("at_site") is not False for d in rep.dropped) else "ok",
+        "dropped_residues": rep.dropped,
         "assessment": assessment, "pdbqt": rep.pdbqt_info, "chain_map": chain_map,
     }
     return ReceptorResult(final, rigid, flex, ligands, report)
