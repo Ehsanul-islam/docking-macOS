@@ -40,7 +40,9 @@ class ReceptorPrepOptions:
     water_keep_radius: float | None = None     # None = remove all waters
     hetatm_overrides: dict = field(default_factory=dict)   # resname -> class
     nonstandard: str = "map"                   # map | remove
-    fix_missing_atoms: bool = True
+    # Who rebuilds missing heavy atoms: PDB2PQR (default), PDBFixer, or nobody. PDBFixer's rebuild of
+    # heavily truncated residues was geometrically unreliable on real entries (1CLL, 1EMA).
+    rebuild_missing_atoms: str = "pdb2pqr"      # pdb2pqr | pdbfixer | none
     model_loops_max: int = 0                   # model internal gaps up to N residues (0 = flag only)
     ph: float = 7.4
     optimize_flips: bool = True
@@ -207,14 +209,14 @@ def _pdbfixer(pdb_text, opts, rep):
                 rep.change("nonstandard", f"{res.chain.id}:{res.name}{res.id}", f"mapped to {repl}",
                            "non-standard residue mapped to parent", "PDBFixer")
             fixer.replaceNonstandardResidues()
-    if opts.fix_missing_atoms:
+    if opts.rebuild_missing_atoms == "pdbfixer":
         fixer.findMissingAtoms()
         for res, atoms in fixer.missingAtoms.items():
             rep.change("missing_atoms", f"{res.chain.id}:{res.name}{res.id}",
                        "added " + ",".join(a.name for a in atoms), "incomplete side chain", "PDBFixer")
-        for res, atoms in fixer.missingTerminals.items():
-            rep.change("missing_atoms", f"{res.chain.id}:{res.name}{res.id}",
-                       "added " + ",".join(atoms), "missing terminal atoms", "PDBFixer")
+        # Terminal atoms (OXT) are left to PDB2PQR: PDBFixer's OXT placement can be badly off when the
+        # carboxylate O is displaced (seen on real entries, e.g. 1CA2), which breaks Meeko's bonding.
+        fixer.missingTerminals = {}
         fixer.addMissingAtoms(seed=0)
     out = io.StringIO()
     PDBFile.writeFile(fixer.topology, fixer.positions, out, keepIds=True)
@@ -248,6 +250,14 @@ def _ver(pkg):
         return "unknown"
 
 
+def _heavy_atoms(pdb_text):
+    out = {}
+    for line in pdb_text.splitlines():
+        if line.startswith("ATOM") and line[76:78].strip() != "H" and not line[12:16].strip().startswith("H"):
+            out.setdefault((line[21], line[22:27].strip()), set()).add(line[12:16].strip())
+    return out
+
+
 def _residue_names(pdb_text):
     out = {}
     for line in pdb_text.splitlines():
@@ -262,7 +272,8 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep) -> bool:
         from openmm import app, unit
         pdb = app.PDBFile(str(pdb_in))
         ff = app.ForceField("amber14-all.xml", "implicit/gbn2.xml")
-        system = ff.createSystem(pdb.topology, nonbondedMethod=app.NoCutoff, constraints=None)
+        system = ff.createSystem(pdb.topology, nonbondedMethod=app.CutoffNonPeriodic,
+                                 nonbondedCutoff=1.5 * unit.nanometer, constraints=None)
         rest = mm.CustomExternalForce("0.5*k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
         rest.addGlobalParameter("k", RESTRAINT_K * unit.kilojoule_per_mole / unit.nanometer**2)
         for p in ("x0", "y0", "z0"):
@@ -275,9 +286,20 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep) -> bool:
                              mm.Platform.getPlatformByName("CPU"))
         sim.context.setPositions(pdb.positions)
         sim.minimizeEnergy(maxIterations=500)
-        with open(pdb_out, "w") as f:
-            app.PDBFile.writeFile(pdb.topology, sim.context.getState(getPositions=True).getPositions(), f,
-                                  keepIds=True)
+        buf = io.StringIO()
+        app.PDBFile.writeFile(pdb.topology, sim.context.getState(getPositions=True).getPositions(), buf,
+                              keepIds=True)
+        # OpenMM standardises HID/HIE/HIP, ASH, GLH, LYN, CYX... to their parent names; restore ours so
+        # the protonation states survive into Meeko.
+        names = _residue_names(pdb_in.read_text())
+        lines = []
+        for line in buf.getvalue().splitlines():
+            if line.startswith(("ATOM", "HETATM")):
+                nm = names.get((line[21], line[22:27].strip()))
+                if nm:
+                    line = line[:17] + nm.ljust(3) + line[20:]
+            lines.append(line)
+        pdb_out.write_text("\n".join(lines) + "\n")
         rep.change("minimization", "all", "restrained minimisation of hydrogens and side-chain strain",
                    "user requested; heavy atoms restrained (10 kcal/mol/A^2)", "OpenMM")
         rep.tools.append(record("openmm", _ver("openmm"), {"ff": "amber14+gbn2", "restraint_k_kj_mol_nm2": RESTRAINT_K}))
@@ -285,6 +307,35 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep) -> bool:
     except Exception as e:  # noqa: BLE001
         rep.warn(f"minimisation skipped: {e}")
         return False
+
+
+def _meeko_templates() -> set:
+    import json
+    import meeko
+    path = Path(meeko.__file__).parent / "data" / "residue_chem_templates.json"
+    return set(json.loads(path.read_text())["residue_templates"])
+
+
+def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
+    """Remove residues Meeko has no bundled template for. Without this Meeko tries to download the
+    definition from RCSB, which breaks offline use and the local-first rule (plan principle 5)."""
+    templates = _meeko_templates()
+    dropped, lines = {}, []
+    for line in src.read_text().splitlines():
+        if line.startswith(("ATOM", "HETATM")):
+            name = line[17:20].strip()
+            if name not in templates:
+                dropped.setdefault((line[21], line[22:27].strip(), name), 0)
+                dropped[(line[21], line[22:27].strip(), name)] += 1
+                continue
+        lines.append(line)
+    for (ch, num, name), n in dropped.items():
+        rep.warn(f"{ch}:{name}{num} left out of the PDBQT: no bundled Meeko template "
+                 f"({n} atoms); Meeko would otherwise download it from RCSB")
+    if not dropped:
+        return src
+    dst.write_text("\n".join(lines) + "\n")
+    return dst
 
 
 def _meeko(pdb_path: Path, base: Path, opts, rep):
@@ -301,7 +352,8 @@ def _meeko(pdb_path: Path, base: Path, opts, rep):
             hint = " (hydrogen clash left by PDB2PQR?)" if "valence" in (r.stdout + r.stderr) else ""
             raise ToolFailure("Meeko receptor preparation failed" + hint, log=r.stdout + r.stderr)
         deleted = True
-        rep.warn("residue(s) without Meeko templates were left out of the PDBQT (see log)")
+        for key in sorted(set(re.findall(r"No template matched for residue_key='([^']+)'", r.stdout + r.stderr))):
+            rep.warn(f"residue {key} left out of the PDBQT: no Meeko template matched (clashes or unusual atoms)")
         r = r2
     rep.tools.append(record("meeko", _ver("meeko"), {"flex": opts.flex_residues, "delete_bad_res": deleted}))
     if opts.flex_residues:
@@ -315,6 +367,24 @@ def _meeko(pdb_path: Path, base: Path, opts, rep):
     return out, None
 
 
+H_CONTACT_CUTOFF = 1.3     # non-adjacent-residue contact at or below this is read as a bond by Meeko
+
+
+def _close_contacts(pdb_text: str, cutoff: float = H_CONTACT_CUTOFF) -> list[str]:
+    st = gemmi.read_pdb_string(pdb_text)
+    ns = gemmi.NeighborSearch(st[0], st.cell, 5).populate()
+    cs = gemmi.ContactSearch(cutoff)
+    cs.ignore = gemmi.ContactSearch.Ignore.AdjacentResidues
+    out = []
+    for r in cs.find_contacts(ns):
+        a, b = r.partner1, r.partner2
+        if a.atom.name == "SG" and b.atom.name == "SG":      # disulfide
+            continue
+        out.append(f"{a.chain.name}:{a.residue.name}{a.residue.seqid.num}.{a.atom.name} - "
+                   f"{b.chain.name}:{b.residue.name}{b.residue.seqid.num}.{b.atom.name} ({r.dist:.2f} A)")
+    return out
+
+
 def _clashes(pdb_text, rep):
     st = gemmi.read_pdb_string(pdb_text)
     st.remove_hydrogens()
@@ -323,6 +393,8 @@ def _clashes(pdb_text, rep):
     cs = gemmi.ContactSearch(CLASH_CUTOFF)
     cs.ignore = gemmi.ContactSearch.Ignore.AdjacentResidues
     for r in cs.find_contacts(ns):
+        if r.partner1.atom.name == "SG" and r.partner2.atom.name == "SG":      # disulfide bond, not a clash
+            continue
         key = tuple(sorted((r.partner1.residue.name + str(r.partner1.residue.seqid.num),
                             r.partner2.residue.name + str(r.partner2.residue.seqid.num))))
         if key not in seen:
@@ -363,7 +435,12 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
     partial_occ = {_rid(ch.name, r) for ch in model for r in ch if any(a.occ < 1.0 for a in r)}
     _collapse_altlocs(model, rep)
 
-    refs = _find_reference(model, opts.reference_ligand)
+    refs_all = _find_reference(model, opts.reference_ligand)
+    refs = refs_all[:1]
+    if len(refs_all) > 1:
+        rep.warn(f"{len(refs_all)} copies of {opts.reference_ligand} found; site defined by "
+                 f"{_rid(refs[0][0], refs[0][1])}; others: "
+                 + ", ".join(_rid(c, r) for c, r in refs_all[1:]) + " (plan §8.2: pick one)")
     ref_pos = [a.pos for _, r in refs for a in r]
     if opts.reference_ligand and not refs:
         raise InvalidInput(f"reference ligand {opts.reference_ligand} not found")
@@ -394,7 +471,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
 
     # classify heteroatom groups
     site_pos = ref_pos
-    ligands, kept_het = [], []
+    ref_keys = {(c, r.name, r.seqid.num, r.seqid.icode) for c, r in refs}
+    ligands = []
     het_out: list[tuple[str, gemmi.Residue]] = []
     for ch in model:
         for res in ch:
@@ -410,8 +488,10 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                     het_out.append((ch.name, res))
                     rep.change("waters", rid, "kept", f"within {opts.water_keep_radius:g} A of ligand", "gemmi")
                 continue
-            if cls == "ligand":
-                if any(res is r for _, r in refs) or not refs:
+            is_ref = (ch.name, res.name, res.seqid.num, res.seqid.icode) in ref_keys
+            if is_ref or cls == "ligand":
+                # The reference ligand is always extracted, even if its name is on a cofactor list.
+                if is_ref or not refs:
                     ligands.append({"chain": ch.name, "resname": res.name, "seq": res.seqid.num,
                                     "heavy_atoms": _heavy(res)})
                 rep.change("hetatm", rid, "removed from receptor", "ligand of interest (kept as separate file)", "gemmi+hetatm")
@@ -488,10 +568,17 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         td = Path(td)
         fixed = _pdbfixer(poly.make_pdb_string(), opts, rep)
         (td / "fixed.pdb").write_text(fixed)
-        rep.tools.append(record("pdbfixer", _ver("pdbfixer"), {"missing_atoms": opts.fix_missing_atoms}))
+        rep.tools.append(record("pdbfixer", _ver("pdbfixer"), {"rebuild_missing_atoms": opts.rebuild_missing_atoms}))
         before = _residue_names(fixed)
         prot = _pdb2pqr(td / "fixed.pdb", opts, rep, td)
         prot_text = prot.read_text()
+        if opts.rebuild_missing_atoms == "pdb2pqr":
+            old_h, new_h = _heavy_atoms(fixed), _heavy_atoms(prot_text)
+            for key, names in new_h.items():
+                added = sorted(names - old_h.get(key, set()))
+                if added:
+                    rep.change("missing_atoms", f"{key[0]}:{before.get(key, '?')}{key[1]}",
+                               "added " + ",".join(added), "missing heavy/terminal atoms", "PDB2PQR")
         for key, new in _residue_names(prot_text).items():
             old = before.get(key)
             if old and old != new:
@@ -506,6 +593,20 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                 final.write_text(prot_text)
         else:
             final.write_text(prot_text)
+            bad = _close_contacts(prot_text)
+            if bad:
+                # PDB2PQR can leave hydrogens on top of acceptors (salt bridges); Meeko then reads them as
+                # bonds. Repair with restrained minimisation (heavy atoms held) rather than failing or
+                # silently deleting residues. Deviates from "minimisation off by default" (plan §5.1).
+                rep.warn(f"{len(bad)} implausibly close contact(s) after hydrogen placement, first: {bad[0]}")
+                if _minimize(prot, final, rep):
+                    rep.changes[-1].update(stage="hydrogen_repair",
+                                           reason=f"{len(bad)} contact(s) <= {H_CONTACT_CUTOFF} A would be read as bonds by Meeko")
+                    left = _close_contacts(final.read_text())
+                    if left:
+                        rep.warn(f"{len(left)} close contact(s) remain after repair, first: {left[0]}")
+                else:
+                    final.write_text(prot_text)
         _clashes(final.read_text(), rep)
 
         # merge kept hetero groups back for Meeko
@@ -525,6 +626,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             meeko_in = td / "for_meeko.pdb"
         else:
             meeko_in = final
+        meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep)
         rigid, flex = _meeko(meeko_in, outdir / "receptor", opts, rep)
 
     final_model = gemmi.read_pdb_string(final.read_text())[0]

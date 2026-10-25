@@ -1,5 +1,7 @@
 import copy
 
+import gemmi
+
 import pytest
 
 from dockchem.errors import InvalidInput
@@ -76,8 +78,9 @@ def test_missing_atoms_rebuilt(tmp_path):
     for n in [a.name for a in res if a.name not in ("N", "CA", "C", "O", "CB")]:
         res.remove_atom(n, "*")
     p = tmp_path / "t.pdb"; st.write_pdb(str(p))
-    r = prepare_receptor(p, tmp_path / "o")
-    assert any("added" in c["change"] for c in changes(r, "missing_atoms"))
+    for mode, tool in (("pdb2pqr", "PDB2PQR"), ("pdbfixer", "PDBFixer")):
+        r = prepare_receptor(p, tmp_path / mode, ReceptorPrepOptions(rebuild_missing_atoms=mode))
+        assert any("added" in c["change"] and c["tool"] == tool for c in changes(r, "missing_atoms")), mode
 
 
 def test_altloc_highest_occupancy(tmp_path):
@@ -148,3 +151,61 @@ def test_mmcif_input(tmp_path):
     st.make_mmcif_document().write_file(str(tmp_path / "t.cif"))
     r = prepare_receptor(tmp_path / "t.cif", tmp_path / "o")
     assert r.pdbqt.exists()
+
+
+# ---- regressions found by running real PDB entries (tools/prep_reference) -------------------------
+def test_reference_ligand_extracted_even_if_name_is_a_cofactor(tmp_path):
+    st = decorated_structure()
+    for res in st[0][0]:
+        if res.name == "LIG":
+            res.name = "BTN"                       # biotin is on the cofactor list; 1STP regression
+    p = tmp_path / "t.pdb"; st.write_pdb(str(p))
+    r = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(reference_ligand="BTN"))
+    assert r.ligands and r.ligands[0]["resname"] == "BTN"
+    assert "BTN" not in r.pdb.read_text()
+
+
+def test_multiple_ligand_copies_use_first_and_warn(tmp_path):
+    st = decorated_structure()
+    ch = st[0][0]
+    lig = [r for r in ch if r.name == "LIG"][0]
+    copy = gemmi.Residue(); copy.name, copy.seqid, copy.het_flag = "LIG", gemmi.SeqId(102, " "), "H"
+    for a in lig:
+        b = copy_atom(a); b.pos = gemmi.Position(a.pos.x + 60, a.pos.y, a.pos.z); copy.add_atom(b)
+    ch.add_residue(copy)
+    p = tmp_path / "t.pdb"; st.write_pdb(str(p))
+    r = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG"))
+    assert any("2 copies of LIG" in w for w in r.report["warnings"])
+    assert all(s.startswith("A:") for s in r.report["site_residues"])
+
+
+def copy_atom(a):
+    import copy as _c
+    return _c.copy(a)
+
+
+def test_close_contacts_ignores_disulfides_and_flags_buried_hydrogen():
+    from dockchem.recprep import _close_contacts
+    ss = ("ATOM      1  SG  CYX A   1       0.000   0.000   0.000  1.00  0.00           S\n"
+          "ATOM      2  SG  CYX A   5       2.050   0.000   0.000  1.00  0.00           S\n")
+    assert _close_contacts(ss) == []
+    bad = ("ATOM      1  OE1 GLU A   1       0.000   0.000   0.000  1.00  0.00           O\n"
+           "ATOM      2  HZ2 LYS A   5       0.830   0.000   0.000  1.00  0.00           H\n")
+    assert len(_close_contacts(bad)) == 1
+
+
+def test_minimisation_preserves_protonation_state_names(tmp_path):
+    p = tmp_path / "t.pdb"; peptide_structure().write_pdb(str(p))
+    r = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(minimize=True))
+    names = {l[17:20] for l in r.pdb.read_text().splitlines() if l.startswith("ATOM")}
+    assert names & {"HID", "HIE", "HIP"} and "HIS" not in names
+
+
+def test_untemplated_residue_is_dropped_with_warning_not_downloaded(tmp_path):
+    from dockchem.recprep import _Report, _drop_untemplated
+    src = tmp_path / "in.pdb"
+    src.write_text("ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+                   "ATOM      2  N   XYZ A   2       3.000   0.000   0.000  1.00  0.00           N\n")
+    rep = _Report()
+    out = _drop_untemplated(src, tmp_path / "out.pdb", rep)
+    assert "XYZ" not in out.read_text() and any("XYZ" in w for w in rep.warnings)
