@@ -6,26 +6,29 @@ wrong molecules (imatinib came out saturated, biotin's acid became a gem-diol), 
 guess. A ligand gets bond orders from exactly one of:
 
   1. a SMILES supplied by the user,
-  2. the bundled dictionary (`data/ligand_dictionary.json`), whose entries were each validated against a
-     real crystal ligand, or
+  2. the wwPDB Chemical Component Dictionary subset (`data/ccd_ligands.json.gz`, ~51k components, public
+     domain), matched on connectivity to the structure's actual atoms, or
   3. perception from geometry + net charge, only when the file already contains hydrogens.
 
 Otherwise NeedsTemplate is raised, saying what to supply.
 """
 from __future__ import annotations
 
+import gzip
 import json
+import re
 from collections import Counter
+from functools import lru_cache
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import gemmi
-from rdkit import Chem
+from rdkit import Chem, RDLogger
 from rdkit.Chem import AllChem, rdDetermineBonds
 
 from .errors import InvalidInput, NeedsTemplate
 
-DICT_PATH = Path(__file__).parent / "data" / "ligand_dictionary.json"
+CCD_PATH = Path(__file__).parent / "data" / "ccd_ligands.json.gz"
 TRUST = "_bond_orders_trusted"          # mol property: "1" established, "0" unknown
 SOURCE = "_bond_orders_source"
 
@@ -33,6 +36,7 @@ SOURCE = "_bond_orders_source"
 DOUBLE_RANGES = {("C", "O"): (1.10, 1.34), ("C", "N"): (1.18, 1.42), ("C", "C"): (1.26, 1.46),
                  ("O", "P"): (1.38, 1.62), ("O", "S"): (1.36, 1.60), ("N", "O"): (1.14, 1.34)}
 AUDIT_SLACK = 0.12
+METAL_SYMBOLS = {"FE", "ZN", "MG", "MN", "CU", "CO", "NI", "CD", "HG", "MO", "W", "PT", "RU", "CA", "NA", "K"}
 
 
 @dataclass
@@ -43,8 +47,21 @@ class ResolvedLigand:
     audit: list[str] = field(default_factory=list)
 
 
-def load_dictionary() -> dict:
-    return json.loads(DICT_PATH.read_text())["entries"]
+@lru_cache(maxsize=1)
+def _ccd() -> dict:
+    if not CCD_PATH.is_file():
+        return {"entries": {}}
+    with gzip.open(CCD_PATH, "rt", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def ccd_entry(resname: str) -> dict | None:
+    return _ccd()["entries"].get(resname.upper())
+
+
+def ccd_info() -> dict:
+    d = _ccd()
+    return {k: d.get(k, "") for k in ("source", "last_modified", "built", "count")}
 
 
 def mark_untrusted(mol: Chem.Mol) -> Chem.Mol:
@@ -135,12 +152,15 @@ def apply_template(mol: Chem.Mol, smiles: str, resname: str, source: str) -> Che
             "the file, covalently modified, or the template may be for a different molecule.",
             resname, "smiles")
     mol.UpdatePropertyCache(strict=False)
+    RDLogger.DisableLog("rdApp.*")             # "more than one matching pattern": symmetric atoms, harmless
     try:
         assigned = AllChem.AssignBondOrdersFromTemplate(template, mol)
     except Exception as e:  # noqa: BLE001
         raise NeedsTemplate(
             f"{resname}: the template does not match the structure's connectivity ({e}). Check the SMILES.",
             resname, "smiles") from e
+    finally:
+        RDLogger.EnableLog("rdApp.*")
     # Hydrogens with coordinates, so explicit-H geometry matches the crystal heavy atoms.
     Chem.SanitizeMol(assigned)
     out = Chem.AddHs(assigned, addCoords=True)
@@ -162,6 +182,40 @@ def _perceive_with_charge(mol: Chem.Mol, charge: int, resname: str) -> Chem.Mol:
     return _finish(m, "perceived_with_charge")
 
 
+def _apply_ccd(mol: Chem.Mol, entry: dict, resname: str) -> tuple[Chem.Mol, str, list[str]]:
+    """Try each CCD SMILES for this component until one fits the structure's atoms."""
+    reasons = []
+    # formula tokens look like "C34", "Fe", "N4": strip the counts before comparing with metal symbols
+    metal = any(re.sub(r"\d+$", "", tok).upper() in METAL_SYMBOLS for tok in entry["f"].split())
+    for smi in entry["s"]:
+        RDLogger.DisableLog("rdApp.*")          # RDKit prints a parse error per unparseable organometallic SMILES
+        try:
+            parsed = Chem.MolFromSmiles(smi)
+        finally:
+            RDLogger.EnableLog("rdApp.*")
+        if parsed is None:
+            reasons.append("RDKit cannot parse the dictionary SMILES")
+            continue
+        try:
+            out = apply_template(mol, smi, resname, f"ccd:{resname}")
+        except NeedsTemplate as e:
+            reasons.append(e.message)
+            continue
+        info = ccd_info()
+        return out, f"ccd:{resname}", [
+            f"bond orders for {resname} ({entry['n'].title()}) come from the wwPDB Chemical Component "
+            f"Dictionary (file dated {info['last_modified'] or info['built']}); protonation state is the "
+            "dictionary's reference form"]
+    if metal:
+        raise NeedsTemplate(
+            f"{resname} ({entry['n'].title()}) is a metal complex. Metal coordination is not supported: the "
+            "scoring functions model it poorly and bond orders around the metal are ambiguous.", resname, "none")
+    raise NeedsTemplate(
+        f"{resname} ({entry['n'].title()}) is in the Chemical Component Dictionary, but its definition does not "
+        f"fit the atoms in this file: {reasons[0]} Typical causes: atoms missing from the structure, a covalent "
+        "link to the protein, or a metal. Supply a SMILES for exactly the atoms present.", resname, "smiles")
+
+
 def ligand_from_structure(path: str | Path, resname: str, chain: str | None = None, seq: int | None = None,
                           smiles: str | None = None, charge: int | None = None) -> ResolvedLigand:
     """Establish bond orders for a ligand in a structure file, or raise NeedsTemplate."""
@@ -169,17 +223,15 @@ def ligand_from_structure(path: str | Path, resname: str, chain: str | None = No
     if smiles:
         out, source = apply_template(mol, smiles, resname, "user_smiles"), "user_smiles"
     else:
-        entry = load_dictionary().get(resname)
-        if entry:
-            out = apply_template(mol, entry["smiles"], resname, f"dictionary:{resname}")
-            source = f"dictionary:{resname}"
-            warns.append(f"bond orders and protonation state for {resname} come from the bundled dictionary "
-                         f"({entry.get('protonation', 'neutral form')})")
+        ccd = ccd_entry(resname)
+        if ccd:
+            out, source, w = _apply_ccd(mol, ccd, resname)
+            warns += w
         elif charge is not None:
             out, source = _perceive_with_charge(mol, charge, resname), "perceived_with_charge"
         else:
             raise NeedsTemplate(
-                f"{resname} is not in the bundled ligand dictionary, so its bond orders are unknown. "
+                f"{resname} is not in the bundled ligand dictionaries, so its bond orders are unknown. "
                 "Supply a SMILES (or, if the file contains hydrogens, the net charge).", resname, "smiles")
     audit = audit_bond_lengths(out)
     if audit:

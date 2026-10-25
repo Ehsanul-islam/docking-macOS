@@ -38,28 +38,36 @@ ligand pipeline prepared them anyway (imatinib 1IEP became a saturated molecule;
 gem-diol), returning only a "warning". Fixed:
 
 - Molecules read from PDB-style files are flagged *untrusted*. `prepare_ligand` and the SDF/MOL/MOL2/SMILES writers
-  refuse them with a typed `NeedsTemplate` error.
+  refuse them with a typed `NeedsTemplate` error (`needs`: `smiles` or `none`).
 - `ligand.from_structure` (module `ligand_templates`) establishes bond orders from exactly one source:
-  user SMILES > bundled dictionary > perception from net charge (only if the file already has hydrogens).
+  user SMILES > wwPDB Chemical Component Dictionary > perception from net charge (only if the file has hydrogens).
   Otherwise it raises `NeedsTemplate` saying what to supply. It never guesses.
 - Template matching checks heavy-atom composition and connectivity, takes stereochemistry from the crystal
   geometry (carbon centres only; 3D "stereo" on phosphates is an artefact), adds hydrogens with coordinates,
   and audits double-bond lengths.
 - `receptor.prepare` reports `bond_orders: resolved | needs_template` for each extracted ligand.
-- Bundled dictionary: 13 entries (STI, AQ4, BTN, BEN, CAU, ATP, GTP, GDP, NAD, NDP, AP5, CLR, BU1). Each was
-  validated against a real crystal ligand (`validated_on`); `tools/ligand_dictionary/build_dictionary.py` refuses to
-  ship an entry that does not match. CI re-validates every entry.
+- **CCD bundle:** `data/ccd_ligands.json.gz` (51,493 components, 4 MB, flat SMILES + formula + name; built by
+  `tools/ligand_dictionary/build_ccd.py` from components.cif.gz dated 2026-10-17). See docs/DATA_SOURCES.md.
+- The earlier hand-written 13-entry dictionary was cross-checked against the CCD (all 13 identical after
+  assignment) and then **removed**: one authoritative source is safer than two.
+
+**Results on the 50 supplied structures** (`ligand_from_structure` over every non-additive, non-metal HETATM group):
+27 of 62 ligand-in-entry cases resolve, all with a clean bond-length audit (imatinib, erlotinib, biotin, ATP, GTP,
+NAD(P), cholesterol, 0WN, 0WM, F09, P0G, TXL, TA1 ...). The 35 refusals are deliberate:
+
+| Reason | Examples | Why refused |
+|---|---|---|
+| Metal complex | HEM x9 | Fe coordination: bond orders ambiguous, Vina models metals poorly |
+| Atoms missing from the file | PLM, 12P, DGA, RET, PLP, CRO | capping a truncated ligand would invent a different molecule |
+| Covalently attached sugar (linking O absent) | NAG, MAN, BMA, GAL, FUC, FUL, NDG | not a free ligand; template has the extra glycosidic O |
 
 **Limits, stated plainly**
 
-- On your 50 entries 15 of 38 ligand cases resolve, but the dictionary was written from this same set, so that is
-  *not* a coverage estimate for arbitrary PDB ligands. It will be much lower. A full CCD snapshot (public domain,
-  wwPDB) is still needed; it could not be downloaded in the sandbox (RCSB blocked).
-- Not supported, and reported as `needs_template`: metal complexes (HEM), covalently bound or incomplete ligands
-  (RET, PLP, CRO), and anything not in the dictionary and without a user SMILES.
-- A net charge alone cannot establish bond orders for a hydrogen-free ligand (there is nothing to perceive from);
-  the earlier suggestion of a "net charge" fallback only works when the file has hydrogens.
+- Only ligands whose defining atoms are all present are resolved. An explicit "dock this truncated ligand anyway"
+  opt-in does not exist yet.
 - The bond-length audit catches gross misassignment, not tautomer errors (C=O vs C=N are within each other's range).
-- The dictionary stores one reference protonation state per ligand; ionisation at a chosen pH is not applied to
+- The CCD stores one reference protonation state per component; ionisation at a chosen pH is not applied to
   ligands that keep their crystal coordinates.
-- Dictionary SMILES were written by hand and validated against structures, not against the CCD itself.
+- The CCD snapshot is a point-in-time copy; the build script must be re-run to refresh it (record the date).
+- A net charge alone cannot establish bond orders for a hydrogen-free ligand; the charge route only works when the
+  file already has hydrogens.
