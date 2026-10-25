@@ -148,3 +148,17 @@ def test_unsupported_elements_can_be_allowed_with_a_warning():
 def test_counter_ions_are_stripped_before_the_element_check():
     r = prepare_ligand("CC(=O)[O-].[Na+]", "acetate")[0]
     assert r.status in ("prepared", "warning")
+
+
+def test_torn_embedding_is_refused_not_passed_on():
+    """CCD UUC (strained spiro-sulfur ring): the 3D embedding put an N-S 'bond' 9 A long."""
+    smi = "c1nc(c2c(n1)n(cn2)C3C(C(C(O3)COCC#Cc4nc5c(ncnc5n4C6C(C(C(O6)CNS78(CN7C8)(O)O)O)O)N)O)O)N"
+    r = prepare_ligand(smi, "UUC")[0]
+    assert r.status == "failed" and "implausible bond" in r.error
+
+
+def test_long_but_real_iodine_bonds_are_accepted():
+    r = prepare_ligand("[I-].[I-].[I-]", "tri", LigandPrepOptions(allow_unusual_elements=True))
+    assert r  # polyiodide input does not crash; real I-I bonds (2.7 A) must not trip the check
+    ok = prepare_ligand("IC(I)I", "iodoform")[0]
+    assert ok.status in ("prepared", "warning")

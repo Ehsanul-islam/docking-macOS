@@ -65,6 +65,7 @@ def work(item):
 
 
 def audit(r, heavy_in):
+    from rdkit import Chem
     problems = []
     mol = r.mol
     conf = mol.GetConformer()
@@ -74,11 +75,14 @@ def audit(r, heavy_in):
     dmin = min((xyz[i].Distance(xyz[j]) for i in range(len(xyz)) for j in range(i + 1, len(xyz))), default=9)
     if dmin < 0.6:
         problems.append(("overlapping_atoms", f"two atoms {dmin:.2f} A apart"))
-    bad_bonds = [(b.GetBeginAtom().GetSymbol(), b.GetEndAtom().GetSymbol(), round(xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]), 2))
+    pt = Chem.GetPeriodicTable()
+    bad_bonds = [(b.GetBeginAtom().GetSymbol(), b.GetEndAtom().GetSymbol(),
+                  round(xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]), 2))
                  for b in mol.GetBonds()
-                 if not 0.85 <= xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]) <= 2.3]
+                 if not 0.85 <= xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]) <= 1.5 * (
+                     pt.GetRcovalent(b.GetBeginAtom().GetAtomicNum()) + pt.GetRcovalent(b.GetEndAtom().GetAtomicNum()))]
     if bad_bonds:
-        problems.append(("implausible_bond_length", f"{len(bad_bonds)} bond(s) outside 0.85-2.3 A, e.g. {bad_bonds[0]}"))
+        problems.append(("implausible_bond_length", f"{len(bad_bonds)} bond(s) implausible, e.g. {bad_bonds[0]}"))
     heavy_out = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() > 1)
     stripped = any("salt" in s.lower() or "fragment" in s.lower() for s in r.steps + r.warnings)
     if heavy_out != heavy_in and not stripped:

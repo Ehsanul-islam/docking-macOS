@@ -176,6 +176,21 @@ def _min_separation(mol, cids) -> float:
     return min(float(pdist(mol.GetConformer(c).GetPositions()).min()) for c in cids) if mol.GetNumAtoms() > 1 else 9.0
 
 
+def _check_bond_lengths(mol, cids):
+    """A bond far longer than its covalent radii allow means the embedding tore the molecule apart."""
+    pt = Chem.GetPeriodicTable()
+    for c in cids:
+        conf = mol.GetConformer(c)
+        for b in mol.GetBonds():
+            i, j = b.GetBeginAtomIdx(), b.GetEndAtomIdx()
+            d = (conf.GetAtomPosition(i) - conf.GetAtomPosition(j)).Length()
+            limit = 1.5 * (pt.GetRcovalent(mol.GetAtomWithIdx(i).GetAtomicNum())
+                           + pt.GetRcovalent(mol.GetAtomWithIdx(j).GetAtomicNum()))
+            if d > limit:
+                raise InvalidInput(f"3D geometry has an implausible bond ({b.GetBeginAtom().GetSymbol()}-"
+                                   f"{b.GetEndAtom().GetSymbol()} {d:.2f} A): the embedding is not trustworthy")
+
+
 def _embed(mol, opts, steps, warnings):
     """Return (mol with Hs and conformer(s), ok)."""
     mh = Chem.AddHs(mol, addCoords=_has_3d(mol))
@@ -219,6 +234,7 @@ def _embed(mol, opts, steps, warnings):
         warnings.append("force-field minimisation collapsed atoms (hypervalent centre): using unrelaxed "
                         "distance-geometry coordinates")
         steps.append("3D: force-field result discarded, ETKDGv3 coordinates kept")
+    _check_bond_lengths(mh, cids)
     return mh
 
 
