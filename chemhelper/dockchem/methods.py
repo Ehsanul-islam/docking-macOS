@@ -160,6 +160,52 @@ def ligand_from_structure(params, srv):
                                                                             "source": r.source})}
 
 
+def _session(params):
+    import gemmi
+    from .selection import EditSession
+    try:
+        st = gemmi.read_structure(str(params["path"]))
+    except Exception as e:  # noqa: BLE001
+        raise InvalidInput(f"cannot read structure: {e}") from e
+    s = EditSession(st, int(params.get("model", 1)))
+    s.apply_all(list(params.get("edits") or []))
+    return s
+
+
+def selection_validate(params, srv):
+    from .selection import _split, parse
+    cmd = params.get("command")
+    if cmd is not None:
+        _split(cmd)
+        parse(_split(cmd)[1])
+    else:
+        parse(params["expr"])
+    return {"result": {"ok": True}}
+
+
+def selection_preview(params, srv):
+    """Stateless: the app sends the edit list so far (its undo stack) plus the command being considered."""
+    s = _session(params)
+    e = s.preview(params["command"])
+    return {"result": {"atoms": e.n_atoms, "residues": e.n_residues, "residue_ids": e.residues,
+                       "truncated": e.n_residues > len(e.residues), "warnings": e.warnings,
+                       "current": s.summary()}}
+
+
+def selection_apply(params, srv):
+    from . import formats
+    s = _session(params)
+    out = s.materialize()
+    artifacts = []
+    if params.get("out"):
+        formats.write_structure(out, params["out"])
+        artifacts.append(str(params["out"]))
+    return {"result": {"summary": s.summary(), "edits": [
+        {"command": e.command, "atoms": e.n_atoms, "residues": e.n_residues, "warnings": e.warnings}
+        for e in s.edits]}, "artifacts": artifacts,
+            "provenance": record("dockchem.selection", __version__, {"edits": s.commands()})}
+
+
 def format_convert(params, srv):
     from . import formats
     return formats.convert(params["source"], params["dest"], params.get("charge", 0))
@@ -185,6 +231,9 @@ METHODS = {
     "library.prepare": library_prepare,
     "receptor.prepare": receptor_prepare,
     "ligand.from_structure": ligand_from_structure,
+    "selection.validate": selection_validate,
+    "selection.preview": selection_preview,
+    "selection.apply": selection_apply,
     "format.convert": format_convert,
     "format.sniff": format_sniff,
     "poses.to_sdf": poses_to_sdf,

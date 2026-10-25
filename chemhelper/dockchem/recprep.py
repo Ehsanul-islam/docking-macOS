@@ -49,6 +49,9 @@ class ReceptorPrepOptions:
     optimize_flips: bool = True
     minimize: bool = False
     flex_residues: list[str] = field(default_factory=list)   # e.g. ["A:15"]
+    # Free edits applied before anything else, e.g. ["delete chain B", "delete resn SO4,GOL",
+    # "delete within 3 of resn XYZ and water"] (see selection.py). Each one is logged in the report.
+    edits: list[str] = field(default_factory=list)
     alphafold: bool = False
     min_plddt: float = 70.0
     trim_low_plddt_termini: bool = False
@@ -617,6 +620,19 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
     partial_occ = {_rid(ch.name, r) for ch in model for r in ch if any(a.occ < 1.0 for a in r)}
     _collapse_altlocs(model, rep)
 
+    if opts.edits:
+        from .selection import EditSession
+        sess = EditSession(st)
+        for cmd in opts.edits:
+            e = sess.apply(cmd)
+            rep.change("selection", f"{e.n_residues} residue(s), {e.n_atoms} atom(s)", cmd,
+                       "user edit", "dockchem.selection")
+            for w in e.warnings:
+                rep.warn(f"edit '{cmd}': {w}")
+        st = sess.materialize()
+        model = st[0]
+        if not any(_is_polymer(r) for ch in model for r in ch):
+            raise InvalidInput("the edits removed every protein residue")
     refs_all = _find_reference(model, opts.reference_ligand)
     refs = refs_all[:1]
     if len(refs_all) > 1:
@@ -625,7 +641,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                  + ", ".join(_rid(c, r) for c, r in refs_all[1:]) + " (plan §8.2: pick one)")
     ref_pos = [a.pos for _, r in refs for a in r]
     if opts.reference_ligand and not refs:
-        raise InvalidInput(f"reference ligand {opts.reference_ligand} not found")
+        raise InvalidInput(f"reference ligand {opts.reference_ligand} not found"
+                           + (" (was it removed by one of the edits?)" if opts.edits else ""))
 
     # chain selection
     ns = gemmi.NeighborSearch(model, st.cell, 6).populate()

@@ -71,3 +71,18 @@ NAD(P), cholesterol, 0WN, 0WM, F09, P0G, TXL, TA1 ...). The 35 refusals are deli
 - The CCD snapshot is a point-in-time copy; the build script must be re-run to refresh it (record the date).
 - A net charge alone cannot establish bond orders for a hydrogen-free ligand; the charge route only works when the
   file already has hydrogens.
+
+## Gap 1: free selection and deletion (done on this branch)
+
+- `dockchem/selection.py`: a selection language (chain, residue name/range, element, atom name, classes, B-factor,
+  occupancy, `within`/`around`/`byres`, boolean logic) with located parse errors; see docs/SELECTION.md.
+- Non-destructive `EditSession`: the command list is the state, so undo/redo/replay are exact and the input is never
+  modified. `preview` reports atoms/residues affected plus warnings (partial residues, new chain breaks, pocket
+  residues, majority/all-protein removal).
+- RPC: `selection.validate`, `selection.preview`, `selection.apply` (stateless).
+- Receptor prep: new `edits` option; each edit is recorded in the Prep Report. Edits that remove all protein or the
+  reference ligand are refused with a clear message.
+- Tests: 50, using real structures with independent oracles (brute-force distances, direct gemmi counts) and
+  mutation-checked (breaking `around` or the partial-residue warning makes them fail).
+
+Not done: the 3D highlight of a previewed selection and the linked sequence strip (viewer work, needs the Swift app).

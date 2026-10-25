@@ -52,3 +52,18 @@ class NeedsTemplate(InvalidInput):
         d = super().to_rpc()
         d["data"].update({"resname": self.resname, "needs": self.needs})
         return d
+
+
+class SelectionError(InvalidInput):
+    """A selection expression could not be parsed or evaluated. `pos` is the character offset."""
+    code = -32006
+    kind = "SelectionError"
+
+    def __init__(self, message: str, pos: int = 0, expr: str = ""):
+        super().__init__(message)
+        self.pos, self.expr = pos, expr
+
+    def to_rpc(self) -> dict:
+        d = super().to_rpc()
+        d["data"].update({"pos": self.pos, "expr": self.expr})
+        return d
