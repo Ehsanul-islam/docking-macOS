@@ -63,7 +63,8 @@ def work(item):
                  if (Path(item["data"]) / f"{item['id']}{e}").exists()), None)
     if path is None:
         return {"category": "missing_file", "error": "structure not downloaded"}
-    out = {"stats": {}}
+    out = {"stats": {}, **{k: item.get(k) for k in ("organism_group", "method", "uniprot", "structures_for_protein",
+                                                     "n_atoms", "ligand")}}
     a = assess(path)
     out["verdict"] = a["verdict"]
     out["finding_codes"] = sorted({f["code"] for f in a["findings"]})
@@ -94,7 +95,8 @@ def work(item):
                    n_flips=sum(1 for c in rp["changes"] if c["stage"] == "flip"),
                    n_ligands=len(res.ligands),
                    ligand_bond_orders=dict(collections.Counter((l.get("bond_orders") or {}).get("status", "?") for l in res.ligands)),
-                   warnings=rp["warnings"][:6], prep_seconds=round(time.time() - t0, 1))
+                   warnings=rp["warnings"][:25], assessment_findings=[f["code"] for f in a["findings"] if f["severity"] in ("fix", "block")],
+                   prep_seconds=round(time.time() - t0, 1))
         return out
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)

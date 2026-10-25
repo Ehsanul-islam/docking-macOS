@@ -1,0 +1,7020 @@
+{
+ "description": "most-studied proteins per organism group and method (UniProt group size), one best-resolution representative each; entries over 100000 atoms excluded to bound run time",
+ "source": "RCSB PDB search API",
+ "items": [
+  {
+   "id": "3K34",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00918",
+   "structures_for_protein": 1236
+  },
+  {
+   "id": "5AFY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00734",
+   "structures_for_protein": 740
+  },
+  {
+   "id": "4E0K",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P61769",
+   "structures_for_protein": 595
+  },
+  {
+   "id": "4QB3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O60885",
+   "structures_for_protein": 560
+  },
+  {
+   "id": "3IQU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P31947",
+   "structures_for_protein": 521
+  },
+  {
+   "id": "7BAA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P03372",
+   "structures_for_protein": 465
+  },
+  {
+   "id": "9IAY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01116",
+   "structures_for_protein": 435
+  },
+  {
+   "id": "6Q4G",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P24941",
+   "structures_for_protein": 425
+  },
+  {
+   "id": "7MN9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P18031",
+   "structures_for_protein": 409
+  },
+  {
+   "id": "6TN5",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P07900",
+   "structures_for_protein": 398
+  },
+  {
+   "id": "7MYI",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P56817",
+   "structures_for_protein": 369
+  },
+  {
+   "id": "3W7Y",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01308",
+   "structures_for_protein": 366
+  },
+  {
+   "id": "1F86",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P02766",
+   "structures_for_protein": 333
+  },
+  {
+   "id": "2OUR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y233",
+   "structures_for_protein": 331
+  },
+  {
+   "id": "5Q22",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q6PJP8",
+   "structures_for_protein": 314
+  },
+  {
+   "id": "5FG6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O95696",
+   "structures_for_protein": 302
+  },
+  {
+   "id": "9Y1J",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06746",
+   "structures_for_protein": 301
+  },
+  {
+   "id": "3UP3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15596",
+   "structures_for_protein": 297
+  },
+  {
+   "id": "9F7W",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P37231",
+   "structures_for_protein": 292
+  },
+  {
+   "id": "3WAR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P68400",
+   "structures_for_protein": 285
+  },
+  {
+   "id": "6H10",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q6B0I6",
+   "structures_for_protein": 283
+  },
+  {
+   "id": "2W72",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P69905",
+   "structures_for_protein": 263
+  },
+  {
+   "id": "5PG1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UIF8",
+   "structures_for_protein": 262
+  },
+  {
+   "id": "5BXO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9H2K2",
+   "structures_for_protein": 257
+  },
+  {
+   "id": "9I24",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00742",
+   "structures_for_protein": 256
+  },
+  {
+   "id": "7G0Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P15090",
+   "structures_for_protein": 243
+  },
+  {
+   "id": "2CE2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01112",
+   "structures_for_protein": 239
+  },
+  {
+   "id": "7LWE",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P41182",
+   "structures_for_protein": 232
+  },
+  {
+   "id": "2FST",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q16539",
+   "structures_for_protein": 229
+  },
+  {
+   "id": "9C5S",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04637",
+   "structures_for_protein": 227
+  },
+  {
+   "id": "9GC7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15788",
+   "structures_for_protein": 215
+  },
+  {
+   "id": "7M7N",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y253",
+   "structures_for_protein": 213
+  },
+  {
+   "id": "6R2W",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08709",
+   "structures_for_protein": 185
+  },
+  {
+   "id": "1US0",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P15121",
+   "structures_for_protein": 174
+  },
+  {
+   "id": "5LSH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P61626",
+   "structures_for_protein": 167
+  },
+  {
+   "id": "8A27",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00533",
+   "structures_for_protein": 167
+  },
+  {
+   "id": "3ZSK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P17931",
+   "structures_for_protein": 159
+  },
+  {
+   "id": "5SVY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P68431",
+   "structures_for_protein": 154
+  },
+  {
+   "id": "5P9J",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q06187",
+   "structures_for_protein": 153
+  },
+  {
+   "id": "5IG6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P25440",
+   "structures_for_protein": 153
+  },
+  {
+   "id": "7AZ2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13526",
+   "structures_for_protein": 152
+  },
+  {
+   "id": "2YEX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O14757",
+   "structures_for_protein": 152
+  },
+  {
+   "id": "8BXH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O60674",
+   "structures_for_protein": 151
+  },
+  {
+   "id": "5YC6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00749",
+   "structures_for_protein": 149
+  },
+  {
+   "id": "5S9G",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8WWQ0",
+   "structures_for_protein": 144
+  },
+  {
+   "id": "6GX2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P16442",
+   "structures_for_protein": 142
+  },
+  {
+   "id": "7BNB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q6P988",
+   "structures_for_protein": 140
+  },
+  {
+   "id": "8AOJ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P28482",
+   "structures_for_protein": 139
+  },
+  {
+   "id": "3A99",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11309",
+   "structures_for_protein": 137
+  },
+  {
+   "id": "9HDW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11172",
+   "structures_for_protein": 129
+  },
+  {
+   "id": "5NM4",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29274",
+   "structures_for_protein": 128
+  },
+  {
+   "id": "7KTN",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NP87",
+   "structures_for_protein": 124
+  },
+  {
+   "id": "7NPC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P51449",
+   "structures_for_protein": 124
+  },
+  {
+   "id": "7AOT",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13451",
+   "structures_for_protein": 122
+  },
+  {
+   "id": "8BI9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29475",
+   "structures_for_protein": 120
+  },
+  {
+   "id": "8QZD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P34913",
+   "structures_for_protein": 118
+  },
+  {
+   "id": "5PXL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P23497",
+   "structures_for_protein": 118
+  },
+  {
+   "id": "5WS7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P36639",
+   "structures_for_protein": 117
+  },
+  {
+   "id": "1Y2K",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q08499",
+   "structures_for_protein": 115
+  },
+  {
+   "id": "6VPM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O14965",
+   "structures_for_protein": 115
+  },
+  {
+   "id": "4A7U",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00441",
+   "structures_for_protein": 112
+  },
+  {
+   "id": "5I86",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92793",
+   "structures_for_protein": 111
+  },
+  {
+   "id": "8VJP",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q07820",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "9JIT",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P14174",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "9MXD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0DP23",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "6Q00",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0CG48",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "5R4V",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q6PL18",
+   "structures_for_protein": 109
+  },
+  {
+   "id": "7RG8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y251",
+   "structures_for_protein": 108
+  },
+  {
+   "id": "6T02",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q96MU7",
+   "structures_for_protein": 108
+  },
+  {
+   "id": "6Q9L",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q00987",
+   "structures_for_protein": 105
+  },
+  {
+   "id": "9E3S",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62937",
+   "structures_for_protein": 103
+  },
+  {
+   "id": "6V6U",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P61586",
+   "structures_for_protein": 102
+  },
+  {
+   "id": "4OQV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q02127",
+   "structures_for_protein": 100
+  },
+  {
+   "id": "9CWI",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29474",
+   "structures_for_protein": 100
+  },
+  {
+   "id": "9T6K",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08581",
+   "structures_for_protein": 100
+  },
+  {
+   "id": "6E1Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P61964",
+   "structures_for_protein": 98
+  },
+  {
+   "id": "6B8F",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P02794",
+   "structures_for_protein": 98
+  },
+  {
+   "id": "6XY7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92835",
+   "structures_for_protein": 97
+  },
+  {
+   "id": "3MRG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04439",
+   "structures_for_protein": 97
+  },
+  {
+   "id": "9IEG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P49366",
+   "structures_for_protein": 96
+  },
+  {
+   "id": "5NVG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0CG47",
+   "structures_for_protein": 96
+  },
+  {
+   "id": "3GJ0",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62826",
+   "structures_for_protein": 95
+  },
+  {
+   "id": "4U1M",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01889",
+   "structures_for_protein": 95
+  },
+  {
+   "id": "5M6Y",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P61925",
+   "structures_for_protein": 93
+  },
+  {
+   "id": "7MBO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P03951",
+   "structures_for_protein": 93
+  },
+  {
+   "id": "8E1A",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P10275",
+   "structures_for_protein": 86
+  },
+  {
+   "id": "1KMV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00374",
+   "structures_for_protein": 86
+  },
+  {
+   "id": "9I7A",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q7Z4V5",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "7Z76",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15370",
+   "structures_for_protein": 84
+  },
+  {
+   "id": "5O5T",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q04609",
+   "structures_for_protein": 83
+  },
+  {
+   "id": "4YJR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P43405",
+   "structures_for_protein": 83
+  },
+  {
+   "id": "6H5W",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P12821",
+   "structures_for_protein": 83
+  },
+  {
+   "id": "4QYN",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P50120",
+   "structures_for_protein": 80
+  },
+  {
+   "id": "5CG5",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P14324",
+   "structures_for_protein": 80
+  },
+  {
+   "id": "8DSC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P43490",
+   "structures_for_protein": 79
+  },
+  {
+   "id": "6SRH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q04771",
+   "structures_for_protein": 78
+  },
+  {
+   "id": "9GP4",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O75164",
+   "structures_for_protein": 78
+  },
+  {
+   "id": "6NV2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q04206",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "3Q27",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0AEX9",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "9IK6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P02768",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "7M07",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UGP5",
+   "structures_for_protein": 76
+  },
+  {
+   "id": "3F9X",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62805",
+   "structures_for_protein": 75
+  },
+  {
+   "id": "5IBP",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P42574",
+   "structures_for_protein": 75
+  },
+  {
+   "id": "6ZWI",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06276",
+   "structures_for_protein": 75
+  },
+  {
+   "id": "6EGE",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NWZ3",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "9MDC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8N884",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "4JMG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q06124",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "9X2V",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P49841",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "6Q7D",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29317",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "9QX6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P19793",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "1Y93",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P39900",
+   "structures_for_protein": 73
+  },
+  {
+   "id": "9S1Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8IXJ6",
+   "structures_for_protein": 71
+  },
+  {
+   "id": "6MX3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q86WV6",
+   "structures_for_protein": 71
+  },
+  {
+   "id": "1RG8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P05230",
+   "structures_for_protein": 71
+  },
+  {
+   "id": "3TV3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01857",
+   "structures_for_protein": 71
+  },
+  {
+   "id": "7OXW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29373",
+   "structures_for_protein": 70
+  },
+  {
+   "id": "9IWM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15648",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "7R2H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P30405",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "3U9W",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09960",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "4FGL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P16083",
+   "structures_for_protein": 68
+  },
+  {
+   "id": "7FEZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P05413",
+   "structures_for_protein": 68
+  },
+  {
+   "id": "5IL2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9HCE5",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "6KAX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q07869",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "4A5S",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P27487",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "8XGK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q14145",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "6V9M",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q07889",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "4X6H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P43235",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "1S1P",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P42330",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "5EW8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11362",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "6GY5",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P53355",
+   "structures_for_protein": 64
+  },
+  {
+   "id": "5NI9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01903",
+   "structures_for_protein": 64
+  },
+  {
+   "id": "5QK0",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UKK9",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "5J41",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09211",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "7Q5V",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9GZT9",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "6HL1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q96RI1",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "7JGW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q07817",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "5BN8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0DMV8",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "6PUD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q95460",
+   "structures_for_protein": 61
+  },
+  {
+   "id": "7A1Q",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NWT6",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "6YF3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62942",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "5MWZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P55201",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "2XU3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P07711",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "5OAZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00519",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "6S14",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13627",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "9RDF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P30613",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "5JB9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00740",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "7MZY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UM73",
+   "structures_for_protein": 57
+  },
+  {
+   "id": "6J64",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P49773",
+   "structures_for_protein": 57
+  },
+  {
+   "id": "11GV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P20248",
+   "structures_for_protein": 57
+  },
+  {
+   "id": "6O5I",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O00255",
+   "structures_for_protein": 57
+  },
+  {
+   "id": "7QYO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UIF9",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "5VCC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08684",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "5LVO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O15530",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "9FS2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P27708",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "9FJT",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P27338",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "6TGU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P19784",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "5MFA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P05164",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "7HI9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O15178",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "9GJ2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P25774",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "7S5H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8NBP7",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "7Q0D",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00915",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "6IBE",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y2J2",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "5FYZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UGL1",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "3OY1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P53779",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "2VIF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P10721",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "2AEB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P05089",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "3K1W",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00797",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "7G83",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92974",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "6NRH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09874",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "1R6J",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O00560",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "9ZL3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9BQA1",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "4OEL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P53634",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "1JL0",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P17707",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "6TN1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04062",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "9YFR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q99497",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "9SIX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P48730",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "7RWG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P31153",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "5U3A",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04746",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "3P34",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P53350",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "9FOH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P14902",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "9OFX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P12931",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "7OTF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q460N3",
+   "structures_for_protein": 47
+  },
+  {
+   "id": "1P5Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P27707",
+   "structures_for_protein": 47
+  },
+  {
+   "id": "7TC3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P27695",
+   "structures_for_protein": 47
+  },
+  {
+   "id": "7LCU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09958",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "3LXP",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29597",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "6N7A",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P23458",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "3ED7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04818",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "9FZJ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O75469",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "6BQA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9H8M2",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "9P0R",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P32322",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "9F2O",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O43570",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "6N0D",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NUW8",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "4J44",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P98170",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "5B5O",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P45452",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "3F6Y",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P28907",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "4TPW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06730",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "2FMA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P05067",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "31WB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92918",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "6YYX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q12797",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "5U3Q",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q03181",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "8KH9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P22455",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "3B0T",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11473",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "5U00",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O00408",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "8AG2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q12830",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "9RFF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P63000",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "4M0E",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P22303",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "6DWD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y3Z3",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "29UU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9H7Z6",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "5VI6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9BY41",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "9HCZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P54274",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6TVE",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P21589",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "4Q27",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09382",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "4UDD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04150",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6BKX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O75874",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6HOY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8N6T7",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "10AK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q14191",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "1UNQ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P31749",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "7H66",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P23946",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "10OU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P21802",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "9RTP",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0C024",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "1TBF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O76074",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "5QHT",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q460N5",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "2AFW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q16769",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4KP6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q07343",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "7B7R",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q02750",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "2O02",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P63104",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "5O6H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P30419",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4WB8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P17612",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "9F4G",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09651",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4AOH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P03950",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "9T4L",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O95989",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4QTC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8TF76",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "6UYB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15562",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "5D6E",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P50579",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "4JS8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P33981",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "4ZZ1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P22102",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "6B6U",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P14618",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "8HTS",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P10415",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "5JFW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04629",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "9BWQ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04179",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "5U69",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O75530",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "9BF2",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UKV8",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "8ALX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NZQ7",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "4CLF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q96PN6",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "7KBG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92769",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "9SA1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8WY64",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5R7X",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q7LBC6",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "3QL9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P84243",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "2B3H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P53582",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "3ZCW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P52732",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "2JC9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P49902",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "2XIR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P35968",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "6BGY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29375",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "9GG8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P10636",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5FAF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06396",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "1LKK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06239",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "4MIK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11086",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "6N35",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01834",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "8XWC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O15527",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "3A7I",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y6E0",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "8ANC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NTG7",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "7UE7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9H999",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3OLL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q92731",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "5BT3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q09472",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6Z6Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P80188",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6FT8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P49759",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3ZXF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P47929",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "7WJV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P09467",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6HGM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01011",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "5ML3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O43924",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3PUC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8WZ42",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "5QOQ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8IU60",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "6XXC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62508",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "6ZEG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62136",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "5LWM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P52333",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "5AQM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P11142",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "5W8J",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00338",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "8Q53",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9GZQ8",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "5RKZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9BRQ3",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "8G2H",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q86X55",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "3FXZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13153",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "6SQO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62837",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "9J9D",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P36897",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "8VSO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P15056",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "6ARP",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P0DOX5",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "6ACL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04908",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "12AV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P04181",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "8RYS",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01584",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "6BG3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00720",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "6QXU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O95271",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "9PLY",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y4B6",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "5J71",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15119",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "6ATR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08263",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "6P7Z",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9H7B4",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "5VSC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q96KQ7",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "2F69",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8WTS6",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "6RQQ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q16790",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "3D59",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13093",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "6FEX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q08345",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "9CMK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P42336",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "7XB9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P18669",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "1HY7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08254",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "5NAT",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00746",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "7JR8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O60760",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "5MPR",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O15382",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "7R5L",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y5A9",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "3OSN",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9UNA4",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "6H0M",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9BPX1",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "9F8D",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q99685",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "6GKS",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q05315",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "1PWB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P35247",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "5I29",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P21675",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "4PF3",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P08235",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "2HYV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P07355",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "6ICG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62993",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "9FHD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P50053",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "6G6X",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P46937",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "1XU9",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P28845",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "9FDF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00558",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "3NCL",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y5Y6",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5VCZ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q99640",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "4YSI",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q93009",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "6TE6",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8TEK3",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "2IMS",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q16611",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "8QTG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q13191",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "7AB0",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q12866",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "9NWX",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q08881",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "6YOJ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q05397",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "3EMH",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q03164",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5QR1",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P22557",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "1MJN",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P20701",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "6S2M",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P02689",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "4JOK",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9HD26",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "5W2I",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q8NFU5",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "6ZNV",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q86U86",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9GUA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P62166",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2W5A",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P51955",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "3F9M",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P35557",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "1HDO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P30043",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "8WRA",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P29466",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "6ESM",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P14780",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "8I17",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P06899",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2J0I",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O96013",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "5GZC",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "O00214",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2E3N",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9Y5P4",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6EQS",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NXA8",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "5JLB",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9BYW2",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "7NAJ",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q6SZW1",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6QJU",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15059",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6BHD",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q15047",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "2DDF",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P78536",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "5FTG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P35790",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "1RYO",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P02787",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "9N9N",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01116-2",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "9BG8",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01111",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "2WY7",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P01024",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "5UGG",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "P00747",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6O53",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "A0A140T913",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "9MHW",
+   "organism_group": "human",
+   "method": "xray",
+   "uniprot": "Q9NR97",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "8F0K",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P62873",
+   "structures_for_protein": 813
+  },
+  {
+   "id": "8YN9",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P63096",
+   "structures_for_protein": 409
+  },
+  {
+   "id": "8V8A",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P0ABE7",
+   "structures_for_protein": 204
+  },
+  {
+   "id": "8XSF",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q9BYF1",
+   "structures_for_protein": 182
+  },
+  {
+   "id": "7A5V",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P28472",
+   "structures_for_protein": 90
+  },
+  {
+   "id": "9WG6",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P07550",
+   "structures_for_protein": 81
+  },
+  {
+   "id": "8VG1",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P62805",
+   "structures_for_protein": 76
+  },
+  {
+   "id": "9RGD",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P14867",
+   "structures_for_protein": 76
+  },
+  {
+   "id": "9GU1",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P42212",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "10QQ",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P55072",
+   "structures_for_protein": 61
+  },
+  {
+   "id": "9NVO",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P0DP23",
+   "structures_for_protein": 60
+  },
+  {
+   "id": "9BZ0",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q16531",
+   "structures_for_protein": 59
+  },
+  {
+   "id": "9BLZ",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q14204",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "7NVL",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q99832",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "8TNQ",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q96SW2",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "9QGG",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P0CG48",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "7R4X",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P62979",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "9BSB",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P09471",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "9FYP",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P37840",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "9JD5",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P31641",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "7YBU",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P05166",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "7W9K",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q07699",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "9MRT",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q8TD43",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "8ZP2",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P23975",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "8J6P",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "Q8TDS4",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "22AY",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "O43526",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "8SH9",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "O14775",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "7Z8R",
+   "organism_group": "human",
+   "method": "cryoem",
+   "uniprot": "P62877",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "1A7F",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P01308",
+   "structures_for_protein": 136
+  },
+  {
+   "id": "1C3T",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P0CG48",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "1J7O",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P0DP23",
+   "structures_for_protein": 47
+  },
+  {
+   "id": "1AMB",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P05067",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "1AP4",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P63316",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "2KWU",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P0CG47",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "1E1G",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P04156",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "1A1U",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P04637",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "1I6C",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "Q13526",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "2ELM",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "Q9P243",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "1E88",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "P02751",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "2EL4",
+   "organism_group": "human",
+   "method": "nmr",
+   "uniprot": "Q14587",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "2VB1",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00698",
+   "structures_for_protein": 1082
+  },
+  {
+   "id": "4I8H",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00760",
+   "structures_for_protein": 587
+  },
+  {
+   "id": "5YCE",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02185",
+   "structures_for_protein": 351
+  },
+  {
+   "id": "6NGM",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P29476",
+   "structures_for_protein": 335
+  },
+  {
+   "id": "6ETK",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P61823",
+   "structures_for_protein": 307
+  },
+  {
+   "id": "7G2W",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q64610",
+   "structures_for_protein": 224
+  },
+  {
+   "id": "7P7D",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00489",
+   "structures_for_protein": 215
+  },
+  {
+   "id": "6JGJ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P42212",
+   "structures_for_protein": 196
+  },
+  {
+   "id": "6S8K",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q6B856",
+   "structures_for_protein": 175
+  },
+  {
+   "id": "6YK4",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P19491",
+   "structures_for_protein": 172
+  },
+  {
+   "id": "4I4T",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P63043",
+   "structures_for_protein": 168
+  },
+  {
+   "id": "2V2P",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02791",
+   "structures_for_protein": 160
+  },
+  {
+   "id": "5N1F",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P25321",
+   "structures_for_protein": 156
+  },
+  {
+   "id": "5R43",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00766",
+   "structures_for_protein": 156
+  },
+  {
+   "id": "9T6Y",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P68082",
+   "structures_for_protein": 153
+  },
+  {
+   "id": "1LK2",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01887",
+   "structures_for_protein": 143
+  },
+  {
+   "id": "1D0C",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P29473",
+   "structures_for_protein": 124
+  },
+  {
+   "id": "5AVD",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00772",
+   "structures_for_protein": 122
+  },
+  {
+   "id": "7HLL",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q62191",
+   "structures_for_protein": 112
+  },
+  {
+   "id": "6SP9",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P47811",
+   "structures_for_protein": 111
+  },
+  {
+   "id": "1G6X",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00974",
+   "structures_for_protein": 99
+  },
+  {
+   "id": "2JHF",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00327",
+   "structures_for_protein": 97
+  },
+  {
+   "id": "5P9V",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P22734",
+   "structures_for_protein": 91
+  },
+  {
+   "id": "6XVM",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00523",
+   "structures_for_protein": 89
+  },
+  {
+   "id": "9VOG",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P13053",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "4B1Y",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P68135",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "7AIS",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P04058",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "5WGI",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "F8W4B7",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "4Z84",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00517",
+   "structures_for_protein": 81
+  },
+  {
+   "id": "4S32",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P63086",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "7Q19",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02754",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "2UUF",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01050",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "3TOD",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P24627",
+   "structures_for_protein": 76
+  },
+  {
+   "id": "7COH",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P07471",
+   "structures_for_protein": 75
+  },
+  {
+   "id": "5K1L",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9NAV7",
+   "structures_for_protein": 71
+  },
+  {
+   "id": "3BVX",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q24451",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "9HWQ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9Z2X8",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "3G46",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02213",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "1RDQ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P05132",
+   "structures_for_protein": 59
+  },
+  {
+   "id": "4GMU",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P07379",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "1M5A",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01315",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "4XEZ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P21816",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "2HA2",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P21836",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "6T9R",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q8WSF8",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "2G58",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P59071",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "32OA",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P15379",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "9PDA",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00761",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "1C5N",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P28504",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "1NUW",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00636",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "1X8P",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q94734",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "4DFX",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P63248",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "3G08",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P11609",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "1RUR",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01837",
+   "structures_for_protein": 47
+  },
+  {
+   "id": "9EZ2",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9PTN2",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "6EM7",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "G3HK48",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "5J93",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P07798",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "3LB2",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9NAV8",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "7ODB",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P19120",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6WZY",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01899",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "9U6A",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q2XVP4",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "3NVW",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P80457",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "7DN6",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P80025",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "4Z65",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P09955",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "1Q1F",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9ER97",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "8PDD",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q962Y6",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "7OI4",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "O35904",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "7QLJ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q5S6Z9",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "7NDV",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P58154",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5IH3",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9WVG6",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "3DDQ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P30274",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "1PB7",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P35439",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6HSH",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "A5H660",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3GBA",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P22756",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "4E7U",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01317",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "9KJE",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q91XB0",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "9D1L",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q25252",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "3NT1",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q05769",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "1M4L",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00730",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "3E33",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q04631",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "4UAF",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P52293",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "3FP7",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00763",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "4JWX",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q00959",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "1PJX",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q7SIG4",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "3GOF",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P29477",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "5AE0",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P16330",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "1G4I",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00593",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "8SHK",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q8C6L5",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "1Q0E",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00442",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "4CA7",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q10714",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "3G3K",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P42260",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2XDW",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P23687",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2PQ3",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P0DP29",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9IHA",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P07751",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "27RD",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P04191",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "4PE0",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02638",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "5KO5",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "A0A0U3AGT1",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2GQP",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P41148",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "2HUE",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P62799",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "4ZBQ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P35747",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "2MSB",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P19999",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1CIP",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P10824",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1VYO",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02701",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1HN4",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00592",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1J02",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P06762",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6W4L",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02281",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "3RT4",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9GK12",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "5M7X",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P63073",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "1O7Q",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P14769",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "7A0D",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00735",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "4C38",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q3SX13",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5TLE",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00883",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "7A7Y",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "A0A059PIQ0",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5F0E",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q8BHN3",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "3DSS",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q08603",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "3FUC",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P55859",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "4I2A",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P09838",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "1YRO",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P08037",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "3KFA",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P00520",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "6WBQ",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "F1QCV2",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "4F29",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P19492",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "4IRL",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P0AEX9",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "9QLC",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "K7PQ54",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "5YL2",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "A0A8D1UIR5",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "5OHI",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q9R1E6",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "8JDG",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q7TNG8",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "9OA5",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q28175",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "1YI9",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P14925",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "2D5X",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P02062",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "1NCW",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P01865",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "8EGF",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q00972",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "4D4R",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "Q00944",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "4XW4",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P61926",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "3G9M",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "P06536",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "2XKI",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "O76242",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "8CEY",
+   "organism_group": "animal",
+   "method": "xray",
+   "uniprot": "O08760",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "9IJE",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P63212",
+   "structures_for_protein": 121
+  },
+  {
+   "id": "7MBX",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P54311",
+   "structures_for_protein": 114
+  },
+  {
+   "id": "38KN",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P68135",
+   "structures_for_protein": 99
+  },
+  {
+   "id": "9JNP",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P02281",
+   "structures_for_protein": 95
+  },
+  {
+   "id": "8RUP",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P62799",
+   "structures_for_protein": 93
+  },
+  {
+   "id": "9M1M",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "Q2XVP4",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "8UD1",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "A0A8D1NRT6",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "7VB7",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "A0A287AAR5",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "8UGP",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "O79880",
+   "structures_for_protein": 73
+  },
+  {
+   "id": "7V2H",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "F1RWL7",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "8FQF",
+   "organism_group": "animal",
+   "method": "cryoem",
+   "uniprot": "P19491",
+   "structures_for_protein": 61
+  },
+  {
+   "id": "5XO3",
+   "organism_group": "animal",
+   "method": "nmr",
+   "uniprot": "P55788",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1QQV",
+   "organism_group": "animal",
+   "method": "nmr",
+   "uniprot": "P02640",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "1CFC",
+   "organism_group": "animal",
+   "method": "nmr",
+   "uniprot": "P0DP33",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "1ABT",
+   "organism_group": "animal",
+   "method": "nmr",
+   "uniprot": "P60615",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "2F01",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P22629",
+   "structures_for_protein": 258
+  },
+  {
+   "id": "4EQP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00644",
+   "structures_for_protein": 208
+  },
+  {
+   "id": "6DYF",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0ABE7",
+   "structures_for_protein": 204
+  },
+  {
+   "id": "5JVI",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00800",
+   "structures_for_protein": 201
+  },
+  {
+   "id": "2IJ2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P14779",
+   "structures_for_protein": 171
+  },
+  {
+   "id": "5N6F",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P28720",
+   "structures_for_protein": 168
+  },
+  {
+   "id": "8C8F",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AEX9",
+   "structures_for_protein": 165
+  },
+  {
+   "id": "45PC",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0ABQ4",
+   "structures_for_protein": 150
+  },
+  {
+   "id": "14YM",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WN94",
+   "structures_for_protein": 144
+  },
+  {
+   "id": "2GLK",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P24300",
+   "structures_for_protein": 141
+  },
+  {
+   "id": "7LKL",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00929",
+   "structures_for_protein": 130
+  },
+  {
+   "id": "4L4E",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00183",
+   "structures_for_protein": 123
+  },
+  {
+   "id": "2FFY",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00811",
+   "structures_for_protein": 118
+  },
+  {
+   "id": "5XP6",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "C7C422",
+   "structures_for_protein": 112
+  },
+  {
+   "id": "8PEB",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q6XEC0",
+   "structures_for_protein": 109
+  },
+  {
+   "id": "3FSA",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00282",
+   "structures_for_protein": 107
+  },
+  {
+   "id": "4TRO",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WGR1",
+   "structures_for_protein": 105
+  },
+  {
+   "id": "3WA2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P46881",
+   "structures_for_protein": 104
+  },
+  {
+   "id": "9DOE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q2IU02",
+   "structures_for_protein": 97
+  },
+  {
+   "id": "6DOP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9KEI9",
+   "structures_for_protein": 96
+  },
+  {
+   "id": "6TM9",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9K2N0",
+   "structures_for_protein": 87
+  },
+  {
+   "id": "8E9D",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00509",
+   "structures_for_protein": 86
+  },
+  {
+   "id": "8QGO",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q8Y8D7",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "7NGG",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WMC1",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "1NWZ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P16113",
+   "structures_for_protein": 84
+  },
+  {
+   "id": "9F0T",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9F663",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "4D3T",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O34453",
+   "structures_for_protein": 82
+  },
+  {
+   "id": "8PGP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9XAY4",
+   "structures_for_protein": 73
+  },
+  {
+   "id": "6FBC",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P19821",
+   "structures_for_protein": 70
+  },
+  {
+   "id": "9PRI",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AEG4",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "9I76",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "G3XDA2",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "5AKR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P25006",
+   "structures_for_protein": 65
+  },
+  {
+   "id": "1TO2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00782",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "1N40",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WPP7",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "6R1D",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A4TVL0",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "5SD5",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WNX1",
+   "structures_for_protein": 59
+  },
+  {
+   "id": "5NJ2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WKD3",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "1M40",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P62593",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "6QOK",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "B1MDI3",
+   "structures_for_protein": 58
+  },
+  {
+   "id": "6NNR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A884",
+   "structures_for_protein": 57
+  },
+  {
+   "id": "6UFE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q81HW2",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "3UHM",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P47205",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "2OB3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A434",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "9FPH",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9F8A8",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "8Q1F",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P71447",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "3IP0",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P26281",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "7Q0Z",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A0H3H219",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "3U7Q",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P07329",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "2YKZ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00138",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "4X5P",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P08191",
+   "structures_for_protein": 50
+  },
+  {
+   "id": "7O8F",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "W8VZW3",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "5AJG",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9RZA4",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "1MZ4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A386",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "8CFN",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9I685",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "7RF1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9F1R6",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "2W9H",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A017",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "4CE8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9HYN5",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "4YSE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P38501",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "1Q6Z",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P20906",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "7P2M",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AES6",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "1GK9",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P06875",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "2H5C",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00778",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "7KKD",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9PPB4",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "7I0R",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P50870",
+   "structures_for_protein": 45
+  },
+  {
+   "id": "3R40",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q6NAM1",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "5MOZ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P14489",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "3TG0",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00634",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "6ZTX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P21179",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "7P0Q",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0C0Y9",
+   "structures_for_protein": 43
+  },
+  {
+   "id": "6AS6",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WK17",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "2XPW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0ACT4",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "4HUA",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AA25",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "3G9X",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A3G3",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "6CD7",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O68183",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "3VYP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "I6Y9J2",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "7AU1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "G3XD46",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "3U6P",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P84131",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "2ZD8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AD64",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "4C1H",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P04190",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "1JZ7",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00722",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "8DKP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "F7X6I3",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "3COV",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WIL5",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "2GG2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AE18",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "4K3L",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A988",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6C1X",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P07445",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "5ZZR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O52792",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "6Z5Z",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A0S4TLR1",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "5B66",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q7DGD4",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "1JBE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0AE67",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "3CSU",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A786",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "5MQ5",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00805",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "4WHS",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00437",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "9XZ8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WFX5",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4YQD",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P43912",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4E9S",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P36649",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "3B34",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P04825",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "3IK0",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00469",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "6H8G",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "V6F235",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "1OE1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O68601",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "2YIM",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O06543",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "2VI8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q7SIB6",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5K7A",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q72HW2",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "4YWA",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q05097",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5OL4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P41021",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "4FYY",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A7F3",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "4JHT",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P05050",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "6N4L",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00459",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "5KQ6",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q3JNW6",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "6N59",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P29166",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "1T8K",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A6A8",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "9T60",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "B1MDL6",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "4GT9",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9WYT0",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "4WKS",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9I194",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "7OU8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q89ZI2",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3AWU",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q83WS2",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3PV8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q5KWC1",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "4Z6M",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q45135",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "4KQI",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q05603",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "1MXR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P69924",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "2OV0",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P22364",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6EQE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A0K8P6T7",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "39AJ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A0H2ZD27",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6MZ2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9L5C7",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "6NLF",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9HY79",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "9PQ7",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q07820",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "1VYR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P71278",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "7ZO3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P52700",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "7RAX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A6Y8",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "2IH3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A334",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "2NWR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O66496",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "8CM6",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q72EJ1",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "4XJW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q54727",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "7L1J",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WPQ5",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "1NK4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P52026",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "7QYM",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P37595",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "4UB6",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0DM37",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "8QGW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O66842",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "2P74",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9L5C8",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "6F6M",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q5KW80",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "2BMW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P21890",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "9BN9",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P14900",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "1JET",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P06202",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "7FD1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00214",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "5O0S",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "F6BL85",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "4WPK",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WFQ9",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "6X6I",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WFK7",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "5YOB",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00323",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "8OLH",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A7U9DT46",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "8SU3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9K499",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "4H4D",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P62623",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "7TCS",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P31013",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "3BON",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0DPI1",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "2VU1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P07097",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "4XTL",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "N0DKS8",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "4YFU",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "E1C9K5",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "5YUY",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q47155",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "2J78",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q08638",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "9IVL",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P52682",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "3FIL",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P19909",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "5LZG",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P01556",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "2A65",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O67854",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "5FEW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9X0Z6",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5TG4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q8RLA6",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "9RO1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q89EJ6",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "4NIR",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q81VW8",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5ON8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P33590",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "4EP8",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P18316",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "3A8G",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P13449",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "2PVE",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00268",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "6C4Q",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "I6X8D2",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5IQX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "G3XD33",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "5M17",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "D6D1V7",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "7BUG",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q84II6",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "8OHB",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q45589",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "4R52",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q1LCS4",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "3SGV",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P60472",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2VBA",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A953",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "2OJP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A6L2",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9GZ4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P07603",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9OP2",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P05637",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "6ZAT",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "M4Z2Q6",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9RPZ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A086IRG1",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "5FUH",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9HU22",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "3SJL",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q51658",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "4YCB",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q2QJL3",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6FPO",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0ACD8",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "4J27",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q8A3I4",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5NAK",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q84HF5",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "2GF3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P40859",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "4WZ4",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P24735",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "2W70",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P24182",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1MTY",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P22869",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "4U9H",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P21853",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "8YUI",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P11797",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5JBN",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A6I6",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "2WSD",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P07788",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1LNI",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P05798",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "3FO3",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "L0DSL2",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "9KWT",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A4IL26",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "6X7J",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A1YIY3",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5BMN",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0AAI8EU60",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "9HXX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0A7U9HFU5",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "21EJ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9X1H0",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "4JF5",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q9L4P2",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "3IVY",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WPP1",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "7APU",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P69441",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "1D3C",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P43379",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "4IHM",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P29068",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "3RMZ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P22619",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6IFP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P19567",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "2V3Z",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P15034",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "4REK",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P12676",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "5LS7",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P0A790",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "1PB1",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P08200",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "5GHX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00808",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "1R0R",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P00780",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "5J8Q",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "O32164",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6JTB",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "B2RID1",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "3ACX",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A9JQL9",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6AJP",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "A0QP43",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "7C63",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q53W80",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "2GQW",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q52437",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "1RTQ",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "Q01693",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "4P8N",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P9WJF1",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "4NDO",
+   "organism_group": "bacteria",
+   "method": "xray",
+   "uniprot": "P84308",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "7XKT",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0ABE7",
+   "structures_for_protein": 176
+  },
+  {
+   "id": "8FVW",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0A8V2",
+   "structures_for_protein": 112
+  },
+  {
+   "id": "8CGK",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P60438",
+   "structures_for_protein": 85
+  },
+  {
+   "id": "9SKU",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0AEX9",
+   "structures_for_protein": 52
+  },
+  {
+   "id": "8CGJ",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0ADZ4",
+   "structures_for_protein": 40
+  },
+  {
+   "id": "9Y78",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P9WGZ1",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "7UT6",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P07328",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "6XL5",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P00579",
+   "structures_for_protein": 37
+  },
+  {
+   "id": "9U6F",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "Q56404",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "8CF1",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0A7S9",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "9T2J",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "A7ZSK2",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "7NZ1",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0AFC7",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "9OWY",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "A0A150N245",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "8CGV",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0C018",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "7Z7V",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0AFD4",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "8BKZ",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P0A6F5",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "8CEU",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "P62399",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "7NK7",
+   "organism_group": "bacteria",
+   "method": "cryoem",
+   "uniprot": "A0R202",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "1FCL",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P19909",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "1GB1",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P06654",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "2MLX",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P00634",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "1EZA",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P08839",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "1JOK",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P00644",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "1AF8",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "Q02054",
+   "structures_for_protein": 13
+  },
+  {
+   "id": "6CJ8",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P60242",
+   "structures_for_protein": 12
+  },
+  {
+   "id": "1BDC",
+   "organism_group": "bacteria",
+   "method": "nmr",
+   "uniprot": "P38507",
+   "structures_for_protein": 12
+  },
+  {
+   "id": "8JZ8",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02883",
+   "structures_for_protein": 176
+  },
+  {
+   "id": "9HMT",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q42561",
+   "structures_for_protein": 127
+  },
+  {
+   "id": "8X6A",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P93836",
+   "structures_for_protein": 109
+  },
+  {
+   "id": "7Y07",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02879",
+   "structures_for_protein": 79
+  },
+  {
+   "id": "26LN",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "D9J2T9",
+   "structures_for_protein": 56
+  },
+  {
+   "id": "1NLS",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02866",
+   "structures_for_protein": 54
+  },
+  {
+   "id": "3WLI",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q9XEI3",
+   "structures_for_protein": 46
+  },
+  {
+   "id": "8AUM",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q9FEW9",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "4RLK",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P28523",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "2VCN",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q43758",
+   "structures_for_protein": 35
+  },
+  {
+   "id": "9TB8",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q9CAJ0",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "1GWU",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P00433",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "1UKG",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q8GSD2",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "9CKW",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P00784",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "1T9I",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P05725",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "4WFO",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P08170",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "5ZM0",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "A8J8W0",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "5IL3",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q40577",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "4R6R",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P18670",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "3F5L",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q75I93",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "6GPU",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P93025",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "1M2T",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P81446",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "3C6X",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P52704",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "4XOJ",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q4GWU5",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "1WDP",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P10538",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "1E4M",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P29736",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "2O9U",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02882",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "1GDJ",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02240",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "4BK7",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P15494",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "8Q0S",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02881",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "3NS2",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "O80992",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "7DC9",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q94BU8",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "3B0G",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q76KB0",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "6VAW",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P02872",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "9KKH",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "B4G043",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "1W1O",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q9T0N8",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "6Q32",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q39054",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "6LOZ",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P16094",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "4DP9",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P00299",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "5UR4",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "O49686",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "7PGZ",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "O49003",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "5LNR",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q8L940",
+   "structures_for_protein": 13
+  },
+  {
+   "id": "2YC3",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "P69834",
+   "structures_for_protein": 13
+  },
+  {
+   "id": "6P3N",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "A0A5S8WF76",
+   "structures_for_protein": 13
+  },
+  {
+   "id": "5ECK",
+   "organism_group": "plant",
+   "method": "xray",
+   "uniprot": "Q9SKE2",
+   "structures_for_protein": 12
+  },
+  {
+   "id": "6RDB",
+   "organism_group": "plant",
+   "method": "cryoem",
+   "uniprot": "D8V7I1",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6RD7",
+   "organism_group": "plant",
+   "method": "cryoem",
+   "uniprot": "D7P7X5",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "6RD5",
+   "organism_group": "plant",
+   "method": "cryoem",
+   "uniprot": "Q85JD5",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "6RD4",
+   "organism_group": "plant",
+   "method": "cryoem",
+   "uniprot": "D8V7I2",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "1JBL",
+   "organism_group": "plant",
+   "method": "nmr",
+   "uniprot": "Q4GWU5",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "1JJZ",
+   "organism_group": "plant",
+   "method": "nmr",
+   "uniprot": "P56254",
+   "structures_for_protein": 14
+  },
+  {
+   "id": "9CY0",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTD1",
+   "structures_for_protein": 3084
+  },
+  {
+   "id": "2O7A",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00720",
+   "structures_for_protein": 559
+  },
+  {
+   "id": "7H47",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q65900",
+   "structures_for_protein": 467
+  },
+  {
+   "id": "8AQK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q32ZE1",
+   "structures_for_protein": 414
+  },
+  {
+   "id": "1OEW",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P11838",
+   "structures_for_protein": 414
+  },
+  {
+   "id": "6T6E",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P12497",
+   "structures_for_protein": 313
+  },
+  {
+   "id": "5R0D",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P33334",
+   "structures_for_protein": 297
+  },
+  {
+   "id": "2HS1",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03366",
+   "structures_for_protein": 297
+  },
+  {
+   "id": "7Z8O",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTC2",
+   "structures_for_protein": 195
+  },
+  {
+   "id": "2PWA",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P06873",
+   "structures_for_protein": 192
+  },
+  {
+   "id": "3E2O",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00431",
+   "structures_for_protein": 175
+  },
+  {
+   "id": "5YOK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03367",
+   "structures_for_protein": 172
+  },
+  {
+   "id": "7H6Z",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q8JUX6",
+   "structures_for_protein": 154
+  },
+  {
+   "id": "7Z09",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P02945",
+   "structures_for_protein": 149
+  },
+  {
+   "id": "6DV4",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P04585",
+   "structures_for_protein": 144
+  },
+  {
+   "id": "8AZC",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTC1",
+   "structures_for_protein": 143
+  },
+  {
+   "id": "2J9J",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03369",
+   "structures_for_protein": 111
+  },
+  {
+   "id": "7GPX",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q68T42",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "3W07",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O26232",
+   "structures_for_protein": 110
+  },
+  {
+   "id": "4M5R",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "C3W5S0",
+   "structures_for_protein": 104
+  },
+  {
+   "id": "7LTU",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTC9",
+   "structures_for_protein": 102
+  },
+  {
+   "id": "1ODM",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P05326",
+   "structures_for_protein": 95
+  },
+  {
+   "id": "3QEX",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q38087",
+   "structures_for_protein": 90
+  },
+  {
+   "id": "3L8W",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q00511",
+   "structures_for_protein": 83
+  },
+  {
+   "id": "3UA7",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P26663",
+   "structures_for_protein": 78
+  },
+  {
+   "id": "2Z6R",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O58456",
+   "structures_for_protein": 77
+  },
+  {
+   "id": "4TQR",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q97W02",
+   "structures_for_protein": 74
+  },
+  {
+   "id": "13XO",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "F1T146",
+   "structures_for_protein": 70
+  },
+  {
+   "id": "9TDI",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A0S2GKZ1",
+   "structures_for_protein": 69
+  },
+  {
+   "id": "4HAT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P30822",
+   "structures_for_protein": 67
+  },
+  {
+   "id": "2FOM",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q91H74",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "1I0V",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00651",
+   "structures_for_protein": 63
+  },
+  {
+   "id": "4N0K",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00044",
+   "structures_for_protein": 62
+  },
+  {
+   "id": "5J4L",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O74036",
+   "structures_for_protein": 61
+  },
+  {
+   "id": "2NMZ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P04587",
+   "structures_for_protein": 59
+  },
+  {
+   "id": "2WQ1",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03069",
+   "structures_for_protein": 59
+  },
+  {
+   "id": "2ACF",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0C6X7",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "6XHN",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0C6U8",
+   "structures_for_protein": 55
+  },
+  {
+   "id": "2XRY",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q8PYK9",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "13TX",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTD2",
+   "structures_for_protein": 53
+  },
+  {
+   "id": "30XL",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q8PWY1",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "7LOG",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "D9IEF7",
+   "structures_for_protein": 51
+  },
+  {
+   "id": "8QUK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P12493",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "6HFC",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03472",
+   "structures_for_protein": 49
+  },
+  {
+   "id": "4EIR",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q1K8B6",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "4NVB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "B3LRE1",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "4ZA9",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A2QHE5",
+   "structures_for_protein": 44
+  },
+  {
+   "id": "6K9O",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P36217",
+   "structures_for_protein": 42
+  },
+  {
+   "id": "6TAW",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q04544",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "1RYP",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P40303",
+   "structures_for_protein": 38
+  },
+  {
+   "id": "5NW3",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P24297",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "7IAW",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A142IX72",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "7MM8",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A0B4WYC6",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "3PL8",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q7ZA32",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3Q39",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q5F4T5",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "6RI6",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "I1VE66",
+   "structures_for_protein": 34
+  },
+  {
+   "id": "3RC4",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P26664",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "1I1W",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P23360",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "2IWX",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P02829",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "3TYQ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O92972",
+   "structures_for_protein": 33
+  },
+  {
+   "id": "4FNK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q91MA7",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "3UF8",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q12306",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "9BXG",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A0M3KKW9",
+   "structures_for_protein": 32
+  },
+  {
+   "id": "4XOT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q9AYY6",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "5DGJ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q83883",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "6WRT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q57834",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "1E2K",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DTH5",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "2EBO",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q05320",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "9ATJ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "K9N7C7",
+   "structures_for_protein": 29
+  },
+  {
+   "id": "2V3I",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P62694",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "2Z30",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P58502",
+   "structures_for_protein": 28
+  },
+  {
+   "id": "1JFB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P23295",
+   "structures_for_protein": 27
+  },
+  {
+   "id": "4EJD",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P12499",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "8F3A",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P04578",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "9PHD",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03452",
+   "structures_for_protein": 26
+  },
+  {
+   "id": "3NZB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P16184",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "3SU6",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A8DG50",
+   "structures_for_protein": 25
+  },
+  {
+   "id": "4Q4W",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "V9VEF3",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5XVT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P34736",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "4DCD",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03300",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "7R6J",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "G0SFD1",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5ESG",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A6ZSR0",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "5KQR",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A024B7W1",
+   "structures_for_protein": 24
+  },
+  {
+   "id": "9U79",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q9YAQ8",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "7OLT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q5AR53",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "2E8V",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q12051",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "4GBU",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q02899",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "3P8N",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P26662",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6WHM",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "C6H0Y9",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "6EKZ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "B9W4V6",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "5N0O",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A2R2JFI5",
+   "structures_for_protein": 23
+  },
+  {
+   "id": "9H1X",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P42196",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "7O91",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "F9VPE5",
+   "structures_for_protein": 22
+  },
+  {
+   "id": "4RD4",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q980A5",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "6AM7",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q8U093",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5WLO",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q72498",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5AN7",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q06121",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5A71",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P41365",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5FGB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P27958",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5XL8",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P19696",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "5GQI",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P11041",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "2AL1",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00924",
+   "structures_for_protein": 21
+  },
+  {
+   "id": "3EM1",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q5UQL3",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "4XVT",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q0ED31",
+   "structures_for_protein": 20
+  },
+  {
+   "id": "6A0Z",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q6DQ34",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "2DXU",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O57883",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "5VRK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q97VT7",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "5JJS",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q6YMS4",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "6X6Z",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P12689",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "8PB5",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0DPA9",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "9NDR",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P0CS93",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "1E9G",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P00817",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "3FMU",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O94753",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "1CXQ",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O92956",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "3LDC",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O27564",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "6TVB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "A0A0A7HR51",
+   "structures_for_protein": 18
+  },
+  {
+   "id": "2XYM",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q99IB8",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "2VEB",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q8TLY9",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "2AVO",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q7SSI0",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "4U8I",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q4W1X2",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "3SXX",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P12807",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "5A0Y",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P11562",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "1V39",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P07617",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "1JG7",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P04547",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "6RXK",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P02309",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "37BV",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O59952",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "5NSL",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "J7HDY4",
+   "structures_for_protein": 17
+  },
+  {
+   "id": "3FQL",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q9WMX2",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "1F7D",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P16088",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "3Q7C",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P13699",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "7ZIL",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "P03089",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "3U55",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "O57978",
+   "structures_for_protein": 16
+  },
+  {
+   "id": "4KWD",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q9UR08",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "4ZP6",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q5UEA2",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "4IBG",
+   "organism_group": "other",
+   "method": "xray",
+   "uniprot": "Q05127",
+   "structures_for_protein": 15
+  },
+  {
+   "id": "9GXG",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P0DTC2",
+   "structures_for_protein": 881
+  },
+  {
+   "id": "9NPX",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P0DTD1",
+   "structures_for_protein": 265
+  },
+  {
+   "id": "8TOX",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "Q2N0S6",
+   "structures_for_protein": 119
+  },
+  {
+   "id": "9SV6",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P20435",
+   "structures_for_protein": 90
+  },
+  {
+   "id": "8R1C",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P10104",
+   "structures_for_protein": 48
+  },
+  {
+   "id": "8DQW",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P40348",
+   "structures_for_protein": 41
+  },
+  {
+   "id": "8VBH",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P03366",
+   "structures_for_protein": 39
+  },
+  {
+   "id": "9P6E",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "Q2N0S5",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "8S7J",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P21404",
+   "structures_for_protein": 36
+  },
+  {
+   "id": "9B5C",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P0CH07",
+   "structures_for_protein": 31
+  },
+  {
+   "id": "7Z0H",
+   "organism_group": "other",
+   "method": "cryoem",
+   "uniprot": "P28000",
+   "structures_for_protein": 30
+  },
+  {
+   "id": "1AZ6",
+   "organism_group": "other",
+   "method": "nmr",
+   "uniprot": "P62694",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "1DMZ",
+   "organism_group": "other",
+   "method": "nmr",
+   "uniprot": "P22216",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "1UPH",
+   "organism_group": "other",
+   "method": "nmr",
+   "uniprot": "P12497",
+   "structures_for_protein": 19
+  },
+  {
+   "id": "1MZI",
+   "organism_group": "other",
+   "method": "nmr",
+   "uniprot": "P04578",
+   "structures_for_protein": 15
+  }
+ ]
+}
