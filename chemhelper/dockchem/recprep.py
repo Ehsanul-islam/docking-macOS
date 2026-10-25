@@ -21,6 +21,7 @@ import gemmi
 from . import hetatm, protonation
 from .errors import HelperError, InvalidInput, ToolFailure
 from .provenance import record
+from . import __version__
 
 LOOP_NEAR_SITE = 10.0
 CLASH_CUTOFF = 2.2                 # heavy-atom non-bonded contact, angstrom
@@ -58,6 +59,9 @@ class ReceptorPrepOptions:
     # Free edits applied before anything else, e.g. ["delete chain B", "delete resn SO4,GOL",
     # "delete within 3 of resn XYZ and water"] (see selection.py). Each one is logged in the report.
     edits: list[str] = field(default_factory=list)
+    # Who writes the PDBQT: Meeko, the built-in table writer (rigid only, see recwriter.py), or "auto" =
+    # Meeko, falling back to the table writer if Meeko fails.
+    pdbqt_writer: str = "auto"                  # auto | meeko | table
     alphafold: bool = False
     min_plddt: float = 70.0
     trim_low_plddt_termini: bool = False
@@ -514,6 +518,30 @@ def _drop_malformed(src: Path, dst: Path, rep) -> Path:
     return dst
 
 
+def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
+    """Meeko first; if it fails and the table writer can do the job, use that and say so loudly."""
+    if opts.pdbqt_writer not in ("auto", "meeko", "table"):
+        raise InvalidInput(f"pdbqt_writer must be auto, meeko or table, not {opts.pdbqt_writer!r}")
+    if opts.pdbqt_writer != "table":
+        try:
+            return _meeko(pdb_path, base, opts, rep)
+        except ToolFailure as e:
+            if opts.pdbqt_writer == "meeko" or opts.flex_residues:
+                raise
+            rep.warn(f"Meeko failed ({e.message}); the receptor PDBQT was written by the built-in table writer")
+    elif opts.flex_residues:
+        raise InvalidInput("flexible residues need Meeko (pdbqt_writer='table' writes a rigid receptor only)")
+    from . import recwriter
+    out = Path(f"{base}.pdbqt")
+    r = recwriter.write_pdbqt(pdb_path.read_text(), out)
+    for d in r["dropped"]:
+        rep.warn(f"residue {d['residue']} left out of the PDBQT: {d['reason']}")
+        rep.dropped.append(d)
+    rep.tools.append(record("dockchem.recwriter", __version__, {"atoms": r["atoms"], "merged_hydrogens": r["merged_hydrogens"],
+                                                                 "charges": "not written (Vina ignores them)"}))
+    return out, None
+
+
 def _isolate_valence_failures(pdb: Path, attempt) -> dict:
     """{"A:46": "ASN"} for every residue that makes Meeko fail on its own with a valence error."""
     atoms = [l for l in pdb.read_text().splitlines() if l.startswith(("ATOM", "HETATM"))]
@@ -963,7 +991,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             meeko_in = final
         meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep)
         meeko_in = _drop_malformed(meeko_in, td / "meeko_sane.pdb", rep)
-        rigid, flex = _meeko(meeko_in, outdir / "receptor", opts, rep)
+        rigid, flex = _write_pdbqt(meeko_in, outdir / "receptor", opts, rep)
 
     final_model = gemmi.read_pdb_string(final.read_text())[0]
     atoms_after = sum(len(r) for ch in final_model for r in ch)

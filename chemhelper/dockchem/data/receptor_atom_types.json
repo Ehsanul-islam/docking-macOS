@@ -1,0 +1,607 @@
+{
+ "merged_hydrogens": {
+  "ALA": [
+   "HA",
+   "HB1",
+   "HB2",
+   "HB3"
+  ],
+  "ARG": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HD3",
+   "HG2",
+   "HG3"
+  ],
+  "ASH": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "ASN": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "ASP": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "CYM": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "CYS": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "CYX": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "GLH": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HG2",
+   "HG3"
+  ],
+  "GLN": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HG2",
+   "HG3"
+  ],
+  "GLU": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HG2",
+   "HG3"
+  ],
+  "GLY": [
+   "HA2",
+   "HA3"
+  ],
+  "HID": [
+   "H1",
+   "H2",
+   "H3",
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HE1"
+  ],
+  "HIE": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HE1"
+  ],
+  "HIP": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HE1"
+  ],
+  "ILE": [
+   "HA",
+   "HB",
+   "HD11",
+   "HD12",
+   "HD13",
+   "HG12",
+   "HG13",
+   "HG21",
+   "HG22",
+   "HG23"
+  ],
+  "LEU": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD11",
+   "HD12",
+   "HD13",
+   "HD21",
+   "HD22",
+   "HD23",
+   "HG"
+  ],
+  "LYN": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HD3",
+   "HE2",
+   "HE3",
+   "HG2",
+   "HG3"
+  ],
+  "LYS": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HD3",
+   "HE2",
+   "HE3",
+   "HG2",
+   "HG3"
+  ],
+  "MET": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HE1",
+   "HE2",
+   "HE3",
+   "HG2",
+   "HG3"
+  ],
+  "PHE": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD1",
+   "HD2",
+   "HE1",
+   "HE2",
+   "HZ"
+  ],
+  "PRO": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD2",
+   "HD3",
+   "HG2",
+   "HG3"
+  ],
+  "SER": [
+   "HA",
+   "HB2",
+   "HB3"
+  ],
+  "THR": [
+   "HA",
+   "HB",
+   "HG21",
+   "HG22",
+   "HG23"
+  ],
+  "TRP": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD1",
+   "HE3",
+   "HH2",
+   "HZ2",
+   "HZ3"
+  ],
+  "TYR": [
+   "HA",
+   "HB2",
+   "HB3",
+   "HD1",
+   "HD2",
+   "HE1",
+   "HE2"
+  ],
+  "VAL": [
+   "HA",
+   "HB",
+   "HG11",
+   "HG12",
+   "HG13",
+   "HG21",
+   "HG22",
+   "HG23"
+  ]
+ },
+ "provenance": {
+  "atoms_observed": 141765,
+  "corpus_pairs": 46,
+  "source": "Meeko receptor PDBQT output"
+ },
+ "types": {
+  "ALA": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "ARG": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CG": "C",
+   "CZ": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HE": "HD",
+   "HH11": "HD",
+   "HH12": "HD",
+   "HH21": "HD",
+   "HH22": "HD",
+   "N": "N",
+   "NE": "N",
+   "NH1": "N",
+   "NH2": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "ASH": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CG": "C",
+   "H": "HD",
+   "HD2": "HD",
+   "N": "N",
+   "O": "OA",
+   "OD1": "OA",
+   "OD2": "OA"
+  },
+  "ASN": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HD21": "HD",
+   "HD22": "HD",
+   "N": "N",
+   "ND2": "N",
+   "O": "OA",
+   "OD1": "OA",
+   "OXT": "OA"
+  },
+  "ASP": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OD1": "OA",
+   "OD2": "OA",
+   "OXT": "OA"
+  },
+  "CA": {
+   "CA": "Ca"
+  },
+  "CYS": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "H": "HD",
+   "HG": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA",
+   "SG": "SA"
+  },
+  "CYX": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "H": "HD",
+   "N": "N",
+   "O": "OA",
+   "SG": "SA"
+  },
+  "GLH": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CG": "C",
+   "H": "HD",
+   "HE2": "HD",
+   "N": "N",
+   "O": "OA",
+   "OE1": "OA",
+   "OE2": "OA"
+  },
+  "GLN": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HE21": "HD",
+   "HE22": "HD",
+   "N": "N",
+   "NE2": "N",
+   "O": "OA",
+   "OE1": "OA",
+   "OXT": "OA"
+  },
+  "GLU": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CG": "C",
+   "H": "HD",
+   "N": "N",
+   "O": "OA",
+   "OE1": "OA",
+   "OE2": "OA"
+  },
+  "GLY": {
+   "C": "C",
+   "CA": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "HID": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD2": "A",
+   "CE1": "A",
+   "CG": "A",
+   "H": "HD",
+   "HD1": "HD",
+   "N": "N",
+   "ND1": "N",
+   "NE2": "NA",
+   "O": "OA"
+  },
+  "HIE": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD2": "A",
+   "CE1": "A",
+   "CG": "A",
+   "H": "HD",
+   "HE2": "HD",
+   "N": "N",
+   "ND1": "NA",
+   "NE2": "N",
+   "O": "OA"
+  },
+  "HIP": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD2": "A",
+   "CE1": "A",
+   "CG": "A",
+   "H": "HD",
+   "HD1": "HD",
+   "HE2": "HD",
+   "N": "N",
+   "ND1": "N",
+   "NE2": "N",
+   "O": "OA"
+  },
+  "ILE": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD1": "C",
+   "CG1": "C",
+   "CG2": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "LEU": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD1": "C",
+   "CD2": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "LYN": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CE": "C",
+   "CG": "C",
+   "H": "HD",
+   "HZ2": "HD",
+   "HZ3": "HD",
+   "N": "N",
+   "NZ": "NA",
+   "O": "OA"
+  },
+  "LYS": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CE": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HZ1": "HD",
+   "HZ2": "HD",
+   "HZ3": "HD",
+   "N": "N",
+   "NZ": "N",
+   "O": "OA"
+  },
+  "MET": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CE": "C",
+   "CG": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "SD": "SA"
+  },
+  "MN": {
+   "MN": "Mn"
+  },
+  "PHE": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD1": "A",
+   "CD2": "A",
+   "CE1": "A",
+   "CE2": "A",
+   "CG": "A",
+   "CZ": "A",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "PRO": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD": "C",
+   "CG": "C",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "SER": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HG": "HD",
+   "N": "N",
+   "O": "OA",
+   "OG": "OA",
+   "OXT": "OA"
+  },
+  "THR": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CG2": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "HG1": "HD",
+   "N": "N",
+   "O": "OA",
+   "OG1": "OA"
+  },
+  "TRP": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD1": "A",
+   "CD2": "A",
+   "CE2": "A",
+   "CE3": "A",
+   "CG": "A",
+   "CH2": "A",
+   "CZ2": "A",
+   "CZ3": "A",
+   "H": "HD",
+   "HE1": "HD",
+   "N": "N",
+   "NE1": "N",
+   "O": "OA"
+  },
+  "TYR": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CD1": "A",
+   "CD2": "A",
+   "CE1": "A",
+   "CE2": "A",
+   "CG": "A",
+   "CZ": "A",
+   "H": "HD",
+   "HH": "HD",
+   "N": "N",
+   "O": "OA",
+   "OH": "OA",
+   "OXT": "OA"
+  },
+  "VAL": {
+   "C": "C",
+   "CA": "C",
+   "CB": "C",
+   "CG1": "C",
+   "CG2": "C",
+   "H": "HD",
+   "H1": "HD",
+   "H2": "HD",
+   "H3": "HD",
+   "N": "N",
+   "O": "OA",
+   "OXT": "OA"
+  },
+  "ZN": {
+   "ZN": "Zn"
+  }
+ }
+}
