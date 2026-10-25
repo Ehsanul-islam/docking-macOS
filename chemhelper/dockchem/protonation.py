@@ -42,7 +42,8 @@ _FLIP_PAIRS = {"ASN": (("OD1", "ND2"),), "GLN": (("OE1", "NE2"),), "HIS": (("ND1
 for _s in ("HID", "HIE", "HIP"):
     FLIP_GROUPS[_s] = FLIP_GROUPS["HIS"]
     _FLIP_PAIRS[_s] = _FLIP_PAIRS["HIS"]
-FLIP_TOLERANCE = 0.4        # A: how closely a swapped atom must land on its partner to count as a flip
+FLIP_AXIS_TOLERANCE = 0.3   # A: the atoms the group rotates about must not have moved
+FLIP_MIN_MOVE = 1.0         # A: mean heavy-atom movement of the group that counts as a flip
 
 
 def parse_key(key: str) -> tuple[str, str]:
@@ -131,7 +132,9 @@ def _d(a, b) -> float:
 
 
 def detect_flips(before_text: str, after_text: str) -> list[dict]:
-    """Residues whose terminal atoms were swapped by PDB2PQR's hydrogen-bond optimisation."""
+    """Residues whose terminal group PDB2PQR rotated about its axis: the axis atoms stay put while the
+    group's heavy atoms move by FLIP_MIN_MOVE on average (the groups are only roughly symmetric, so an
+    exact atom-swap test misses real flips)."""
     b, a = _coords(before_text), _coords(after_text)
     flips = []
     for key, atoms_a in a.items():
@@ -139,22 +142,17 @@ def detect_flips(before_text: str, after_text: str) -> list[dict]:
         if not atoms_b:
             continue
         name = next(iter(atoms_a.values()))[3]
-        pairs = _FLIP_PAIRS.get(name)
-        if not pairs:
+        group = FLIP_GROUPS.get(name)
+        if not group:
             continue
-        flipped = True
-        for x, y in pairs:
-            if not all(n in atoms_a and n in atoms_b for n in (x, y)):
-                flipped = False
-                break
-            # after-atom x sits where before-atom y was, and vice versa
-            if not (_d(atoms_a[x], atoms_b[y]) < FLIP_TOLERANCE and _d(atoms_a[y], atoms_b[x]) < FLIP_TOLERANCE):
-                flipped = False
-                break
-            if _d(atoms_a[x], atoms_b[x]) < FLIP_TOLERANCE:      # pair not actually apart: no flip
-                flipped = False
-                break
-        if flipped:
+        axis, moving = group
+        heavy = [n for n in moving if not n.startswith("H") and n in atoms_a and n in atoms_b]
+        if len(heavy) < 2 or not all(n in atoms_a and n in atoms_b for n in axis):
+            continue
+        if any(_d(atoms_a[n], atoms_b[n]) > FLIP_AXIS_TOLERANCE for n in axis):
+            continue
+        mean = sum(_d(atoms_a[n], atoms_b[n]) for n in heavy) / len(heavy)
+        if mean >= FLIP_MIN_MOVE:
             flips.append({"key": f"{key[0]}:{key[1]}", "resname": name})
     return flips
 

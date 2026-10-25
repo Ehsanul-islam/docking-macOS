@@ -172,6 +172,12 @@ def _session(params):
     return s
 
 
+def structure_assess(params, srv):
+    from .assess import assess
+    a = assess(params["path"], int(params.get("model", 1)))
+    return {"result": a, "artifacts": [], "provenance": record("dockchem.assess", __version__, {"model": params.get("model", 1)})}
+
+
 def selection_validate(params, srv):
     from .selection import _split, parse
     cmd = params.get("command")
@@ -231,6 +237,7 @@ METHODS = {
     "library.prepare": library_prepare,
     "receptor.prepare": receptor_prepare,
     "ligand.from_structure": ligand_from_structure,
+    "structure.assess": structure_assess,
     "selection.validate": selection_validate,
     "selection.preview": selection_preview,
     "selection.apply": selection_apply,

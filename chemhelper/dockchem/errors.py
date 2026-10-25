@@ -67,3 +67,19 @@ class SelectionError(InvalidInput):
         d = super().to_rpc()
         d["data"].update({"pos": self.pos, "expr": self.expr})
         return d
+
+
+class UnusableStructure(InvalidInput):
+    """The structure assessment found nothing that can be docked into. `assessment` has the findings;
+    pass allow_unusable=True to prepare it anyway."""
+    code = -32007
+    kind = "UnusableStructure"
+
+    def __init__(self, message: str, assessment: dict | None = None):
+        super().__init__(message)
+        self.assessment = assessment or {}
+
+    def to_rpc(self) -> dict:
+        d = super().to_rpc()
+        d["data"]["assessment"] = self.assessment
+        return d

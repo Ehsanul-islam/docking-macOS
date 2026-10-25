@@ -19,7 +19,9 @@ from pathlib import Path
 import gemmi
 
 from . import hetatm, protonation
-from .errors import HelperError, InvalidInput, ToolFailure
+from . import stagecheck
+from .assess import assess_structure
+from .errors import HelperError, InvalidInput, ToolFailure, UnusableStructure
 from .provenance import record
 from . import __version__
 
@@ -62,6 +64,8 @@ class ReceptorPrepOptions:
     # Who writes the PDBQT: Meeko, the built-in table writer (rigid only, see recwriter.py), or "auto" =
     # Meeko, falling back to the table writer if Meeko fails.
     pdbqt_writer: str = "auto"                  # auto | meeko | table
+    # Structures the assessment calls unusable are refused with the reasons; True prepares them anyway.
+    allow_unusable: bool = False
     alphafold: bool = False
     min_plddt: float = 70.0
     trim_low_plddt_termini: bool = False
@@ -734,6 +738,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                 del st[i]
         rep.change("model", f"model {opts.model}", f"kept 1 of {n_models} models", "single model docked", "gemmi")
     model = st[0]
+    assessment = assess_structure(st, 1, src.suffix.lower())
     n_h = sum(1 for ch in model for r in ch for a in r if a.element.name == "H")
     atoms_before = sum(len(r) for ch in model for r in ch)
     if n_h:
@@ -758,6 +763,12 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         model = st[0]
         if not any(_is_polymer(r) for ch in model for r in ch):
             raise InvalidInput("the edits removed every protein residue")
+        assessment = assess_structure(st, 1, ".cif")        # what is left is what gets docked into
+    if assessment["verdict"] == "unusable":
+        if not opts.allow_unusable:
+            raise UnusableStructure("this structure cannot be docked into: " + assessment["summary"] +
+                                    " (set allow_unusable to prepare it anyway)", assessment)
+        rep.warn("structure assessed as unusable but prepared on request: " + assessment["summary"])
     refs_all = _find_reference(model, opts.reference_ligand)
     refs = refs_all[:1]
     if len(refs_all) > 1:
@@ -892,6 +903,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         fixed = _pdbfixer(poly.make_pdb_string(), opts, rep)
+        stagecheck.check_moved_atoms("pdbfixer", poly.make_pdb_string(), fixed, limit=stagecheck.PDBFIXER_MOVE_LIMIT)
         (td / "fixed.pdb").write_text(fixed)
         rep.tools.append(record("pdbfixer", _ver("pdbfixer"), {"rebuild_missing_atoms": opts.rebuild_missing_atoms}))
         before = _residue_names(fixed)
@@ -906,6 +918,10 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         protonation.verify_overrides(prot_text, applied)
         flips = protonation.detect_flips(fixed, prot_text) if opts.optimize_flips else []
         flipped = {f["key"] for f in flips}
+        doomed = {tuple(k.split(":", 1)) for k in assessment["stats"].get("distorted_keys", [])}   # dropped later anyway
+        stagecheck.check_moved_atoms("pdb2pqr", fixed, prot_text,
+                                     {tuple(f["key"].split(":", 1)) for f in flips} | doomed)
+        stagecheck.check_hydrogens("pdb2pqr", prot_text)
         reject = []
         for k, v in opts.flip_decisions.items():
             c, n = protonation.parse_key(k)
@@ -992,6 +1008,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep)
         meeko_in = _drop_malformed(meeko_in, td / "meeko_sane.pdb", rep)
         rigid, flex = _write_pdbqt(meeko_in, outdir / "receptor", opts, rep)
+        stagecheck.check_pdbqt(meeko_in.read_text(), rigid, rep.dropped, flex)
 
     final_model = gemmi.read_pdb_string(final.read_text())[0]
     atoms_after = sum(len(r) for ch in final_model for r in ch)
@@ -1008,5 +1025,6 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "site_residues": sorted(site_res_ids),
         # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
         "status": "degraded" if rep.dropped else "ok", "dropped_residues": rep.dropped,
+        "assessment": assessment,
     }
     return ReceptorResult(final, rigid, flex, ligands, report)
