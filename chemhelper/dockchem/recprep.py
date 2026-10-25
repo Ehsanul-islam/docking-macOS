@@ -510,11 +510,13 @@ def _contact_pairs(pdb_text: str) -> list[tuple]:
     st = gemmi.read_pdb_string(pdb_text)
     ns = gemmi.NeighborSearch(st[0], st.cell, 5).populate()
     cs = gemmi.ContactSearch(2 * BOND_ALLOWANCE * max(covalent_radius.values()))
-    cs.ignore = gemmi.ContactSearch.Ignore.AdjacentResidues
+    cs.ignore = gemmi.ContactSearch.Ignore.SameResidue      # adjacent residues clash too (3SN6 THR98 HG1)
     out = []
     for r in cs.find_contacts(ns):
         a, b = r.partner1, r.partner2
         if a.atom.name == "SG" and b.atom.name == "SG":      # disulfide
+            continue
+        if {a.atom.name, b.atom.name} == {"C", "N"} and r.dist > 1.0:     # the peptide bond itself
             continue
         ea, eb = a.atom.element.name, b.atom.element.name       # table is keyed by element symbol
         if ea not in covalent_radius or eb not in covalent_radius:

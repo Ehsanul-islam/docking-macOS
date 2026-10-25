@@ -281,3 +281,14 @@ def test_hetatm_amino_acid_is_ligand_not_receptor(tmp_path):
     r = prepare_receptor(p, tmp_path / "o")
     out = gemmi.read_pdb_string(r.pdb.read_text())
     assert len(out[0]) == 1 and max(res.seqid.num for res in out[0][0]) < 100      # 501 not in the chain
+
+
+def test_adjacent_residue_hydrogen_clash_is_detected_but_peptide_bond_is_not():
+    """3SN6 regression: THR98 HG1 was 1.08 A from LYS97 O (adjacent residues were being ignored)."""
+    from dockchem.recprep import _close_contacts
+    clash = ("ATOM      1  O   LYS A  97       0.000   0.000   0.000  1.00  0.00           O\n"
+             "ATOM      2  HG1 THR A  98       1.080   0.000   0.000  1.00  0.00           H\n")
+    assert len(_close_contacts(clash)) == 1
+    peptide_bond = ("ATOM      1  C   LYS A  97       0.000   0.000   0.000  1.00  0.00           C\n"
+                    "ATOM      2  N   THR A  98       1.330   0.000   0.000  1.00  0.00           N\n")
+    assert _close_contacts(peptide_bond) == []
