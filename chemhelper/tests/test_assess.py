@@ -196,3 +196,14 @@ def test_short_x_ray_hydroxyl_hydrogens_are_not_distortion(base, tmp_path):
     assert n >= 3
     a = assess(write(st, tmp_path))
     assert a["stats"]["distorted_residues"] == 0 and "distorted_coordinates" not in codes(a)
+
+
+def test_backbone_stub_residue_is_a_fix_finding(base, tmp_path):
+    st = copy.deepcopy(base)
+    r = st[0][0][5]
+    for i in reversed(range(len(r))):
+        if r[i].name != "N":
+            del r[i]
+    a = assess(write(st, tmp_path))
+    assert a["verdict"] == "fixable" and "backbone_stubs" in codes(a, "fix") and a["stats"]["backbone_stubs"] == 1
+    assert "missing_atoms" not in codes(a)           # a stub is not counted as a rebuildable residue

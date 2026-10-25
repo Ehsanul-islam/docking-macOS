@@ -14,7 +14,6 @@ from .errors import ToolFailure
 
 AD_TYPES = {"C", "A", "N", "NA", "OA", "O", "S", "SA", "HD", "H", "P", "F", "Cl", "Br", "I", "Zn", "Mg", "Mn",
             "Ca", "Fe", "B", "Cu", "Ni", "Co", "Cd", "Hg"}
-HEAVY_MOVE_LIMIT = 1.0      # A: PDB2PQR legitimately nudges a few side chains (<= ~0.9 A seen); more is a defect
 PDBFIXER_MOVE_LIMIT = 0.05  # A: PDBFixer must not move atoms that were already there
 
 
@@ -39,25 +38,48 @@ def residue_set(text: str) -> dict:
     return {(c, n): r for (c, n, _), (_, _, _, r, _) in _atoms(text).items()}
 
 
+ANCHORS = {"N", "CA", "C", "O", "CB"}       # atoms a preparation stage must not relocate
+ANCHOR_LIMIT = 0.5                          # A
+BOND_LIMIT = 1.9                            # A: heavy-atom pairs closer than this in the input are bonded
+BOND_CHANGE = 0.35                          # A: bonds must keep their length (rotations and flips do)
+
+
 def check_moved_atoms(stage: str, before: str, after: str, allowed_moved: set | None = None,
-                      limit: float = HEAVY_MOVE_LIMIT) -> float:
-    """Residues must survive and their input heavy atoms must stay put (except `allowed_moved` residue keys,
-    e.g. deliberately flipped ones). Returns the largest displacement seen."""
+                      limit: float = ANCHOR_LIMIT) -> float:
+    """What a stage may not do: lose residues, relocate the backbone / CB, or stretch or squash bonds.
+    Side chains legitimately rotate (flips, PDB2PQR's debumping) and equivalent atoms (OD1/OD2, ...) are
+    relabelled, which is why positions of other atoms are not compared; bond lengths are, because rotations
+    and relabelling preserve them. `allowed_moved` residue keys are exempt. Returns the largest anchor move."""
+    import itertools
+    exempt = allowed_moved or set()
     a, b = _atoms(before), _atoms(after)
     problems, worst = [], 0.0
     lost = set(residue_set(before)) - set(residue_set(after))
     if lost:
         problems.append("residues lost: " + ", ".join(f"{c}:{n}" for c, n in sorted(lost)))
-    for k, (x, y, z, res, el) in a.items():
-        if el == "H" or k[2].startswith("H") or (k[0], k[1]) in (allowed_moved or set()):
+    by_res_a, by_res_b = {}, {}
+    for k, v in a.items():
+        if v[4] != "H" and not k[2].startswith("H"):
+            by_res_a.setdefault((k[0], k[1]), {})[k[2]] = v
+    for k, v in b.items():
+        if v[4] != "H" and not k[2].startswith("H"):
+            by_res_b.setdefault((k[0], k[1]), {})[k[2]] = v
+    for rk, atoms_a in by_res_a.items():
+        if rk in exempt or rk not in by_res_b:
             continue
-        q = b.get(k)
-        if q is None:
-            continue                      # removed atoms are reported by the stage that removes them
-        d = math.dist((x, y, z), q[:3])
-        worst = max(worst, d)
-        if d > limit:
-            problems.append(f"{k[0]}:{res}{k[1]}.{k[2]} moved {d:.2f} A")
+        atoms_b = by_res_b[rk]
+        res = next(iter(atoms_a.values()))[3]
+        for name in ANCHORS & atoms_a.keys() & atoms_b.keys():
+            d = math.dist(atoms_a[name][:3], atoms_b[name][:3])
+            worst = max(worst, d)
+            if d > limit:
+                problems.append(f"{rk[0]}:{res}{rk[1]}.{name} moved {d:.2f} A")
+        for n1, n2 in itertools.combinations(sorted(atoms_a.keys() & atoms_b.keys()), 2):
+            d0 = math.dist(atoms_a[n1][:3], atoms_a[n2][:3])
+            if d0 < BOND_LIMIT:
+                d1 = math.dist(atoms_b[n1][:3], atoms_b[n2][:3])
+                if abs(d1 - d0) > BOND_CHANGE:
+                    problems.append(f"{rk[0]}:{res}{rk[1]} bond {n1}-{n2} changed {d0:.2f} -> {d1:.2f} A")
     if problems:
         _fail(stage, problems)
     return worst

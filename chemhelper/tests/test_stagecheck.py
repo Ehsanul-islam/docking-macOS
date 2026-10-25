@@ -29,12 +29,35 @@ def test_lost_residue_is_a_stage_failure():
     assert e.value.stage == "pdb2pqr"
 
 
-def test_atom_moved_too_far_fails_unless_exempt():
+def test_backbone_anchor_moved_fails_unless_exempt():
     after = BEFORE.replace("   1.400", "   3.000")
     with pytest.raises(ToolFailure, match="A:ALA1.CA moved 1.60"):
         S.check_moved_atoms("pdb2pqr", BEFORE, after)
     assert S.check_moved_atoms("pdb2pqr", BEFORE, after, allowed_moved={("A", "1")}) == 0.0     # exempt: not counted
-    S.check_moved_atoms("pdb2pqr", BEFORE, BEFORE.replace("   1.400", "   1.900"))     # 0.5 A: within the limit
+    S.check_moved_atoms("pdb2pqr", BEFORE, BEFORE.replace("   1.400", "   1.700"), limit=0.5)  # 0.3 A: fine
+
+
+def residue(res, atoms, num=1):
+    return "".join(pdb(i + 1, n, res, num, xyz, n[0]) for i, (n, xyz) in enumerate(atoms))
+
+
+GLU = [("N", (0, 0, 0)), ("CA", (1.45, 0, 0)), ("C", (2.0, 1.4, 0)), ("CB", (2.0, -0.8, 1.2)), ("CG", (3.5, -0.8, 1.2)),
+       ("CD", (4.1, -2.1, 1.2)), ("OE1", (5.3, -2.2, 1.2)), ("OE2", (3.4, -3.2, 1.2))]
+
+
+def test_equivalent_atom_relabelling_and_side_chain_rotation_are_legitimate():
+    """PDB2PQR swaps OE1/OE2 and rotates side chains to relieve clashes; neither changes any bond length."""
+    swapped = [(n if n not in ("OE1", "OE2") else {"OE1": "OE2", "OE2": "OE1"}[n], xyz) for n, xyz in GLU]
+    S.check_moved_atoms("pdb2pqr", residue("GLU", GLU), residue("GLU", swapped))
+    rotated = [(n, (x, -y - 1.6 if n in ("CG", "CD", "OE1", "OE2") else y, z)) for n, (x, y, z) in GLU]   # mirror about CB
+    rotated = [(n, (x, 2 * -0.8 - y, z) if n in ("CG", "CD", "OE1", "OE2") else (x, y, z)) for n, (x, y, z) in GLU]
+    S.check_moved_atoms("pdb2pqr", residue("GLU", GLU), residue("GLU", rotated))
+
+
+def test_a_stretched_or_squashed_bond_is_a_stage_failure():
+    broken = [(n, (x + 1.2, y, z) if n == "CD" else (x, y, z)) for n, (x, y, z) in GLU]
+    with pytest.raises(ToolFailure, match="bond CD-OE1 changed|bond CG-CD changed"):
+        S.check_moved_atoms("pdb2pqr", residue("GLU", GLU), residue("GLU", broken))
 
 
 def test_hydrogens_moving_is_not_an_issue():

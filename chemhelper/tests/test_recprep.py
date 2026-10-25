@@ -338,3 +338,40 @@ def test_bisection_finds_exactly_the_residues_meeko_chokes_on(tmp_path):
 
     assert _isolate_valence_failures(pdb, fake) == {"A:7": "ALA", "A:30": "ALA"}
     assert _isolate_valence_failures(pdb, lambda p: SimpleNamespace(returncode=0, stdout="", stderr="")) == {}
+
+
+def test_backbone_stub_residue_is_left_out_by_name_instead_of_crashing_pdb2pqr(tmp_path):
+    """Real entries (1OF1, 1W1P, 1W2G, 2BM2, 2BSM) contain residues that are a single N atom; PDB2PQR dies on them."""
+    st = peptide_structure()
+    for r in st[0][0]:
+        if r.seqid.num == 8:
+            for i in reversed(range(len(r))):
+                if r[i].name != "N":
+                    del r[i]
+    src = tmp_path / "stub.pdb"
+    st.write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert res.report["status"] == "degraded"
+    assert any(d["residue"] == "A:CYS8" and "backbone atoms missing" in d["reason"] for d in res.report["dropped_residues"])
+
+
+def test_multi_letter_chain_names_are_aliased_and_reported(tmp_path):
+    """mmCIF entries can have chains named AAA; the PDB format cannot hold them (12 of 300 benchmark entries)."""
+    st = peptide_structure()
+    st[0][0].name = "AAA"
+    src = tmp_path / "long.cif"
+    st.make_mmcif_document().write_file(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions(chains=["AAA"]))
+    assert res.report["chain_map"] == {"AAA": "A"}
+    assert any(c["stage"] == "chains" and c["residue"] == "AAA" for c in res.report["changes"])
+    assert res.pdbqt.exists()
+
+
+def test_too_many_long_chain_names_is_a_clear_error(tmp_path):
+    from dockchem.recprep import _alias_chains, _Report
+    st = peptide_structure()
+    for i in range(70):
+        ch = gemmi.Chain(f"X{i:02d}")
+        st[0].add_chain(ch)
+    with pytest.raises(InvalidInput, match="multi-letter"):
+        _alias_chains(st, ReceptorPrepOptions(), _Report())

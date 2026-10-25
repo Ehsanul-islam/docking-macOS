@@ -180,11 +180,19 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
         _finding(findings, "fix", "unknown_residues", f"{len(unk)} unidentified (UNK) residues will be left "
                  "out of the receptor", [_label(c, r) for c, r in unk])
 
+    stubs = [(c, r) for c, r in prot if "CA" not in {a.name for a in r}
+             or len({a.name for a in r} & {"N", "C", "O"}) < 2]
+    stats["backbone_stubs"] = len(stubs)
+    if stubs:
+        _finding(findings, "fix", "backbone_stubs", f"{len(stubs)} residues have (almost) no backbone and cannot be "
+                 "rebuilt; they will be left out of the receptor", [_label(c, r) for c, r in stubs])
+    stub_ids = {id(r) for _, r in stubs}
+
     expected = _expected_heavy()
     truncated, missing_total = [], 0
     for c, r in prot:
         exp = expected.get(r.name)
-        if not exp:
+        if not exp or id(r) in stub_ids:
             continue
         have = {a.name for a in r}
         miss = exp - have - {"OXT"}

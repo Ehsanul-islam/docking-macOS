@@ -93,7 +93,7 @@ def work(item):
                    crosscheck_reason=cc.get("reason", "")[:150] if cc.get("result") == "unavailable" else "",
                    n_flips=sum(1 for c in rp["changes"] if c["stage"] == "flip"),
                    n_ligands=len(res.ligands),
-                   ligand_bond_orders=collections.Counter(l.get("bond_orders", "?") for l in res.ligands),
+                   ligand_bond_orders=dict(collections.Counter((l.get("bond_orders") or {}).get("status", "?") for l in res.ligands)),
                    warnings=rp["warnings"][:6], prep_seconds=round(time.time() - t0, 1))
         return out
     finally:

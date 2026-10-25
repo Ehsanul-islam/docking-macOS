@@ -145,6 +145,48 @@ def _collapse_altlocs(model, rep):
                        "highest occupancy (first on tie)", "gemmi")
 
 
+ALIAS_POOL = [chr(c) for c in list(range(65, 91)) + list(range(97, 123)) + list(range(48, 58))]
+
+
+def _alias_chains(st, opts, rep):
+    """The PDB format (used by PDBFixer, PDB2PQR and Meeko) holds one-letter chain names; mmCIF entries can have
+    'AAA' or 'AB1'. Rename such chains to free letters and tell the user the mapping. Returns (opts, map)."""
+    import dataclasses
+    model = st[0]
+    long_ = [ch.name for ch in model if len(ch.name) > 1]
+    if not long_:
+        return opts, {}
+    free = [c for c in ALIAS_POOL if c not in {ch.name for ch in model}]
+    if len(long_) > len(free):
+        raise InvalidInput(f"{len(long_)} chains with multi-letter names but only {len(free)} free one-letter names: "
+                           "delete chains you do not need first (e.g. edits=['delete chain XYZ'])")
+    mapping = dict(zip(long_, free))
+    for ch in model:
+        if ch.name in mapping:
+            ch.name = mapping[ch.name]
+    for old, new in mapping.items():
+        rep.change("chains", old, f"renamed to {new}", "multi-letter chain names do not fit the PDB format", "dockchem")
+    rep.warn("chains renamed for processing: " + ", ".join(f"{o}->{n}" for o, n in mapping.items()))
+
+    def tr(spec):
+        if not spec:
+            return spec
+        head, sep, rest = spec.partition(":")
+        return mapping.get(head, head) + sep + rest if sep else spec
+    new_opts = dataclasses.replace(
+        opts, chains=[mapping.get(c, c) for c in opts.chains] if opts.chains is not None else None,
+        reference_ligand=tr(opts.reference_ligand), flex_residues=[tr(f) for f in opts.flex_residues])
+    return new_opts, mapping
+
+
+def _is_backbone_stub(res) -> str | None:
+    """PDB2PQR cannot rebuild a residue that has (almost) no backbone ('Too few atoms present to reconstruct')."""
+    have = {a.name for a in res}
+    if "CA" not in have or len(have & {"N", "C", "O"}) < 2:
+        return "backbone atoms missing (has " + ",".join(sorted(have - {"OXT"}))[:20] + ")"
+    return None
+
+
 def _find_reference(model, spec):
     if not spec:
         return []
@@ -837,6 +879,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             raise UnusableStructure("this structure cannot be docked into: " + assessment["summary"] +
                                     " (set allow_unusable to prepare it anyway)", assessment)
         rep.warn("structure assessed as unusable but prepared on request: " + assessment["summary"])
+    opts, chain_map = _alias_chains(st, opts, rep)
+    model = st[0]
     refs_all = _find_reference(model, opts.reference_ligand)
     refs = refs_all[:1]
     if len(refs_all) > 1:
@@ -937,6 +981,11 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             if _is_polymer(res):
                 if res.name in hetatm.MODIFIED and opts.nonstandard == "remove":
                     rep.change("nonstandard", _rid(ch.name, res), "removed", "user chose to remove", "gemmi")
+                    continue
+                stub = _is_backbone_stub(res) if gemmi.find_tabulated_residue(res.name) else None
+                if stub:
+                    rep.warn(f"{_rid(ch.name, res)} left out: {stub}")
+                    rep.dropped.append({"residue": _rid(ch.name, res), "reason": stub})
                     continue
                 pc.add_residue(res)
                 pc[len(pc) - 1].het_flag = "A"
@@ -1093,6 +1142,6 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "site_residues": sorted(site_res_ids),
         # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
         "status": "degraded" if rep.dropped else "ok", "dropped_residues": rep.dropped,
-        "assessment": assessment, "pdbqt": rep.pdbqt_info,
+        "assessment": assessment, "pdbqt": rep.pdbqt_info, "chain_map": chain_map,
     }
     return ReceptorResult(final, rigid, flex, ligands, report)
