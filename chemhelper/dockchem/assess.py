@@ -77,7 +77,8 @@ def _distorted(res) -> str | None:
             x = d[a].pos.dist(d[b].pos)
             if not lo <= x <= hi:
                 return f"{a}-{b} is {x:.2f} A (expected {lo:.2f}-{hi:.2f})"
-    atoms = [a for a in d.values()]
+    # Heavy atoms only: refinement programs place hydroxyl hydrogens 0.84 A from the oxygen, which is normal.
+    atoms = [a for a in d.values() if a.element.name != "H"]
     for i, a in enumerate(atoms):
         for b in atoms[i + 1:]:
             x = a.pos.dist(b.pos)

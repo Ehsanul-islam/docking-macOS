@@ -1,0 +1,1506 @@
+{
+ "description": "Astex Diverse Set + evenly spaced PoseBusters benchmark entries",
+ "source": "https://zenodo.org/records/8278563",
+ "items": [
+  {
+   "id": "1G9V",
+   "ligand": "RQ3",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1GKC",
+   "ligand": "NFH",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1GM8",
+   "ligand": "SOX",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1GPK",
+   "ligand": "HUP",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HNN",
+   "ligand": "SKF",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HP0",
+   "ligand": "AD3",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HQ2",
+   "ligand": "PH2",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HVY",
+   "ligand": "D16",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HWI",
+   "ligand": "115",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1HWW",
+   "ligand": "SWA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1IA1",
+   "ligand": "TQ3",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1IG3",
+   "ligand": "VIB",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1J3J",
+   "ligand": "CP6",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1JD0",
+   "ligand": "AZM",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1JJE",
+   "ligand": "BYS",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1JLA",
+   "ligand": "TNK",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1K3U",
+   "ligand": "IAD",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1KE5",
+   "ligand": "LS1",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1KZK",
+   "ligand": "JE2",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1L2S",
+   "ligand": "STC",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1L7F",
+   "ligand": "BCZ",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1LPZ",
+   "ligand": "CMB",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1LRH",
+   "ligand": "NLA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1M2Z",
+   "ligand": "DEX",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1MEH",
+   "ligand": "MOA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1MMV",
+   "ligand": "3AR",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1MZC",
+   "ligand": "BNE",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1N1M",
+   "ligand": "A3M",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1N2J",
+   "ligand": "PAF",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1N2V",
+   "ligand": "BDI",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1N46",
+   "ligand": "PFA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1NAV",
+   "ligand": "IH5",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OF1",
+   "ligand": "SCT",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OF6",
+   "ligand": "DTY",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OPK",
+   "ligand": "P16",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OQ5",
+   "ligand": "CEL",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OWE",
+   "ligand": "675",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1OYT",
+   "ligand": "FSN",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1P2Y",
+   "ligand": "NCT",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1P62",
+   "ligand": "GEO",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1PMN",
+   "ligand": "984",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1Q1G",
+   "ligand": "MTI",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1Q41",
+   "ligand": "IXM",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1Q4G",
+   "ligand": "BFL",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1R1H",
+   "ligand": "BIR",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1R55",
+   "ligand": "097",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1R58",
+   "ligand": "AO5",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1R9O",
+   "ligand": "FLP",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1S19",
+   "ligand": "MC9",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1S3V",
+   "ligand": "TQD",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1SG0",
+   "ligand": "STL",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1SJ0",
+   "ligand": "E4D",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1SQ5",
+   "ligand": "PAU",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1SQN",
+   "ligand": "NDR",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1T40",
+   "ligand": "ID5",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1T46",
+   "ligand": "STI",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1T9B",
+   "ligand": "1CS",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1TOW",
+   "ligand": "CRZ",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1TT1",
+   "ligand": "KAI",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1TZ8",
+   "ligand": "DES",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1U1C",
+   "ligand": "BAU",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1U4D",
+   "ligand": "DBQ",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1UML",
+   "ligand": "FR4",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1UNL",
+   "ligand": "RRC",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1UOU",
+   "ligand": "CMU",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1V0P",
+   "ligand": "PVB",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1V48",
+   "ligand": "HA1",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1V4S",
+   "ligand": "MRK",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1VCJ",
+   "ligand": "IBA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1W1P",
+   "ligand": "GIO",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1W2G",
+   "ligand": "THM",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1X8X",
+   "ligand": "TYR",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1XM6",
+   "ligand": "5RM",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1XOQ",
+   "ligand": "ROF",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1XOZ",
+   "ligand": "CIA",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1Y6B",
+   "ligand": "AAX",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1YGC",
+   "ligand": "905",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1YQY",
+   "ligand": "915",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1YV3",
+   "ligand": "BIT",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1YVF",
+   "ligand": "PH7",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1YWR",
+   "ligand": "LI9",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "1Z95",
+   "ligand": "198",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "2BM2",
+   "ligand": "PM2",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "2BR1",
+   "ligand": "PFP",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "2BSM",
+   "ligand": "BSM",
+   "source": "astex_diverse_set"
+  },
+  {
+   "id": "5S8I",
+   "ligand": "2LY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "5SAK",
+   "ligand": "ZRY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "5SD5",
+   "ligand": "HWI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6M2B",
+   "ligand": "EZO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6T88",
+   "ligand": "MWQ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6TW7",
+   "ligand": "NZB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6VTA",
+   "ligand": "AKN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6WTN",
+   "ligand": "RXT",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6XAF",
+   "ligand": "GDP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6XCT",
+   "ligand": "478",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6XHT",
+   "ligand": "V2V",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6XUM",
+   "ligand": "30L",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6YDY",
+   "ligand": "K73",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6YMS",
+   "ligand": "OZH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6YQW",
+   "ligand": "82I",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6YRV",
+   "ligand": "PJ8",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6YT6",
+   "ligand": "PKE",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6Z0R",
+   "ligand": "Q4H",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6Z1C",
+   "ligand": "7EY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6Z4N",
+   "ligand": "Q7B",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6ZAE",
+   "ligand": "ACV",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6ZCY",
+   "ligand": "QF8",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6ZPB",
+   "ligand": "3D1",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6ZT2",
+   "ligand": "QPK",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "6ZXQ",
+   "ligand": "IMO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7A9E",
+   "ligand": "R4W",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7AA0",
+   "ligand": "R6B",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7AKL",
+   "ligand": "RK5",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7AN5",
+   "ligand": "RDH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7AVI",
+   "ligand": "S2Q",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7B2C",
+   "ligand": "TP7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BA0",
+   "ligand": "T5H",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BHX",
+   "ligand": "TO5",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BJJ",
+   "ligand": "TVW",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BLA",
+   "ligand": "WCS",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BMI",
+   "ligand": "U4B",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7BTT",
+   "ligand": "F8R",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7C3U",
+   "ligand": "AZG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7C8Q",
+   "ligand": "DSG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7CIJ",
+   "ligand": "G0C",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7CNQ",
+   "ligand": "G8X",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7CTM",
+   "ligand": "BDP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7D0P",
+   "ligand": "1VU",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7D6O",
+   "ligand": "MTE",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7D9L",
+   "ligand": "GSF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7DKT",
+   "ligand": "GLF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7DUA",
+   "ligand": "HJ0",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7E4L",
+   "ligand": "MDN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ECR",
+   "ligand": "SIN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ELT",
+   "ligand": "TYM",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7EPV",
+   "ligand": "FDA",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7F51",
+   "ligand": "BA7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7F8T",
+   "ligand": "FAD",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7FHA",
+   "ligand": "ADX",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7FT9",
+   "ligand": "4MB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7JGW",
+   "ligand": "V9S",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7JMV",
+   "ligand": "4NC",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7JR8",
+   "ligand": "VH7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7JXX",
+   "ligand": "VP7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7K0V",
+   "ligand": "VQP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7KB1",
+   "ligand": "WBJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7KFO",
+   "ligand": "IAC",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7KM8",
+   "ligand": "WPD",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7KQU",
+   "ligand": "YOF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7KZ9",
+   "ligand": "XN7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7L03",
+   "ligand": "F9F",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7L6D",
+   "ligand": "BMF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7L81",
+   "ligand": "UD4",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7LCU",
+   "ligand": "XTA",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7LJN",
+   "ligand": "GTP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7LOE",
+   "ligand": "Y84",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7LT0",
+   "ligand": "ONJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7LZQ",
+   "ligand": "YJV",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7M3H",
+   "ligand": "YPV",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7M6K",
+   "ligand": "YRJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MEU",
+   "ligand": "MGP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MGT",
+   "ligand": "ZD4",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MMH",
+   "ligand": "ZJY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MRH",
+   "ligand": "ZMJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MSR",
+   "ligand": "DCA",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MWU",
+   "ligand": "ZPM",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7MYU",
+   "ligand": "ZR7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7N03",
+   "ligand": "ZRP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7N4W",
+   "ligand": "P4V",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7N7B",
+   "ligand": "T3F",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NA4",
+   "ligand": "1I9",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NF0",
+   "ligand": "BYN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NFB",
+   "ligand": "GEN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NLK",
+   "ligand": "UHK",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NML",
+   "ligand": "I7B",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NPL",
+   "ligand": "UKZ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NR8",
+   "ligand": "UOE",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NTG",
+   "ligand": "F6R",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7NUT",
+   "ligand": "GLP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7O0N",
+   "ligand": "CDP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OCB",
+   "ligand": "V88",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ODY",
+   "ligand": "DGI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OFF",
+   "ligand": "VCB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OKC",
+   "ligand": "VFE",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OLI",
+   "ligand": "8HG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OMJ",
+   "ligand": "GCP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OP9",
+   "ligand": "06K",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ORW",
+   "ligand": "7WA",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OU8",
+   "ligand": "1XI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7OZC",
+   "ligand": "G6S",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7P1M",
+   "ligand": "4IU",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7P2W",
+   "ligand": "4QR",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7P4J",
+   "ligand": "5JK",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7P4V",
+   "ligand": "DAT",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7P85",
+   "ligand": "5ZG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7PGX",
+   "ligand": "FMN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7PJQ",
+   "ligand": "OWH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7PL1",
+   "ligand": "SFG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7PRI",
+   "ligand": "7TI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7PT3",
+   "ligand": "3KK",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7Q19",
+   "ligand": "DSM",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7Q27",
+   "ligand": "8KC",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7Q5I",
+   "ligand": "I0F",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7QF4",
+   "ligand": "RBF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7QGP",
+   "ligand": "DJ8",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7QHL",
+   "ligand": "D5P",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7QPP",
+   "ligand": "VDX",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7QTA",
+   "ligand": "URI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7R59",
+   "ligand": "I5F",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7R7R",
+   "ligand": "AWJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RC3",
+   "ligand": "SAH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RH3",
+   "ligand": "59O",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RKW",
+   "ligand": "5TV",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ROR",
+   "ligand": "69X",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RPZ",
+   "ligand": "6IC",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RUI",
+   "ligand": "7QZ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7RWS",
+   "ligand": "4UR",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7S45",
+   "ligand": "ACO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7SCW",
+   "ligand": "GSP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7SED",
+   "ligand": "8VD",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7SGV",
+   "ligand": "L30",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7SNE",
+   "ligand": "9XR",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7SUC",
+   "ligand": "COM",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7T0D",
+   "ligand": "FPP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7T1D",
+   "ligand": "E7K",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7T3E",
+   "ligand": "SLB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7T9O",
+   "ligand": "GEI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TBU",
+   "ligand": "S3P",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TH4",
+   "ligand": "FFO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TM6",
+   "ligand": "GPJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TS6",
+   "ligand": "KMI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TUO",
+   "ligand": "KL9",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TXK",
+   "ligand": "LW8",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7TYP",
+   "ligand": "KUR",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7U3J",
+   "ligand": "L6U",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UAW",
+   "ligand": "MF6",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UF2",
+   "ligand": "5SP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UJ5",
+   "ligand": "DGL",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ULC",
+   "ligand": "56B",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UMW",
+   "ligand": "NAD",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UQ3",
+   "ligand": "O2U",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UTW",
+   "ligand": "NAI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7UY4",
+   "ligand": "SMI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7V14",
+   "ligand": "ORU",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7V3S",
+   "ligand": "5I9",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7V8Z",
+   "ligand": "5YH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7VBU",
+   "ligand": "6I4",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7VJT",
+   "ligand": "7IJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7VQ9",
+   "ligand": "ISY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7VYJ",
+   "ligand": "CA0",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7W06",
+   "ligand": "ITN",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WCF",
+   "ligand": "ACP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WJB",
+   "ligand": "BGC",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WL4",
+   "ligand": "JFU",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WPW",
+   "ligand": "F15",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WUX",
+   "ligand": "6OI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7WY1",
+   "ligand": "D0L",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7X9K",
+   "ligand": "8OG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7XEK",
+   "ligand": "9YX",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7XG5",
+   "ligand": "PLP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7XIJ",
+   "ligand": "EJ3",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7XPO",
+   "ligand": "UPG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7XRL",
+   "ligand": "FWK",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7Z1Q",
+   "ligand": "NIO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7Z7F",
+   "ligand": "IF3",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZDY",
+   "ligand": "6MJ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZHP",
+   "ligand": "IQY",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZOC",
+   "ligand": "T8E",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZU2",
+   "ligand": "DHT",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZXZ",
+   "ligand": "K9R",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "7ZZB",
+   "ligand": "KGX",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8A1H",
+   "ligand": "DLZ",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AAU",
+   "ligand": "LH0",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AEM",
+   "ligand": "LVF",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AIE",
+   "ligand": "M7L",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AJX",
+   "ligand": "FUM",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AQL",
+   "ligand": "PLG",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8AY3",
+   "ligand": "OE3",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8BN6",
+   "ligand": "R53",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8BPL",
+   "ligand": "CP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8BTI",
+   "ligand": "RFO",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8C5D",
+   "ligand": "GTB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8C7Y",
+   "ligand": "TXV",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8CI0",
+   "ligand": "8EL",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8CSD",
+   "ligand": "C5P",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8D39",
+   "ligand": "QDB",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8DHG",
+   "ligand": "T78",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8DP2",
+   "ligand": "UMA",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8DW5",
+   "ligand": "FQ7",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8E77",
+   "ligand": "ULP",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8EAD",
+   "ligand": "UY0",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8EX2",
+   "ligand": "Q2Q",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8EYE",
+   "ligand": "X4I",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8F8E",
+   "ligand": "XJI",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8FLN",
+   "ligand": "Y7W",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8FO5",
+   "ligand": "Y4U",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8G0V",
+   "ligand": "YHT",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8G6P",
+   "ligand": "API",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8H0M",
+   "ligand": "2EH",
+   "source": "posebusters_benchmark_set"
+  },
+  {
+   "id": "8HO0",
+   "ligand": "3ZI",
+   "source": "posebusters_benchmark_set"
+  }
+ ]
+}

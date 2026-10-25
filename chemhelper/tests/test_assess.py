@@ -180,3 +180,19 @@ def test_rpc_method(base, tmp_path):
     out = methods.REGISTRY["structure.assess"]({"path": str(write(base, tmp_path))}, None) \
         if hasattr(methods, "REGISTRY") else methods.structure_assess({"path": str(write(base, tmp_path))}, None)
     assert out["result"]["verdict"] == "ready" and out["provenance"]["tool"] == "dockchem.assess"
+
+
+def test_short_x_ray_hydroxyl_hydrogens_are_not_distortion(base, tmp_path):
+    """Refined entries (5SAK, 6XCT, ...) put OG-HG at 0.84 A; 49 of 300 benchmark entries were wrongly refused."""
+    st = copy.deepcopy(base)
+    n = 0
+    for r in st[0][0]:
+        if r.name in ("SER", "THR", "TYR"):
+            o = next(a for a in r if a.name in ("OG", "OG1", "OH"))
+            h = gemmi.Atom()
+            h.name, h.element, h.pos = "H" + o.name[1:], gemmi.Element("H"), gemmi.Position(o.pos.x + 0.84, o.pos.y, o.pos.z)
+            r.add_atom(h)
+            n += 1
+    assert n >= 3
+    a = assess(write(st, tmp_path))
+    assert a["stats"]["distorted_residues"] == 0 and "distorted_coordinates" not in codes(a)
