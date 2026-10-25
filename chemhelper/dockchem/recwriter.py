@@ -101,3 +101,67 @@ def write_pdbqt(pdb_text: str, out: Path) -> dict:
                              f"{0.0:+6.3f} {ad:<2s}")
     Path(out).write_text("\n".join(lines) + "\n")
     return {"atoms": serial, "dropped": dropped, "merged_hydrogens": n_merged}
+
+
+# ---- cofactors, sugars and other hetero groups kept as part of the receptor ---------------------------------
+
+def type_hetero_group(pdb_block: str, resname: str, chain: str, seq: int) -> tuple[list[tuple], list[str]]:
+    """AutoDock-type one kept hetero group (FAD, NAG, NAP, ...): bond orders from the bundled wwPDB dictionary
+    (ligand_templates), hydrogens added by RDKit, atom types by Meeko's own typing. Returns
+    ([(name, (x, y, z), ad_type)], warnings). Raises NeedsTemplate / InvalidInput when bond orders or element
+    support are missing; the caller then reports the group as left out. Metal complexes are refused."""
+    import tempfile
+
+    from rdkit import Chem
+    from rdkit.Chem import rdForceFieldHelpers  # noqa: F401  (ensures RDKit force-field data is loaded)
+
+    from .ligand_templates import ligand_from_structure
+    from .ligprep import COMMON_ELEMENTS
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "group.pdb"
+        p.write_text(pdb_block)
+        resolved = ligand_from_structure(p, resname, chain, seq)
+    mol = resolved.mol
+    odd = sorted({a.GetSymbol() for a in mol.GetAtoms()} - COMMON_ELEMENTS)
+    if odd:
+        raise InvalidInput(f"{resname} contains {', '.join(odd)}: no reliable AutoDock atom types")
+    names = {a.GetIdx(): (a.GetPDBResidueInfo().GetName().strip() if a.GetPDBResidueInfo() else f"{a.GetSymbol()}{a.GetIdx()}")
+             for a in mol.GetAtoms()}
+    molh = Chem.AddHs(mol, addCoords=True)
+    from meeko import MoleculePreparation
+    try:
+        setup = MoleculePreparation().prepare(molh)[0]
+    except Exception:  # noqa: BLE001  Gasteiger fails on hypervalent centres; Vina ignores charges
+        setup = MoleculePreparation(charge_model="zero").prepare(molh)[0]
+    conf = molh.GetConformer()
+    out, nh = [], 0
+    for a in molh.GetAtoms():
+        i = a.GetIdx()
+        if setup.get_is_ignore(i):                  # non-polar hydrogens are merged into their carbon
+            continue
+        ad = setup.get_atom_type(i)
+        if not ad:
+            raise InvalidInput(f"{resname}: atom {names.get(i, i)} got no AutoDock type")
+        if a.GetAtomicNum() == 1:
+            nh += 1
+            name = f"H{nh}"
+        else:
+            name = names.get(i, f"{a.GetSymbol()}{i}")
+        p3 = conf.GetAtomPosition(i)
+        out.append((name, (p3.x, p3.y, p3.z), ad))
+    return out, list(resolved.warnings) + [f"hydrogens of {resname} were added from its dictionary protonation "
+                                             f"state ({resolved.source}), not from the structure"]
+
+
+def append_hetero(out: Path, chain: str, resname: str, seq: int, atoms: list[tuple], serial0: int) -> int:
+    """Append typed atoms of one hetero group to a PDBQT; returns the next serial number."""
+    lines, serial = [], serial0
+    for name, (x, y, z), ad in atoms:
+        serial += 1
+        nm = name if len(name) == 4 else f" {name:<3s}"
+        lines.append(f"ATOM  {serial % 100000:5d} {nm} {resname:>3s} {chain[:1]}{seq:4d}    "
+                     f"{x:8.3f}{y:8.3f}{z:8.3f}{1.0:6.2f}{0.0:6.2f}    {0.0:+6.3f} {ad:<2s}")
+    with open(out, "a") as fh:
+        fh.write("\n".join(lines) + "\n")
+    return serial

@@ -89,6 +89,7 @@ class _Report:
         self.tools: list[dict] = []
         self.dropped: list[dict] = []        # residues absent from the PDBQT: makes the result "degraded"
         self.pdbqt_info: dict = {}           # which writer produced the PDBQT and how the cross-check went
+        self.pending_het: dict = {}          # (chain, num, name) -> PDB lines Meeko has no template for
 
     def change(self, stage, residue, change, reason, tool):
         self.changes.append({"stage": stage, "residue": residue, "change": change,
@@ -484,7 +485,13 @@ def _meeko_templates() -> set:
     return set(json.loads(path.read_text())["residue_templates"])
 
 
-def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
+def _report_pending_as_dropped(rep, dropped: dict, reason: str = "no bundled Meeko template") -> None:
+    for (ch, num, name), n in dropped.items():
+        rep.warn(f"{ch}:{name}{num} left out of the PDBQT: {reason} ({n} atoms)")
+        rep.dropped.append({"residue": f"{ch}:{name}{num}", "reason": reason})
+
+
+def _drop_untemplated(src: Path, dst: Path, rep, defer: bool = False) -> Path:
     """Remove residues Meeko has no bundled template for. Without this Meeko tries to download the
     definition from RCSB, which breaks offline use and the local-first rule (plan principle 5)."""
     templates = _meeko_templates()
@@ -505,15 +512,15 @@ def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
             if name not in templates:
                 dropped.setdefault((line[21], line[22:27].strip(), name), 0)
                 dropped[(line[21], line[22:27].strip(), name)] += 1
+                if defer:
+                    rep.pending_het.setdefault((line[21], line[22:27].strip(), name), []).append(line)
                 continue
         lines.append(line)
     for ch, num in sorted(renamed):
         rep.warn(f"{ch}:CYS{num} has no HG (thiolate or unbridged): represented as CYX in the PDBQT, "
                  "so its negative charge is not modelled")
-    for (ch, num, name), n in dropped.items():
-        rep.warn(f"{ch}:{name}{num} left out of the PDBQT: no bundled Meeko template "
-                 f"({n} atoms); Meeko would otherwise download it from RCSB")
-        rep.dropped.append({"residue": f"{ch}:{name}{num}", "reason": "no bundled Meeko template"})
+    if not defer:
+        _report_pending_as_dropped(rep, dropped)
     if not dropped and not renamed:
         return src
     dst.write_text("\n".join(lines) + "\n")
@@ -579,6 +586,7 @@ def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
         mode = "meeko"                       # the table writer has no torsion trees
     if mode == "meeko":
         rep.pdbqt_info = {"writer": "meeko", "crosscheck": "not applicable"}
+        _settle_pending_het(rep, None)
         return _meeko(pdb_path, base, opts, rep)
 
     out = Path(f"{base}.pdbqt")
@@ -600,6 +608,7 @@ def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
                 rep.warn("the built-in table writer has no rules for: "
                          + ", ".join(d["residue"] for d in r["dropped"][:5]) + "; Meeko wrote the PDBQT instead")
                 rep.pdbqt_info = {"writer": "meeko", "crosscheck": "not applicable (table writer incomplete)"}
+                _settle_pending_het(rep, None)
                 return out, None
         except ToolFailure:
             pass
@@ -609,9 +618,38 @@ def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
     rep.tools.append(record("dockchem.recwriter", __version__, {"atoms": r["atoms"], "merged_hydrogens": r["merged_hydrogens"],
                                                                  "charges": "not written (Vina ignores them)"}))
     rep.pdbqt_info = {"writer": "table", "atoms": r["atoms"]}
+    _settle_pending_het(rep, out, r["atoms"])
     if mode == "auto" and opts.crosscheck:
         rep.pdbqt_info["crosscheck"] = _crosscheck(pdb_path, out, base, opts, rep)
     return out, None
+
+
+def _settle_pending_het(rep, out: Path | None, serial: int = 0) -> None:
+    """Kept hetero groups Meeko has no template for: type them through the ligand route and append them to the
+    table-written PDBQT; anything that cannot be typed is reported as left out (status degraded)."""
+    from . import recwriter
+    pending, rep.pending_het = rep.pending_het, {}
+    unsupported = {}
+    typed = []
+    for (ch, num, name), lines in pending.items():
+        if out is None:
+            unsupported[(ch, num, name)] = (len(lines), "no bundled Meeko template")
+            continue
+        try:
+            seq = int(re.match(r"-?\d+", num).group())
+            atoms, warns = recwriter.type_hetero_group("\n".join(lines) + "\nEND\n", name, ch, seq)
+            serial = recwriter.append_hetero(out, ch, name, seq, atoms, serial)
+            typed.append(f"{ch}:{name}{num}")
+            for w in warns:
+                rep.warn(f"{ch}:{name}{num}: {w}")
+        except HelperError as e:
+            unsupported[(ch, num, name)] = (len(lines), e.message.split(". ")[0][:150])
+    for (ch, num, name), (n, why) in unsupported.items():
+        rep.warn(f"{ch}:{name}{num} left out of the PDBQT: {why} ({n} atoms)")
+        rep.dropped.append({"residue": f"{ch}:{name}{num}", "reason": why})
+    if typed:
+        rep.change("hetero_groups", ", ".join(typed), "added to the receptor PDBQT",
+                   "kept groups typed from the bundled wwPDB dictionary", "dockchem.recwriter")
 
 
 def _crosscheck(pdb_path: Path, table_pdbqt: Path, base: Path, opts, rep) -> dict:
@@ -649,9 +687,18 @@ def compare_pdbqt(table_path: Path, meeko_path: Path) -> dict:
         return d
     a, b = per_residue(table_path), per_residue(meeko_path)
     shared = set(a) & set(b)
-    diff = [f"{k[0]}:{k[2]}{k[1]} table {dict(a[k])} vs Meeko {dict(b[k])}" for k in sorted(shared) if a[k] != b[k]]
-    return {"result": "disagree" if diff else "agree", "n_residues_compared": len(shared),
-            "n_residues_different": len(diff), "examples": diff[:10],
+    conflicts, extra = [], []
+    for k in sorted(shared):
+        missing_in_table = b[k] - a[k]          # atom types Meeko wrote that the table did not
+        only_table = a[k] - b[k]                # atoms the table wrote that Meeko left out (terminal atoms)
+        label = f"{k[0]}:{k[2]}{k[1]}"
+        if missing_in_table:
+            conflicts.append(f"{label} table {dict(a[k])} vs Meeko {dict(b[k])}")
+        elif only_table:
+            extra.append(f"{label} +{dict(only_table)}")
+    return {"result": "disagree" if conflicts else "agree", "n_residues_compared": len(shared),
+            "n_residues_different": len(conflicts), "examples": conflicts[:10],
+            "n_residues_table_has_extra_atoms": len(extra), "extra_atoms_examples": extra[:5],
             "only_in_table": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(a) - set(b))[:20],
             "only_in_meeko": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(b) - set(a))[:20]}
 
@@ -1030,7 +1077,24 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         fixed, applied = protonation.apply_overrides(fixed, opts.protonation_overrides)
         (td / "fixed.pdb").write_text(fixed)
         user_set = {tuple(a["key"].split(":", 1)) for a in applied}
-        prot = _pdb2pqr(td / "fixed.pdb", opts, rep, td)
+        try:
+            prot = _pdb2pqr(td / "fixed.pdb", opts, rep, td)
+        except ToolFailure as first:
+            if opts.rebuild_missing_atoms != "pdb2pqr":
+                raise
+            # PDB2PQR dies on some truncated residues (e.g. an N-terminal Pro without its ring). Let PDBFixer
+            # complete the heavy atoms and give PDB2PQR whole residues.
+            import dataclasses
+            alt = dataclasses.replace(opts, rebuild_missing_atoms="pdbfixer")
+            fixed = _pdbfixer(poly.make_pdb_string(), alt, rep)
+            fixed, applied = protonation.apply_overrides(fixed, opts.protonation_overrides)
+            (td / "fixed.pdb").write_text(fixed)
+            try:
+                prot = _pdb2pqr(td / "fixed.pdb", alt, rep, td)
+            except ToolFailure:
+                raise first
+            rep.warn("PDB2PQR could not process the input as given; missing heavy atoms were added by PDBFixer "
+                     "instead and PDB2PQR then protonated the completed residues")
         prot_text = prot.read_text()
         protonation.verify_overrides(prot_text, applied)
         flips = protonation.detect_flips(fixed, prot_text) if opts.optimize_flips else []
@@ -1122,7 +1186,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             meeko_in = td / "for_meeko.pdb"
         else:
             meeko_in = final
-        meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep)
+        defer_het = opts.pdbqt_writer != "meeko" and not opts.flex_residues
+        meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep, defer=defer_het)
         meeko_in = _drop_malformed(meeko_in, td / "meeko_sane.pdb", rep)
         rigid, flex = _write_pdbqt(meeko_in, outdir / "receptor", opts, rep)
         stagecheck.check_pdbqt(meeko_in.read_text(), rigid, rep.dropped, flex)

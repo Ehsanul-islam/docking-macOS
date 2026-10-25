@@ -375,3 +375,19 @@ def test_too_many_long_chain_names_is_a_clear_error(tmp_path):
         st[0].add_chain(ch)
     with pytest.raises(InvalidInput, match="multi-letter"):
         _alias_chains(st, ReceptorPrepOptions(), _Report())
+
+
+def test_pdb2pqr_crash_on_truncated_n_terminal_proline_falls_back_to_pdbfixer_rebuild(tmp_path):
+    """Real entry 1UOU starts with a Pro whose ring (CG, CD) is missing; PDB2PQR raises AttributeError on it."""
+    st = peptide_structure("PSHDEKRCNQFYTALGSHDEK")
+    r = st[0][0][0]
+    for i in reversed(range(len(r))):
+        if r[i].name in ("CG", "CD"):
+            del r[i]
+    src = tmp_path / "p.pdb"
+    st.write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert res.report["status"] == "ok" and res.pdbqt.exists()
+    assert any("missing heavy atoms were added by PDBFixer" in w for w in res.report["warnings"])
+    pro = [l for l in open(res.pdb) if l[17:20] == "PRO" and l[22:26].strip() == "1"]
+    assert {"CG", "CD"} <= {l[12:16].strip() for l in pro}

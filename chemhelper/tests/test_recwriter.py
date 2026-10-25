@@ -118,6 +118,11 @@ def test_compare_pdbqt_flags_a_type_disagreement_and_ignores_renames(tmp_path):
     assert compare_pdbqt(a, b)["result"] == "agree"
     r = compare_pdbqt(a, c)
     assert r["result"] == "disagree" and "A:ALA1" in r["examples"][0]
+    d = tmp_path / "d"
+    d.write_text(line("N", "N") + line("H", "HD") + line("OXT", "OA"))          # table wrote a terminal atom Meeko omitted
+    e = compare_pdbqt(d, a)
+    assert e["result"] == "agree" and e["n_residues_table_has_extra_atoms"] == 1
+    assert compare_pdbqt(a, d)["result"] == "disagree"                      # Meeko wrote something the table lacks
 
 
 def pdb_line(serial, name, res, num, xyz, el, chain="A"):
@@ -164,3 +169,49 @@ def test_output_format_is_valid_pdbqt_columns(pair):
     for l in open(t.pdbqt):
         assert l.startswith("ATOM") and len(l.rstrip("\n")) == 79
         float(l[30:38]); float(l[38:46]); float(l[46:54]); float(l[70:76])
+
+
+# ---- kept hetero groups (cofactors, sugars) ---------------------------------------------------------------
+
+from pathlib import Path as _P
+
+DATA = _P(__file__).parent / "data"
+
+
+def test_cofactor_is_typed_through_the_dictionary_route():
+    """Real NADP block from 1T40: bond orders from the wwPDB dictionary, hydrogens added, Meeko atom types."""
+    import collections
+    atoms, warns = recwriter.type_hetero_group((DATA / "NAP_1T40.pdb").read_text(), "NAP", "A", 318)
+    types = collections.Counter(a[2] for a in atoms)
+    assert types["P"] == 3 and types["OA"] >= 10 and types["HD"] >= 5 and types["A"] >= 6
+    assert all(t in {"C", "A", "N", "NA", "OA", "P", "S", "SA", "HD", "F", "Cl", "Br", "I"} for t in types)
+    assert any("dictionary protonation state" in w for w in warns)
+    assert len({a[0] for a in atoms}) == len(atoms)                       # unique atom names
+
+
+def test_metal_cofactor_is_refused_with_the_reason():
+    from dockchem.errors import HelperError
+    with pytest.raises(HelperError, match="metal"):
+        recwriter.type_hetero_group((DATA / "HEM_1MMV.pdb").read_text(), "HEM", "A", 1750)
+
+
+def test_settle_pending_types_what_it_can_and_reports_the_rest(tmp_path):
+    from dockchem.recprep import _Report, _settle_pending_het
+    rep = _Report()
+    rep.pending_het = {("A", "318", "NAP"): (DATA / "NAP_1T40.pdb").read_text().splitlines(),
+                       ("A", "1750", "HEM"): (DATA / "HEM_1MMV.pdb").read_text().splitlines()}
+    out = tmp_path / "r.pdbqt"
+    out.write_text("")
+    _settle_pending_het(rep, out, 0)
+    text = out.read_text()
+    assert " NAP A 318" in text and "HEM" not in text
+    assert [d["residue"] for d in rep.dropped] == ["A:HEM1750"] and "metal" in rep.dropped[0]["reason"]
+    assert any(c["stage"] == "hetero_groups" and "NAP" in c["residue"] for c in rep.changes)
+
+
+def test_settle_pending_with_meeko_writer_reports_everything_as_left_out():
+    from dockchem.recprep import _Report, _settle_pending_het
+    rep = _Report()
+    rep.pending_het = {("A", "318", "NAP"): (DATA / "NAP_1T40.pdb").read_text().splitlines()}
+    _settle_pending_het(rep, None)
+    assert rep.dropped and rep.dropped[0]["reason"] == "no bundled Meeko template"
