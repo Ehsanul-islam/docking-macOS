@@ -36,6 +36,70 @@ def read_sdf_from_zip(zpath, name):
         return z.read(name).decode()
 
 
+def nearest_copy(path, code, ref) -> str:
+    """chain:resname:seq of the copy of the ligand in the structure that sits at the benchmark's crystal pose.
+    Entries with several copies (chains A and B) would otherwise be built around the wrong one."""
+    import math
+
+    import gemmi
+    c = ref.GetConformer().GetPositions().mean(axis=0)
+    st = gemmi.read_structure(str(path))
+    best = (1e9, None)
+    for ch in st[0]:
+        for r in ch:
+            if r.name == code and r.het_flag == "H":
+                p = [a.pos for a in r if a.element.name != "H"]
+                if p:
+                    cen = (sum(x.x for x in p) / len(p), sum(x.y for x in p) / len(p), sum(x.z for x in p) / len(p))
+                    d = math.dist(cen, c)
+                    if d < best[0]:
+                        best = (d, f"{ch.name}:{r.name}:{r.seqid.num}")
+    return best[1] or code
+
+
+def strip_h(m):
+    """Remove every hydrogen. RDKit's RemoveHs keeps ones that define double-bond stereo ('[H]/N=C'), which the
+    benchmark's start conformers contain."""
+    from rdkit import Chem
+    rw = Chem.RWMol(m)
+    for i in sorted((a.GetIdx() for a in rw.GetAtoms() if a.GetAtomicNum() == 1), reverse=True):
+        rw.RemoveAtom(i)
+    out = rw.GetMol()
+    out.UpdatePropertyCache(strict=False)
+    return out
+
+
+def heavy_rmsd(pose, ref):
+    """Symmetry-aware heavy-atom RMSD without alignment. Falls back to a bond-order-blind match when the two
+    molecules differ in charge or aromaticity assignment (same skeleton)."""
+    from rdkit import Chem
+    from rdkit.Chem import rdMolAlign
+    try:
+        return rdMolAlign.CalcRMS(strip_h(pose), strip_h(ref))
+    except Exception:  # noqa: BLE001
+        pass
+
+    def skeleton(m):
+        m = Chem.RWMol(strip_h(m))
+        for b in m.GetBonds():
+            b.SetBondType(Chem.BondType.SINGLE)
+            b.SetIsAromatic(False)
+        for a in m.GetAtoms():
+            a.SetFormalCharge(0)
+            a.SetIsAromatic(False)
+            a.SetNoImplicit(True)
+            a.SetNumExplicitHs(0)
+        return m.GetMol()
+    sp, sr = skeleton(pose), skeleton(ref)
+    matches = sr.GetSubstructMatches(sp, uniquify=False, maxMatches=20000, useChirality=False)
+    if not matches:
+        raise ValueError("no skeleton match")
+    import numpy as np
+    P = sp.GetConformer().GetPositions()
+    R = sr.GetConformer().GetPositions()
+    return min(float(np.sqrt(((P - R[list(m)]) ** 2).sum(axis=1).mean())) for m in matches)
+
+
 def work(item):
     from rdkit import Chem, RDLogger
     from rdkit.Chem import rdMolAlign
@@ -73,8 +137,10 @@ def work(item):
             rec = SimpleNamespace(pdbqt=pq, report={"status": "baseline", "dropped_residues": []})
         else:
             path = next(Path(item["data"]).glob(item["id"] + ".*"))
+            spec = nearest_copy(path, item["ligand"], ref)          # the copy the benchmark's coordinates belong to
+            out["reference"] = spec
             try:
-                rec = prepare_receptor(path, work / "rec", ReceptorPrepOptions(reference_ligand=item["ligand"]))
+                rec = prepare_receptor(path, work / "rec", ReceptorPrepOptions(reference_ligand=spec))
             except HelperError as e:
                 return {**out, "category": "receptor_failed", "error": f"{e.kind}: {e.message[:200]}"}
         out["receptor_status"] = rec.report["status"]
@@ -107,12 +173,10 @@ def work(item):
 
         out["stage"] = "scoring"
         poses, _ = read_pdbqt_poses(work / "out.pdbqt")
-        refh = Chem.RemoveHs(ref)
         rmsds = []
         for pose in poses:
-            ph = Chem.RemoveHs(pose)
             try:
-                rmsds.append(round(rdMolAlign.CalcRMS(ph, refh), 2))      # no alignment; symmetry-aware
+                rmsds.append(round(heavy_rmsd(pose, ref), 2))
             except Exception:  # noqa: BLE001
                 rmsds.append(None)
         good = [x for x in rmsds if x is not None]
