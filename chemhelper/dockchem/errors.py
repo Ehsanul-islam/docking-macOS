@@ -36,3 +36,19 @@ class ToolFailure(HelperError):
 class Cancelled(HelperError):
     code = -32004
     kind = "Cancelled"
+
+
+class NeedsTemplate(InvalidInput):
+    """Bond orders cannot be established. The caller must supply a SMILES (or net charge if the file has
+    hydrogens). `needs` tells the UI what to ask for."""
+    code = -32005
+    kind = "NeedsTemplate"
+
+    def __init__(self, message: str, resname: str = "", needs: str = "smiles", log: str = ""):
+        super().__init__(message, log)
+        self.resname, self.needs = resname, needs
+
+    def to_rpc(self) -> dict:
+        d = super().to_rpc()
+        d["data"].update({"resname": self.resname, "needs": self.needs})
+        return d

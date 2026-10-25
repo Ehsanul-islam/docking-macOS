@@ -15,6 +15,7 @@ from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
 from .errors import InvalidInput
+from .ligand_templates import is_untrusted
 
 # Torsions above this make the Vina search less reliable (plan §9.3 "high torsion count").
 TORSION_WARN = 15
@@ -209,6 +210,11 @@ def prepare_ligand(source: str | Chem.Mol, name: str = "ligand",
     steps: list[str] = []
     warnings: list[str] = []
     try:
+        if isinstance(source, Chem.Mol) and is_untrusted(source):
+            return [PreparedLigand(name, "failed", error=(
+                "bond orders are unknown (the molecule came from a PDB-style file, which has none). Preparing "
+                "it would invent chemistry. Establish bond orders with ligand.from_structure (SMILES, bundled "
+                "dictionary, or net charge for files with hydrogens)."))]
         mol = Chem.MolFromSmiles(source) if isinstance(source, str) else Chem.Mol(source)
         if mol is None:
             return [PreparedLigand(name, "failed", error="RDKit could not parse/sanitize input")]

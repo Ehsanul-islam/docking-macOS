@@ -141,6 +141,25 @@ def receptor_prepare(params, srv):
             "artifacts": arts, "provenance": record("dockchem.recprep", __version__, params.get("options") or {})}
 
 
+def ligand_from_structure(params, srv):
+    from pathlib import Path
+    from rdkit import Chem
+    from . import ligand_templates as lt
+    r = lt.ligand_from_structure(params["path"], params["resname"], params.get("chain"), params.get("seq"),
+                                 params.get("smiles"), params.get("charge"))
+    artifacts = []
+    if params.get("outdir"):
+        out = Path(params["outdir"]); out.mkdir(parents=True, exist_ok=True)
+        sdf = out / f"{params['resname']}.sdf"
+        w = Chem.SDWriter(str(sdf)); w.write(r.mol); w.close()
+        artifacts.append(str(sdf))
+    return {"result": {"source": r.source, "smiles": Chem.MolToSmiles(Chem.RemoveHs(r.mol)),
+                       "heavy_atoms": r.mol.GetNumHeavyAtoms(), "audit": r.audit},
+            "warnings": r.warnings, "artifacts": artifacts,
+            "provenance": record("dockchem.ligand_templates", __version__, {"resname": params["resname"],
+                                                                            "source": r.source})}
+
+
 def format_convert(params, srv):
     from . import formats
     return formats.convert(params["source"], params["dest"], params.get("charge", 0))
@@ -165,6 +184,7 @@ METHODS = {
     "ligand.prepare": ligand_prepare,
     "library.prepare": library_prepare,
     "receptor.prepare": receptor_prepare,
+    "ligand.from_structure": ligand_from_structure,
     "format.convert": format_convert,
     "format.sniff": format_sniff,
     "poses.to_sdf": poses_to_sdf,

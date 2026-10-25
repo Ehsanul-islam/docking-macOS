@@ -19,7 +19,7 @@ from pathlib import Path
 import gemmi
 
 from . import hetatm
-from .errors import InvalidInput, ToolFailure
+from .errors import HelperError, InvalidInput, ToolFailure
 from .provenance import record
 
 LOOP_NEAR_SITE = 10.0
@@ -186,6 +186,21 @@ def _alphafold(st_model, site_res_ids, opts, rep):
 OFFLINE_ENV = {"HTTP_PROXY": "http://127.0.0.1:9", "HTTPS_PROXY": "http://127.0.0.1:9",
                "ALL_PROXY": "http://127.0.0.1:9", "http_proxy": "http://127.0.0.1:9",
                "https_proxy": "http://127.0.0.1:9", "all_proxy": "http://127.0.0.1:9", "NO_PROXY": ""}
+
+
+def _resolve_ligand_bond_orders(src: Path, lig: dict, pdb_path: Path, rep) -> dict:
+    """Try to establish bond orders for an extracted ligand (dictionary only; never guesses). Failure is not
+    an error for receptor prep: the ligand is simply reported as needing a template."""
+    from . import ligand_templates as lt
+    from rdkit import Chem
+    try:
+        r = lt.ligand_from_structure(src, lig["resname"], lig["chain"], lig["seq"])
+    except HelperError as e:
+        rep.warn(f"ligand {lig['chain']}:{lig['resname']}{lig['seq']}: bond orders unknown ({e.message[:100]}...)")
+        return {"status": "needs_template", "message": e.message, "needs": getattr(e, "needs", "smiles")}
+    sdf = pdb_path.with_suffix(".sdf")
+    w = Chem.SDWriter(str(sdf)); w.write(r.mol); w.close()
+    return {"status": "resolved", "source": r.source, "sdf": str(sdf), "warnings": r.warnings}
 
 
 def _run(cmd, cwd):
@@ -687,6 +702,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         p = outdir / f"ligand_{lig['chain']}_{lig['resname']}{lig['seq']}.pdb"
         lig_st.write_pdb(str(p))
         lig["path"] = str(p)
+        lig["bond_orders"] = _resolve_ligand_bond_orders(src, lig, p, rep)
 
     # build polymer-only structure for PDBFixer / PDB2PQR
     poly = gemmi.Structure()

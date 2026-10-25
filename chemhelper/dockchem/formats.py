@@ -11,7 +11,8 @@ import gemmi
 from rdkit import Chem
 from rdkit.Chem import AllChem, rdDetermineBonds
 
-from .errors import InvalidInput, UnsupportedFeature
+from .errors import InvalidInput, NeedsTemplate, UnsupportedFeature
+from .ligand_templates import is_untrusted, mark_untrusted
 
 PDB_ATOM_LIMIT = 99_999
 MIN_POLYMER_RESIDUES = 8        # fewer than this in a PDB file => treated as a small molecule
@@ -160,8 +161,10 @@ def read_molecules(path: str | Path, charge: int = 0) -> tuple[list[Chem.Mol], l
         mols = [m]
     elif ext == ".pdb":
         m = Chem.MolFromPDBFile(str(path), removeHs=False, proximityBonding=True)
-        mols = [m] if m else []
-        warns.append("PDB ligand bond orders were inferred, not read; prefer SDF or CCD-templated input")
+        mols = [mark_untrusted(m)] if m else []
+        warns.append("a PDB file has no bond orders or hydrogens: this molecule is a heavy-atom skeleton and "
+                     "cannot be used for docking or written to SDF/MOL2/SMILES until bond orders are "
+                     "established (use ligand.from_structure with a SMILES)")
     elif ext == ".pdbqt":
         mols, w = read_pdbqt_poses(path)
         warns += w
@@ -201,6 +204,10 @@ def read_pdbqt_poses(path: str | Path) -> tuple[list[Chem.Mol], list[str]]:
 def write_molecules(mols: list[Chem.Mol], path: str | Path) -> list[str]:
     path = Path(path)
     ext, warns = path.suffix.lower(), []
+    if ext in (".sdf", ".mol", ".mol2", ".smi", ".smiles") and any(is_untrusted(m) for m in mols):
+        raise NeedsTemplate("this molecule came from a PDB-style file and its bond orders are unknown; writing "
+                            f"{ext} would record guessed chemistry. Establish bond orders first "
+                            "(ligand.from_structure with a SMILES).", "", "smiles")
     if ext in (".sdf", ".mol"):
         if ext == ".mol" and len(mols) > 1:
             raise InvalidInput(".mol holds one molecule; use .sdf")
