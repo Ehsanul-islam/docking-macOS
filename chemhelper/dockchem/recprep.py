@@ -24,7 +24,8 @@ from .provenance import record
 
 LOOP_NEAR_SITE = 10.0
 CLASH_CUTOFF = 2.2                 # heavy-atom non-bonded contact, angstrom
-RESTRAINT_K = 41840.0            # 10 kcal/mol/A^2 in kJ/mol/nm^2
+RESTRAINT_K = 41840.0            # 10 kcal/mol/A^2 in kJ/mol/nm^2 (user-requested minimisation)
+REPAIR_K = 418400.0              # 100 kcal/mol/A^2: hydrogen repair must hold heavy atoms nearly fixed
 UNUSUAL_STATES = {"ASH": "protonated Asp", "GLH": "protonated Glu", "LYN": "neutral Lys",
                   "CYM": "deprotonated Cys", "HIP": "doubly protonated His"}
 TERMINAL_RENAME = {"HID", "HIE", "HIP", "ASH", "GLH", "LYN", "CYX", "CYM"}
@@ -175,8 +176,16 @@ def _alphafold(st_model, site_res_ids, opts, rep):
                         break
 
 
+# Helper tools (Meeko, PDB2PQR) can fetch definitions from RCSB on their own. Local-first (plan principle 5)
+# means they must never do so silently, so they run with an unroutable proxy.
+OFFLINE_ENV = {"HTTP_PROXY": "http://127.0.0.1:9", "HTTPS_PROXY": "http://127.0.0.1:9",
+               "ALL_PROXY": "http://127.0.0.1:9", "http_proxy": "http://127.0.0.1:9",
+               "https_proxy": "http://127.0.0.1:9", "all_proxy": "http://127.0.0.1:9", "NO_PROXY": ""}
+
+
 def _run(cmd, cwd):
-    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    import os
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env={**os.environ, **OFFLINE_ENV})
 
 
 def _pdbfixer(pdb_text, opts, rep):
@@ -266,29 +275,102 @@ def _residue_names(pdb_text):
     return out
 
 
-def _minimize(pdb_in: Path, pdb_out: Path, rep) -> bool:
+MAX_HEAVY_SHIFT = 0.5       # A: restrained minimisation must not move heavy atoms further than this
+BOND_RANGE = {("N", "CA"): (1.35, 1.60), ("CA", "C"): (1.40, 1.65)}
+
+
+def _topology_without_gap_bonds(pdb, app, unit):
+    """OpenMM bonds consecutive residues blindly; across a chain break that pulls the gap shut."""
+    top = app.Topology()
+    chains = {}
+    atoms = {}
+    for chain in pdb.topology.chains():
+        c = top.addChain(chain.id)
+        for res in chain.residues():
+            r = top.addResidue(res.name, c, res.id, res.insertionCode)
+            for a in res.atoms():
+                atoms[a.index] = top.addAtom(a.name, a.element, r, a.id)
+    pos = pdb.positions
+    for a, b in pdb.topology.bonds():
+        if a.residue is not b.residue:
+            d = sum((pos[a.index][k] - pos[b.index][k]).value_in_unit(unit.angstrom) ** 2 for k in range(3)) ** 0.5
+            if d > 2.0:
+                continue
+        top.addBond(atoms[a.index], atoms[b.index])
+    return top
+
+
+_PARENT = {"HID": "HIS", "HIE": "HIS", "HIP": "HIS", "ASH": "ASP", "GLH": "GLU", "LYN": "LYS",
+           "CYX": "CYS", "CYM": "CYS"}
+
+
+def _parent_names(pdb_text: str) -> str:
+    out = []
+    for l in pdb_text.splitlines():
+        if l.startswith(("ATOM", "HETATM")) and l[17:20] in _PARENT:
+            l = l[:17] + _PARENT[l[17:20]] + l[20:]
+        out.append(l)
+    return "\n".join(out) + "\n"
+
+
+def _geometry_problem(before: str, after: str) -> str:
+    """Return a description if `after` is not a faithful, physically sane version of `before`."""
+    def heavy(text):
+        out = {}
+        for l in text.splitlines():
+            if l.startswith("ATOM") and not l[12:16].strip().startswith("H") and l[76:78].strip() != "H":
+                out[(l[21], l[22:27].strip(), l[12:16].strip())] = (float(l[30:38]), float(l[38:46]), float(l[46:54]))
+        return out
+    b, a = heavy(before), heavy(after)
+    worst = max((math.dist(b[k], a[k]) for k in b if k in a), default=0.0)
+    if worst > MAX_HEAVY_SHIFT:
+        return f"heavy atom moved {worst:.2f} A (limit {MAX_HEAVY_SHIFT})"
+    for (ch, num), _ in {(k[0], k[1]): 0 for k in a}.items():
+        for (n1, n2), (lo, hi) in BOND_RANGE.items():
+            p, q = a.get((ch, num, n1)), a.get((ch, num, n2))
+            if p and q and not lo <= math.dist(p, q) <= hi:
+                return f"implausible {n1}-{n2} bond ({math.dist(p, q):.2f} A) at {ch}:{num}"
+    return ""
+
+
+def _minimize(pdb_in: Path, pdb_out: Path, rep, k: float = RESTRAINT_K) -> bool:
     try:
         import openmm as mm
         from openmm import app, unit
-        pdb = app.PDBFile(str(pdb_in))
+        # OpenMM only bonds residue names it knows (not LYN, for one): hand it the parent names and let the
+        # force-field templates tell variants apart by their hydrogens. Our names are restored on output.
+        std = io.StringIO(_parent_names(pdb_in.read_text()))
+        pdb = app.PDBFile(std)
+        topology = _topology_without_gap_bonds(pdb, app, unit)
         ff = app.ForceField("amber14-all.xml", "implicit/gbn2.xml")
-        system = ff.createSystem(pdb.topology, nonbondedMethod=app.CutoffNonPeriodic,
-                                 nonbondedCutoff=1.5 * unit.nanometer, constraints=None)
+        # ignoreExternalBonds: residues at chain breaks have no neighbour and must still match.
+        # Without external bonds OpenMM cannot choose between CYX (disulfide) and CYM (thiolate) for a Cys with
+        # no HG, so pin by geometry: another SG within 2.5 A means a disulfide.
+        sg = {r: pdb.positions[a.index] for r in topology.residues() for a in r.atoms() if a.name == "SG"}
+        pinned = {}
+        for r in topology.residues():
+            if r.name == "CYS" and not any(a.name == "HG" for a in r.atoms()) and r in sg:
+                near = any(o is not r and sum((sg[r][k] - sg[o][k]).value_in_unit(unit.angstrom) ** 2
+                                              for k in range(3)) ** 0.5 < 2.5 for o in sg)
+                pinned[r] = "CYX" if near else "CYM"
+        system = ff.createSystem(topology, nonbondedMethod=app.CutoffNonPeriodic,
+                                 nonbondedCutoff=1.5 * unit.nanometer, constraints=None,
+                                 ignoreExternalBonds=True, residueTemplates=pinned)
         rest = mm.CustomExternalForce("0.5*k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
-        rest.addGlobalParameter("k", RESTRAINT_K * unit.kilojoule_per_mole / unit.nanometer**2)
+        rest.addGlobalParameter("k", k * unit.kilojoule_per_mole / unit.nanometer**2)
         for p in ("x0", "y0", "z0"):
             rest.addPerParticleParameter(p)
         for atom in pdb.topology.atoms():
             if atom.element.symbol != "H":
                 rest.addParticle(atom.index, pdb.positions[atom.index].value_in_unit(unit.nanometer))
         system.addForce(rest)
-        sim = app.Simulation(pdb.topology, system, mm.VerletIntegrator(0.001),
+        sim = app.Simulation(topology, system, mm.VerletIntegrator(0.001),
                              mm.Platform.getPlatformByName("CPU"))
         sim.context.setPositions(pdb.positions)
         sim.minimizeEnergy(maxIterations=500)
         buf = io.StringIO()
-        app.PDBFile.writeFile(pdb.topology, sim.context.getState(getPositions=True).getPositions(), buf,
-                              keepIds=True)
+        final_pos = sim.context.getState(getPositions=True).getPositions()
+        app.PDBFile.writeFile(topology, final_pos, buf, keepIds=True)
         # OpenMM standardises HID/HIE/HIP, ASH, GLH, LYN, CYX... to their parent names; restore ours so
         # the protonation states survive into Meeko.
         names = _residue_names(pdb_in.read_text())
@@ -299,10 +381,14 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep) -> bool:
                 if nm:
                     line = line[:17] + nm.ljust(3) + line[20:]
             lines.append(line)
-        pdb_out.write_text("\n".join(lines) + "\n")
+        text = "\n".join(lines) + "\n"
+        problem = _geometry_problem(pdb_in.read_text(), text)
+        if problem:
+            raise ValueError(f"result rejected, {problem}")
+        pdb_out.write_text(text)
         rep.change("minimization", "all", "restrained minimisation of hydrogens and side-chain strain",
-                   "user requested; heavy atoms restrained (10 kcal/mol/A^2)", "OpenMM")
-        rep.tools.append(record("openmm", _ver("openmm"), {"ff": "amber14+gbn2", "restraint_k_kj_mol_nm2": RESTRAINT_K}))
+                   f"heavy atoms restrained ({k / 4184:g} kcal/mol/A^2)", "OpenMM")
+        rep.tools.append(record("openmm", _ver("openmm"), {"ff": "amber14+gbn2", "restraint_k_kj_mol_nm2": k}))
         return True
     except Exception as e:  # noqa: BLE001
         rep.warn(f"minimisation skipped: {e}")
@@ -321,46 +407,86 @@ def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
     definition from RCSB, which breaks offline use and the local-first rule (plan principle 5)."""
     templates = _meeko_templates()
     dropped, lines = {}, []
-    for line in src.read_text().splitlines():
+    text = src.read_text()
+    has_hg = {(l[21], l[22:27].strip()) for l in text.splitlines()
+              if l.startswith("ATOM") and l[12:16].strip() == "HG" and l[17:20] == "CYS"}
+    renamed = set()
+    for line in text.splitlines():
         if line.startswith(("ATOM", "HETATM")):
             name = line[17:20].strip()
+            key = (line[21], line[22:27].strip())
+            if name == "CYM" or (name == "CYS" and key not in has_hg):
+                # Meeko has no thiolate template; CYX is the HG-less cysteine. The -1 charge is not represented.
+                renamed.add(key)
+                line = line[:17] + "CYX" + line[20:]
+                name = "CYX"
             if name not in templates:
                 dropped.setdefault((line[21], line[22:27].strip(), name), 0)
                 dropped[(line[21], line[22:27].strip(), name)] += 1
                 continue
         lines.append(line)
+    for ch, num in sorted(renamed):
+        rep.warn(f"{ch}:CYS{num} has no HG (thiolate or unbridged): represented as CYX in the PDBQT, "
+                 "so its negative charge is not modelled")
     for (ch, num, name), n in dropped.items():
         rep.warn(f"{ch}:{name}{num} left out of the PDBQT: no bundled Meeko template "
                  f"({n} atoms); Meeko would otherwise download it from RCSB")
-    if not dropped:
+    if not dropped and not renamed:
         return src
     dst.write_text("\n".join(lines) + "\n")
     return dst
 
 
 def _meeko(pdb_path: Path, base: Path, opts, rep):
+    """Run mk_prepare_receptor. Ladder: as-is -> without OXT on rejected C-termini -> delete (named)."""
     exe = Path(sys.executable).parent / "mk_prepare_receptor.py"
-    cmd = [str(exe) if exe.exists() else "mk_prepare_receptor.py", "-i", str(pdb_path), "-o", str(base),
-           "-p"]
-    for f in opts.flex_residues:
-        cmd += ["-f", f]
-    r = _run(cmd, base.parent)
-    deleted = False
+    exe = str(exe) if exe.exists() else "mk_prepare_receptor.py"
+    flex = [a for f in opts.flex_residues for a in ("-f", f)]
+
+    def attempt(path: Path, extra=()):
+        return _run([exe, "-i", str(path), "-o", str(base), "-p", *flex, *extra], base.parent)
+
+    def failing(res):
+        return sorted(set(re.findall(r"No template matched for residue_key='([^']+)'", res.stdout + res.stderr)))
+
+    used, deleted = pdb_path, False
+    r = attempt(used)
     if r.returncode != 0:
-        r2 = _run(cmd + ["-x"], base.parent)           # drop residues with no template (cofactors etc.)
+        keys = set(failing(r))
+        lines, stripped = [], set()
+        for l in pdb_path.read_text().splitlines():
+            key = f"{l[21].strip()}:{l[22:27].strip()}" if l.startswith(("ATOM", "HETATM")) else None
+            if key in keys and l[12:16].strip() == "OXT":
+                stripped.add(key)
+                continue
+            lines.append(l)
+        if stripped:
+            alt = pdb_path.with_name(pdb_path.stem + "_noOXT.pdb")
+            alt.write_text("\n".join(lines) + "\n")
+            r_alt = attempt(alt)
+            if r_alt.returncode == 0:
+                for key in sorted(stripped):
+                    rep.warn(f"residue {key}: OXT omitted from the PDBQT because Meeko could not match "
+                             "the C-terminal template with it")
+                r, used = r_alt, alt
+            else:
+                r, used = r_alt, alt                      # keep the smaller failing set for the next step
+    if r.returncode != 0:
+        names = failing(r)
+        r2 = attempt(used, ["-x"])        # last resort: delete residues that match no template
         if r2.returncode != 0:
             hint = " (hydrogen clash left by PDB2PQR?)" if "valence" in (r.stdout + r.stderr) else ""
             raise ToolFailure("Meeko receptor preparation failed" + hint, log=r.stdout + r.stderr)
         deleted = True
-        for key in sorted(set(re.findall(r"No template matched for residue_key='([^']+)'", r.stdout + r.stderr))):
+        for key in names:
             rep.warn(f"residue {key} left out of the PDBQT: no Meeko template matched (clashes or unusual atoms)")
         r = r2
     rep.tools.append(record("meeko", _ver("meeko"), {"flex": opts.flex_residues, "delete_bad_res": deleted}))
     if opts.flex_residues:
-        rigid, flex = Path(f"{base}_rigid.pdbqt"), Path(f"{base}_flex.pdbqt")
+        rigid, flexf = Path(f"{base}_rigid.pdbqt"), Path(f"{base}_flex.pdbqt")
         if not rigid.exists():
             raise ToolFailure("Meeko did not produce rigid/flex PDBQT", log=r.stdout + r.stderr)
-        return rigid, flex
+        return rigid, flexf
     out = Path(f"{base}.pdbqt")
     if not out.exists():
         raise ToolFailure("Meeko produced no PDBQT", log=r.stdout + r.stderr)
@@ -599,7 +725,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                 # bonds. Repair with restrained minimisation (heavy atoms held) rather than failing or
                 # silently deleting residues. Deviates from "minimisation off by default" (plan §5.1).
                 rep.warn(f"{len(bad)} implausibly close contact(s) after hydrogen placement, first: {bad[0]}")
-                if _minimize(prot, final, rep):
+                if _minimize(prot, final, rep, REPAIR_K):
                     rep.changes[-1].update(stage="hydrogen_repair",
                                            reason=f"{len(bad)} contact(s) <= {H_CONTACT_CUTOFF} A would be read as bonds by Meeko")
                     left = _close_contacts(final.read_text())

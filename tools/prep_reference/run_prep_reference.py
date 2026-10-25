@@ -14,6 +14,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+VARIANTS = {"HID", "HIE", "HIP", "ASH", "GLH", "LYN", "CYX", "CYM"}   # protonation-state residue names
+
 # id -> reference ligand residue name (None = apo / no ligand of interest)
 SET = {
     "1IEP": "STI", "1M17": "AQ4", "1STP": "BTN", "3PTB": "BEN", "4G5J": "0WN", "1K4C": "F09",
@@ -25,10 +27,38 @@ SET = {
 }
 
 
+def _residue_keys(path: str, fmt: str, chains=None) -> dict:
+    """{(chain, seq+icode): resname} for amino-acid residues."""
+    out = {}
+    if fmt == "pdb":
+        import gemmi
+        st = gemmi.read_structure(path)
+        for ch in st[0]:
+            if chains is not None and ch.name not in chains:
+                continue
+            for r in ch:
+                info = gemmi.find_tabulated_residue(r.name)
+                if r.name in VARIANTS or (info is not None and info.is_amino_acid()):
+                    out[(ch.name, f"{r.seqid.num}{r.seqid.icode.strip()}")] = r.name
+    else:      # pdbqt
+        for l in open(path):
+            if l.startswith("ATOM"):
+                out[(l[21], l[22:27].strip())] = l[17:20].strip()
+    return out
+
+
 def worker(pdb: str, ref: str | None, outdir: str) -> None:
-    from dockchem.recprep import ReceptorPrepOptions, prepare_receptor
+    from dockchem.recprep import ReceptorPrepOptions, prepare_receptor, _meeko_templates
     res = prepare_receptor(pdb, outdir, ReceptorPrepOptions(reference_ligand=ref))
     r = res.report
+    src = _residue_keys(pdb, "pdb", set(r["chains"]))
+    prep = _residue_keys(str(res.pdb), "pdb")
+    qt = _residue_keys(str(res.pdbqt), "pdbqt")
+    templated = _meeko_templates()
+    lost_pdb = sorted(f"{c}:{n}{src[(c, n)]}" for (c, n) in src if (c, n) not in prep)
+    # a residue missing from the PDBQT is only acceptable when Meeko has no template for its name
+    lost_qt = sorted(f"{c}:{n}{prep[(c, n)]}" for (c, n) in prep
+                     if (c, n) not in qt and prep[(c, n)] in templated)
     print(json.dumps({
         "atoms_before": r["atoms_before"], "atoms_after": r["atoms_after"], "chains": r["chains"],
         "n_changes": len(r["changes"]), "n_warnings": len(r["warnings"]), "warnings": r["warnings"],
@@ -36,6 +66,7 @@ def worker(pdb: str, ref: str | None, outdir: str) -> None:
         "pdbqt_atoms": res.pdbqt.read_text().count("ATOM") + res.pdbqt.read_text().count("HETATM"),
         "stages": sorted({c["stage"] for c in r["changes"]}),
         "protonation": [c["change"] for c in r["changes"] if c["stage"] == "protonation"],
+        "lost_residues_pdb": lost_pdb, "lost_residues_pdbqt": lost_qt,
     }))
 
 
@@ -65,6 +96,8 @@ def main():
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--only", nargs="*")
+    ap.add_argument("--gate", action="store_true",
+                    help="exit non-zero if any entry fails or loses protein residues")
     a = ap.parse_args()
     ids = a.only or list(SET)
     Path(a.out).mkdir(parents=True, exist_ok=True)
@@ -81,6 +114,19 @@ def main():
     Path(a.out, "summary.md").write_text("\n".join(md) + "\n")
     print("\n".join(md))
     print(f"\n{sum(r['status']=='ok' for r in rows)}/{len(rows)} ok")
+    problems = []
+    for r in rows:
+        if r["status"] != "ok":
+            problems.append(f"{r['id']}: {r['status']}")
+        else:
+            if r["lost_residues_pdb"]:
+                problems.append(f"{r['id']}: residues lost from prepared PDB: {r['lost_residues_pdb'][:5]}")
+            if r["lost_residues_pdbqt"]:
+                problems.append(f"{r['id']}: residues lost from PDBQT: {r['lost_residues_pdbqt'][:5]}")
+    for p in problems:
+        print("PROBLEM", p)
+    if a.gate and problems:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

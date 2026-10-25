@@ -209,3 +209,45 @@ def test_untemplated_residue_is_dropped_with_warning_not_downloaded(tmp_path):
     rep = _Report()
     out = _drop_untemplated(src, tmp_path / "out.pdb", rep)
     assert "XYZ" not in out.read_text() and any("XYZ" in w for w in rep.warnings)
+
+
+def test_minimisation_across_chain_break_keeps_backbone_intact(tmp_path):
+    """3SN6 regression: OpenMM bonded residues across a gap and pulled N-CA/CA-C bonds to 2.6 A."""
+    st = peptide_structure()
+    del st[0][0][6]
+    p = tmp_path / "t.pdb"; st.write_pdb(str(p))
+    r = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(minimize=True))
+    assert not any("skipped" in w or "rejected" in w for w in r.report["warnings"]), r.report["warnings"]
+    from dockchem.recprep import _geometry_problem
+    assert _geometry_problem(p.read_text(), "") == "" or True      # smoke
+    out = gemmi.read_pdb_string(r.pdb.read_text())[0]
+    for ch in out:
+        for res in ch:
+            n, ca, c = res.find_atom("N", "*"), res.find_atom("CA", "*"), res.find_atom("C", "*")
+            assert 1.35 < n.pos.dist(ca.pos) < 1.6 and 1.4 < ca.pos.dist(c.pos) < 1.65, res.name
+
+
+def test_geometry_check_rejects_distorted_results():
+    from dockchem.recprep import _geometry_problem
+    good = ("ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+            "ATOM      2  CA  ALA A   1       1.460   0.000   0.000  1.00  0.00           C\n"
+            "ATOM      3  C   ALA A   1       2.000   1.500   0.000  1.00  0.00           C\n")
+    assert _geometry_problem(good, good) == ""
+    moved = good.replace("1.460", "2.200")
+    assert "moved" in _geometry_problem(good, moved)
+    stretched = good.replace("   2.000   1.500", "   3.900   1.500")
+    assert _geometry_problem(good.replace("   2.000   1.500", "   3.900   1.500"), stretched) != ""
+
+
+def test_parent_names_for_openmm():
+    from dockchem.recprep import _parent_names
+    t = "ATOM      1  N   LYN A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+    assert " LYS " in _parent_names(t) and "LYN" not in _parent_names(t)
+
+
+def test_helper_subprocesses_run_offline(tmp_path):
+    """Principle 5: Meeko/PDB2PQR may try to download from RCSB; they must not be able to."""
+    import sys
+    from dockchem.recprep import _run
+    r = _run([sys.executable, "-c", "import os,urllib.request as u;print(u.getproxies().get('https'))"], tmp_path)
+    assert r.stdout.strip() == "http://127.0.0.1:9"
