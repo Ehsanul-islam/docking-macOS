@@ -15,7 +15,7 @@ See [docs/vina_macos_plan_v2.md](docs/vina_macos_plan_v2.md) for the full plan.
 
 ## Status
 
-Phase 0 (foundations) scaffold. Python parts are tested on Linux in CI. The Swift package,
+Phase 0 (foundations) scaffold plus Phase 2 preparation code (see docs/PHASE2_STATUS.md). Python parts are tested on Linux in CI. The Swift package,
 `engine/build_vina.sh` and the equivalence run against real Vina binaries have **not yet been
 run**: they need macOS. See docs/PHASE0_STATUS.md.
 

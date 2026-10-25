@@ -54,3 +54,24 @@ def test_progress_notifications():
 def test_server_survives_after_error():
     out = run([req(1, "ligand.inspect", smiles="bad("), req(2, "system.ping")])
     assert "error" in out[0] and out[1]["result"]["result"] == "pong"
+
+
+def test_prepare_methods_over_rpc(tmp_path):
+    import sys; sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
+    from fixtures import decorated_structure
+    rec = tmp_path / "r.pdb"; decorated_structure().write_pdb(str(rec))
+    lib = tmp_path / "l.smi"; lib.write_text("CCO eth\nbad bad\n")
+    out = run([req(1, "ligand.prepare", smiles="CC(=O)Nc1ccccc1", outdir=str(tmp_path / "lig")),
+               req(2, "library.prepare", path=str(lib), outdir=str(tmp_path / "lib")),
+               req(3, "receptor.prepare", path=str(rec), outdir=str(tmp_path / "rec"),
+                   options={"reference_ligand": "LIG"}),
+               req(4, "format.sniff", path=str(rec)),
+               req(5, "ligand.prepare", smiles="CCO", options={"nope": 1})])
+    by = {m["id"]: m for m in out if "id" in m}
+    assert by[1]["result"]["result"][0]["status"] == "prepared"
+    assert (tmp_path / "lig" / "ligand.pdbqt").exists()
+    assert by[2]["result"]["result"]["counts"]["failed"] == 1
+    assert by[3]["result"]["result"]["ligands"][0]["resname"] == "LIG"
+    assert (tmp_path / "rec" / "prep_report.json").exists()
+    assert by[4]["result"]["result"] == "receptor"
+    assert by[5]["error"]["data"]["type"] == "InvalidInput"
