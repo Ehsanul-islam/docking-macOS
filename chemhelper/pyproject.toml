@@ -1,0 +1,22 @@
+[project]
+name = "dockchem"
+version = "0.1.0"
+description = "Chemistry helper for the macOS docking app (JSON-RPC over stdio)"
+requires-python = ">=3.11"
+dependencies = ["rdkit", "gemmi"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+dockchem-helper = "dockchem.server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["dockchem*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

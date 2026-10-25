@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "name": "example-1",
+      "receptor": "data/example/receptor.pdbqt",
+      "ligand": "data/example/ligand.pdbqt",
+      "center": [0.0, 0.0, 0.0],
+      "size": [20, 20, 20],
+      "scoring": "vina",
+      "seed": 42,
+      "exhaustiveness": 8
+    }
+  ]
+}
