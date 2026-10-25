@@ -292,3 +292,49 @@ def test_adjacent_residue_hydrogen_clash_is_detected_but_peptide_bond_is_not():
     peptide_bond = ("ATOM      1  C   LYS A  97       0.000   0.000   0.000  1.00  0.00           C\n"
                     "ATOM      2  N   THR A  98       1.330   0.000   0.000  1.00  0.00           N\n")
     assert _close_contacts(peptide_bond) == []
+
+
+def test_residue_with_impossible_internal_geometry_is_dropped_by_name_not_a_vague_failure(tmp_path):
+    """1LYZ's own coordinates put ASN46 CG 0.65 A from ND2 and CB 1.1 A from CG; Meeko then dies on a
+    pentavalent carbon. Here three atoms are crowded onto CB."""
+    from dockchem.recprep import _malformed_residues
+    st = peptide_structure()
+    for r in st[0][0]:
+        if r.seqid.num == 9:                       # ASN
+            d = {a.name: a for a in r}
+            cb = d["CB"].pos
+            for k, name in enumerate(("OD1", "ND2", "N")):      # crowd three atoms onto CB: 5 bonds
+                d[name].pos = gemmi.Position(cb.x + 0.9 * (k == 0), cb.y + 0.9 * (k == 1), cb.z + 0.9 * (k == 2))
+    src = tmp_path / "bad.pdb"
+    st.write_pdb(str(src))
+    assert ("A", "9") in _malformed_residues(src.read_text())
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert res.report["status"] == "degraded"
+    assert any(d["residue"] == "A:ASN9" and "impossible geometry" in d["reason"]
+               for d in res.report["dropped_residues"])
+    assert any("A:ASN9 left out" in w for w in res.report["warnings"])
+
+
+def test_clean_structure_has_no_malformed_residues():
+    from dockchem.recprep import _malformed_residues
+    assert _malformed_residues(peptide_structure().make_pdb_string()) == {}
+
+
+def test_bisection_finds_exactly_the_residues_meeko_chokes_on(tmp_path):
+    """A fake Meeko that fails with a valence error whenever residue 7 or 30 is present."""
+    from types import SimpleNamespace
+    from dockchem.recprep import _isolate_valence_failures
+    lines = []
+    for n in range(1, 41):
+        lines.append(f"ATOM  {n:5d}  CA  ALA A{n:4d}       0.000   0.000   0.000  1.00  0.00           C")
+    pdb = tmp_path / "x.pdb"
+    pdb.write_text("\n".join(lines) + "\n")
+
+    def fake(path):
+        present = {l[22:27].strip() for l in path.read_text().splitlines() if l.startswith("ATOM")}
+        if present & {"7", "30"}:
+            return SimpleNamespace(returncode=1, stdout="AtomValenceException: Explicit valence", stderr="")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    assert _isolate_valence_failures(pdb, fake) == {"A:7": "ALA", "A:30": "ALA"}
+    assert _isolate_valence_failures(pdb, lambda p: SimpleNamespace(returncode=0, stdout="", stderr="")) == {}

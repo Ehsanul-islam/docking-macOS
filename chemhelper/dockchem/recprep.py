@@ -18,7 +18,7 @@ from pathlib import Path
 
 import gemmi
 
-from . import hetatm
+from . import hetatm, protonation
 from .errors import HelperError, InvalidInput, ToolFailure
 from .provenance import record
 
@@ -47,6 +47,12 @@ class ReceptorPrepOptions:
     model_loops_max: int = 0                   # model internal gaps up to N residues (0 = flag only)
     ph: float = 7.4
     optimize_flips: bool = True
+    # Per-residue protonation, e.g. {"A:64": "HIE", "A:25": "ASH"} (see protonation.py). Applied before
+    # PDB2PQR and verified afterwards; an override that does not take effect is an error.
+    protonation_overrides: dict = field(default_factory=dict)
+    # Per-residue Asn/Gln/His flip decisions, e.g. {"A:45": "reject"}. Every flip PDB2PQR makes is listed
+    # in the report (stage "flip"); "reject" restores the crystal orientation. Default is accept.
+    flip_decisions: dict = field(default_factory=dict)
     minimize: bool = False
     flex_residues: list[str] = field(default_factory=list)   # e.g. ["A:15"]
     # Free edits applied before anything else, e.g. ["delete chain B", "delete resn SO4,GOL",
@@ -461,6 +467,81 @@ def _drop_untemplated(src: Path, dst: Path, rep) -> Path:
     return dst
 
 
+MAX_VALENCE = {"H": 1, "C": 4, "N": 4, "O": 2, "S": 2}     # bonds a perceived-by-distance atom may have
+
+
+def _malformed_residues(pdb_text: str) -> dict:
+    """Residues whose own atoms sit so close that Meeko's distance rule gives an atom an impossible
+    valence (e.g. a pentavalent carbon). That is a defect in the input coordinates, not something the
+    pipeline can repair. Returns {(chain, resnum): (resname, "A.x - B.y (d A)")}."""
+    from meeko.utils.covalent_radius_table import covalent_radius
+    out = {}
+    st = gemmi.read_pdb_string(pdb_text)
+    for ch in st[0]:
+        for res in ch:
+            atoms = [a for a in res if a.element.name in covalent_radius]
+            nbrs = {i: [] for i in range(len(atoms))}
+            for i, a in enumerate(atoms):
+                for j in range(i + 1, len(atoms)):
+                    b = atoms[j]
+                    d = a.pos.dist(b.pos)
+                    if d < BOND_ALLOWANCE * (covalent_radius[a.element.name] + covalent_radius[b.element.name]):
+                        nbrs[i].append((j, d))
+                        nbrs[j].append((i, d))
+            for i, a in enumerate(atoms):
+                lim = MAX_VALENCE.get(a.element.name)
+                if lim is not None and len(nbrs[i]) > lim:
+                    j, d = min(nbrs[i], key=lambda t: t[1])
+                    out[(ch.name, f"{res.seqid.num}{res.seqid.icode.strip()}")] = (
+                        res.name, f"{a.name} has {len(nbrs[i])} bonds, closest {atoms[j].name} at {d:.2f} A")
+                    break
+    return out
+
+
+def _drop_malformed(src: Path, dst: Path, rep) -> Path:
+    """Leave out residues with impossible internal geometry, by name, instead of letting Meeko fail with
+    an RDKit valence error. The result is reported as degraded (the receptor has a hole)."""
+    text = src.read_text()
+    bad = _malformed_residues(text)
+    if not bad:
+        return src
+    for (ch, num), (name, why) in sorted(bad.items()):
+        rep.warn(f"{ch}:{name}{num} left out of the PDBQT: impossible geometry in the input structure ({why})")
+        rep.dropped.append({"residue": f"{ch}:{name}{num}", "reason": f"impossible geometry in input ({why})"})
+    keep = [l for l in text.splitlines()
+            if not (l.startswith(("ATOM", "HETATM")) and (l[21], l[22:27].strip()) in bad)]
+    dst.write_text("\n".join(keep) + "\n")
+    return dst
+
+
+def _isolate_valence_failures(pdb: Path, attempt) -> dict:
+    """{"A:46": "ASN"} for every residue that makes Meeko fail on its own with a valence error."""
+    atoms = [l for l in pdb.read_text().splitlines() if l.startswith(("ATOM", "HETATM"))]
+    order, names = [], {}
+    for l in atoms:
+        k = f"{l[21].strip()}:{l[22:27].strip()}"
+        if k not in names:
+            order.append(k)
+            names[k] = l[17:20].strip()
+    probe = pdb.with_name(pdb.stem + "_probe.pdb")
+
+    def fails(keys):
+        wanted = set(keys)
+        probe.write_text("\n".join(l for l in atoms if f"{l[21].strip()}:{l[22:27].strip()}" in wanted) + "\nEND\n")
+        r = attempt(probe)
+        return r.returncode != 0 and "valence" in r.stdout + r.stderr
+
+    def find(keys):
+        if not fails(keys):
+            return []
+        if len(keys) == 1:
+            return list(keys)
+        h = len(keys) // 2
+        return find(keys[:h]) + find(keys[h:])
+
+    return {k: names[k] for k in find(order)}
+
+
 def _meeko(pdb_path: Path, base: Path, opts, rep):
     """Run mk_prepare_receptor. Ladder: as-is -> without OXT on rejected C-termini -> delete (named)."""
     exe = Path(sys.executable).parent / "mk_prepare_receptor.py"
@@ -475,10 +556,26 @@ def _meeko(pdb_path: Path, base: Path, opts, rep):
 
     used, deleted = pdb_path, False
     r = attempt(used)
+    if r.returncode != 0 and "valence" in r.stdout + r.stderr:
+        # RDKit rejected a residue's own geometry (e.g. a pentavalent carbon from distorted coordinates).
+        # Find the offending residues by bisection, leave them out by name, and carry on.
+        bad = _isolate_valence_failures(used, attempt)
+        if bad:
+            keep = [l for l in used.read_text().splitlines()
+                    if not (l.startswith(("ATOM", "HETATM")) and f"{l[21].strip()}:{l[22:27].strip()}" in bad)]
+            alt = used.with_name(used.stem + "_sane.pdb")
+            alt.write_text("\n".join(keep) + "\n")
+            for key, name in sorted(bad.items()):
+                label = key.replace(":", f":{name}", 1)
+                rep.warn(f"residue {label} left out of the PDBQT: its coordinates give an impossible "
+                         "valence (distorted geometry in the input structure)")
+                rep.dropped.append({"residue": label, "reason": "impossible valence (distorted input geometry)"})
+            used = alt
+            r = attempt(used)
     if r.returncode != 0:
         keys = set(failing(r))
         lines, stripped = [], set()
-        for l in pdb_path.read_text().splitlines():
+        for l in used.read_text().splitlines():
             key = f"{l[21].strip()}:{l[22:27].strip()}" if l.startswith(("ATOM", "HETATM")) else None
             if key in keys and l[12:16].strip() == "OXT":
                 stripped.add(key)
@@ -770,8 +867,40 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         (td / "fixed.pdb").write_text(fixed)
         rep.tools.append(record("pdbfixer", _ver("pdbfixer"), {"rebuild_missing_atoms": opts.rebuild_missing_atoms}))
         before = _residue_names(fixed)
+        bad_dec = {k: v for k, v in opts.flip_decisions.items() if str(v).lower() not in ("accept", "reject")}
+        if bad_dec:
+            raise InvalidInput(f"flip_decisions must be 'accept' or 'reject': {bad_dec}")
+        fixed, applied = protonation.apply_overrides(fixed, opts.protonation_overrides)
+        (td / "fixed.pdb").write_text(fixed)
+        user_set = {tuple(a["key"].split(":", 1)) for a in applied}
         prot = _pdb2pqr(td / "fixed.pdb", opts, rep, td)
         prot_text = prot.read_text()
+        protonation.verify_overrides(prot_text, applied)
+        flips = protonation.detect_flips(fixed, prot_text) if opts.optimize_flips else []
+        flipped = {f["key"] for f in flips}
+        reject = []
+        for k, v in opts.flip_decisions.items():
+            c, n = protonation.parse_key(k)
+            if str(v).lower() == "reject":
+                if f"{c}:{n}" in flipped:
+                    reject.append(f"{c}:{n}")
+                else:
+                    rep.warn(f"flip decision {k}: PDB2PQR did not flip this residue, nothing to reject")
+        if reject:
+            prot_text = protonation.undo_flips(prot_text, reject)
+            prot.write_text(prot_text)
+        for f in flips:
+            c, n = f["key"].split(":", 1)
+            kept = f["key"] in reject
+            rep.change("flip", f"{c}:{before.get(('%s' % c, n), f['resname'])}{n}",
+                       "flip rejected, crystal orientation restored" if kept else "side chain flipped",
+                       "user decision" if kept else "hydrogen-bond optimisation (PDB2PQR); "
+                       "set flip_decisions to reject", "user" if kept else "PDB2PQR")
+            if kept:
+                rep.warn(f"flip at {f['key']} was rejected: the crystal orientation may form worse "
+                         "hydrogen bonds")
+        if not opts.optimize_flips and opts.flip_decisions:
+            rep.warn("flip_decisions ignored because optimize_flips is off (no flips are made)")
         if opts.rebuild_missing_atoms == "pdb2pqr":
             old_h, new_h = _heavy_atoms(fixed), _heavy_atoms(prot_text)
             for key, names in new_h.items():
@@ -782,11 +911,15 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         for key, new in _residue_names(prot_text).items():
             old = before.get(key)
             if old and old != new:
+                mine = key in user_set
                 rep.change("protonation", f"{key[0]}:{old}{key[1]}", f"{old} -> {new}",
+                           "user override" if mine else
                            f"PROPKA pKa at pH {opts.ph:g}" if new != "HID" and new != "HIE" else
-                           "histidine tautomer from H-bond network", "PDB2PQR+PROPKA")
+                           "histidine tautomer from H-bond network",
+                           "user" if mine else "PDB2PQR+PROPKA")
                 if new in UNUSUAL_STATES:
-                    rep.warn(f"unusual protonation {key[0]}:{new}{key[1]} ({UNUSUAL_STATES[new]})")
+                    rep.warn(f"unusual protonation {key[0]}:{new}{key[1]} ({UNUSUAL_STATES[new]})"
+                             + (" - set by user override" if mine else ""))
         final = outdir / "receptor_prepared.pdb"
         if opts.minimize:
             if not _minimize(prot, final, rep):
@@ -829,6 +962,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         else:
             meeko_in = final
         meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep)
+        meeko_in = _drop_malformed(meeko_in, td / "meeko_sane.pdb", rep)
         rigid, flex = _meeko(meeko_in, outdir / "receptor", opts, rep)
 
     final_model = gemmi.read_pdb_string(final.read_text())[0]

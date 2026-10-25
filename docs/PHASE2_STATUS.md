@@ -86,3 +86,26 @@ NAD(P), cholesterol, 0WN, 0WM, F09, P0G, TXL, TA1 ...). The 35 refusals are deli
   mutation-checked (breaking `around` or the partial-residue warning makes them fail).
 
 Not done: the 3D highlight of a previewed selection and the linked sequence strip (viewer work, needs the Swift app).
+
+## Gap 4: per-residue protonation overrides and flip accept/reject (done on this branch)
+
+Receptor options (also available over `receptor.prepare`):
+
+- `protonation_overrides`: `{"A:64": "HIE", "A:25": "ASH"}`. Keys are `chain:number[icode]`; the structure
+  decides the residue type. Allowed: His → HID/HIE/HIP, Asp → ASP/ASH, Glu → GLU/GLH, Lys → LYS/LYN,
+  Cys → CYS/CYM. CYX cannot be chosen (disulfides come from SG–SG distance). Unknown residue (including
+  one removed by `edits`) or a state that does not belong to the residue is an `InvalidInput`.
+  The override is applied by naming the residue in the PDB2PQR input, then **verified** against the
+  residue name and hydrogens PDB2PQR actually produced; a mismatch is a `ToolFailure`, never silent.
+  Report: stage `protonation`, reason `user override`, tool `user`; unusual states carry a warning.
+- `flip_decisions`: `{"A:25": "reject"}`. Every Asn/Gln/His flip PDB2PQR makes is listed (stage `flip`,
+  detected by comparing its output to its input). `reject` rotates the group back 180° about its axis
+  (hydrogens included), restoring the crystal orientation, with a warning that H-bonds may be worse.
+  Rejecting a residue that was not flipped warns. Default is accept.
+
+Workflow for a UI: run prep, read the `flip`/`protonation` rows of the report, rerun with decisions.
+Tests: `tests/test_protonation.py` (25, includes real 3PTB flips accepted vs rejected; mutation-checked).
+
+Limits: no His flip *tautomer* choice separate from `HID/HIE/HIP`; Tyr/Ser/Thr/Arg states not selectable;
+PDB2PQR with a mid-run decision per flip is not possible, so a decision means a full rerun (minutes on
+large entries); an un-flipped group is not re-minimised for local clashes beyond the existing repair step.
