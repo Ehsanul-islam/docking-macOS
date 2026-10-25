@@ -50,7 +50,8 @@ def work(item):
     problems = []
     for r in res:
         if r.status == "failed":
-            problems.append(("prep_failed", r.error[:200]))
+            kind = "refused_unsupported_element" if r.error.startswith("contains ") else "prep_failed"
+            problems.append((kind, r.error[:200]))
             continue
         problems += audit(r, heavy_in)
     if problems:
@@ -73,6 +74,11 @@ def audit(r, heavy_in):
     dmin = min((xyz[i].Distance(xyz[j]) for i in range(len(xyz)) for j in range(i + 1, len(xyz))), default=9)
     if dmin < 0.6:
         problems.append(("overlapping_atoms", f"two atoms {dmin:.2f} A apart"))
+    bad_bonds = [(b.GetBeginAtom().GetSymbol(), b.GetEndAtom().GetSymbol(), round(xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]), 2))
+                 for b in mol.GetBonds()
+                 if not 0.85 <= xyz[b.GetBeginAtomIdx()].Distance(xyz[b.GetEndAtomIdx()]) <= 2.3]
+    if bad_bonds:
+        problems.append(("implausible_bond_length", f"{len(bad_bonds)} bond(s) outside 0.85-2.3 A, e.g. {bad_bonds[0]}"))
     heavy_out = sum(1 for a in mol.GetAtoms() if a.GetAtomicNum() > 1)
     stripped = any("salt" in s.lower() or "fragment" in s.lower() for s in r.steps + r.warnings)
     if heavy_out != heavy_in and not stripped:
@@ -92,11 +98,13 @@ def audit(r, heavy_in):
     return problems
 
 
-def load_items(sample, seed, kinds):
+def load_items(sample, seed, kinds, only_ids=None):
     data = json.load(gzip.open(CCD))["entries"]
     items = [{"id": k, "smiles": v["s"], "type": v.get("t", "")} for k, v in data.items() if v.get("s")]
     if kinds:
         items = [i for i in items if any(t in i["type"].upper() for t in kinds)]
+    if only_ids is not None:
+        items = [i for i in items if i["id"] in only_ids]
     items.sort(key=lambda i: i["id"])
     if sample:
         random.Random(seed).shuffle(items)
@@ -115,9 +123,9 @@ def report(path):
     print(f"\n{n} ligands")
     for c, k in cat.most_common():
         print(f"  {c:34s}{k:7d}  {100 * k / n:5.1f}%")
-    scored = [r for r in rows if r["category"] not in ("skipped_atom_or_ion", "dictionary_smiles_unparseable")]
+    scored = [r for r in rows if r["category"] not in ("skipped_atom_or_ion", "dictionary_smiles_unparseable", "refused_unsupported_element")]
     ok = sum(r["category"] == "ok" for r in scored)
-    print(f"\nprepared and audited OK: {ok}/{len(scored)} = {100 * ok / max(1, len(scored)):.2f}% of ligands with usable chemistry")
+    print(f"\nprepared and audited OK: {ok}/{len(scored)} = {100 * ok / max(1, len(scored)):.2f}% of ligands that are in scope (organic elements, parseable)")
     t = sorted(r.get("seconds", 0) for r in rows)
     if t:
         print(f"seconds per ligand: median {t[len(t) // 2]:.2f}, p95 {t[int(len(t) * .95)]:.2f}, max {t[-1]:.1f}")
@@ -139,11 +147,15 @@ if __name__ == "__main__":
     ap.add_argument("--timeout", type=float, default=120)
     ap.add_argument("--kinds", nargs="*", help="only CCD types containing these words, e.g. NON-POLYMER")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--rerun-failures-from", help="JSONL of an earlier run: only ligands that were not ok there")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     jl = out / "ligands.jsonl"
+    only = None
+    if a.rerun_failures_from:
+        only = {r["id"] for r in map(json.loads, open(a.rerun_failures_from)) if r["category"] not in ("ok", "skipped_atom_or_ion", "dictionary_smiles_unparseable")}
     if not a.report:
         from runner import run_batch
-        print(run_batch(load_items(a.sample, a.seed, a.kinds), "ligand_batch:work", jl, a.workers, a.timeout))
+        print(run_batch(load_items(a.sample, a.seed, a.kinds, only), "ligand_batch:work", jl, a.workers, a.timeout))
     report(jl)

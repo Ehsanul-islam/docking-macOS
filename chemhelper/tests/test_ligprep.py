@@ -1,6 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
+import pytest
 from dockchem.ligprep import (LigandPrepOptions, prepare_ligand, prepare_library, properties,
                               read_records)
 
@@ -72,7 +73,7 @@ def test_bad_input_fails_cleanly():
 
 
 def test_uncommon_element_warns():
-    p = one("OB(O)c1ccccc1", protonate=False)
+    p = one("C[Zn]C", protonate=False, allow_unusual_elements=True)
     assert any("uncommon element" in w for w in p.warnings)
 
 
@@ -111,3 +112,39 @@ def test_borderline_phenol_not_ionised_by_default():
 def test_ph_range_enumerates_states():
     r = prepare_ligand("CC(=O)Nc1ccc(O)cc1", "x", LigandPrepOptions(ph_range=2.0))
     assert len(r) == 2
+
+
+# ---- regressions found by running the whole wwPDB Chemical Component Dictionary ----------------------
+
+def test_hypervalent_phosphorus_gets_zero_charges_not_a_crash():
+    """CCD 02E: pentavalent P makes Gasteiger charges undefined; Meeko used to die on a non-finite charge."""
+    r = prepare_ligand("COC=CCC(N)P(O)(O)(Oc1ccccc1)Oc2ccccc2", "02E")[0]
+    assert r.status == "warning" and r.pdbqt
+    assert any("partial charges could not be computed" in w for w in r.warnings)
+
+
+def test_overlapping_atoms_in_the_embedding_are_never_passed_on():
+    """CCD A1JWR (SF5 group): the first embedding put atoms on top of each other."""
+    import numpy as np
+    from scipy.spatial.distance import pdist
+    r = prepare_ligand("Cn1c(c(c(n1)O)C(=O)O)CNc2cccc(c2)S(F)(F)(F)(F)F", "A1JWR")[0]
+    assert r.status in ("prepared", "warning")
+    assert pdist(r.mol.GetConformer().GetPositions()).min() >= 0.7
+
+
+@pytest.mark.parametrize("smiles,element", [("C[Se]C", "Se"), ("C1CN2CCN1[Zn]2", "Zn"), ("C[Si](C)(C)C", "Si"),
+                                            ("c1ccccc1[Fe]c1ccccc1", "Fe")])
+def test_unsupported_elements_are_refused_clearly(smiles, element):
+    r = prepare_ligand(smiles, "x")[0]
+    assert r.status == "failed" and element in r.error and "allow_unusual_elements" in r.error
+
+
+def test_unsupported_elements_can_be_allowed_with_a_warning():
+    r = prepare_ligand("C[Mg]Cl", "x", LigandPrepOptions(allow_unusual_elements=True))[0]
+    assert r.status in ("prepared", "warning") and r.pdbqt
+    assert any("uncommon element" in w for w in r.warnings)
+
+
+def test_counter_ions_are_stripped_before_the_element_check():
+    r = prepare_ligand("CC(=O)[O-].[Na+]", "acetate")[0]
+    assert r.status in ("prepared", "warning")

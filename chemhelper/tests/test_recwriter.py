@@ -50,19 +50,74 @@ def test_table_writer_refuses_flexible_residues(tmp_path):
         prepare_receptor(p, tmp_path / "o2", ReceptorPrepOptions(pdbqt_writer="x"))
 
 
-def test_auto_falls_back_to_table_writer_when_meeko_fails(tmp_path, monkeypatch):
+def test_auto_uses_the_table_writer_and_is_unaffected_by_meeko_failing(tmp_path, monkeypatch):
     def boom(*a, **k):
         raise ToolFailure("Meeko receptor preparation failed")
     monkeypatch.setattr(recprep, "_meeko", boom)
     p = tmp_path / "p.pdb"
     peptide_structure().write_pdb(str(p))
     res = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions())
-    assert res.pdbqt.exists() and typed(res.pdbqt)
-    assert any("built-in table writer" in w for w in res.report["warnings"])
-    with pytest.raises(ToolFailure):
+    assert res.pdbqt.exists() and typed(res.pdbqt) and res.report["status"] == "ok"
+    assert res.report["pdbqt"]["writer"] == "table"
+    assert res.report["pdbqt"]["crosscheck"]["result"] == "unavailable"
+    with pytest.raises(ToolFailure):          # explicit Meeko stays strict
         prepare_receptor(p, tmp_path / "o2", ReceptorPrepOptions(pdbqt_writer="meeko"))
-    with pytest.raises(ToolFailure):          # flexible residues cannot fall back
+    with pytest.raises(ToolFailure):          # flexible residues cannot use the table writer
         prepare_receptor(p, tmp_path / "o3", ReceptorPrepOptions(flex_residues=["A:3"]))
+
+
+def test_default_run_cross_checks_against_meeko_and_they_agree(tmp_path):
+    p = tmp_path / "d.pdb"
+    decorated_structure().write_pdb(str(p))
+    res = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(reference_ligand="LIG"))
+    cc = res.report["pdbqt"]["crosscheck"]
+    assert res.report["pdbqt"]["writer"] == "table" and cc["result"] == "agree" and cc["n_residues_compared"] > 10
+    assert any(t["tool"] == "meeko" and t["params"]["role"] == "cross-check" for t in res.report["tools"])
+    assert not (tmp_path / "o" / "meeko_crosscheck").exists()        # scratch is cleaned up
+
+
+def test_crosscheck_can_be_switched_off(tmp_path):
+    p = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(p))
+    res = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(crosscheck=False))
+    assert "crosscheck" not in res.report["pdbqt"] and not any(t["tool"] == "meeko" for t in res.report["tools"])
+
+
+def test_meeko_takes_over_when_the_table_lacks_rules(tmp_path, monkeypatch):
+    t = dict(recwriter._table())
+    t["types"] = {k: v for k, v in t["types"].items() if k != "PHE"}
+    monkeypatch.setattr(recwriter, "_table", lambda: t)
+    p = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(p))
+    res = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions())
+    assert res.report["pdbqt"]["writer"] == "meeko" and res.report["status"] == "ok"
+    assert any("no rules for" in w and "Meeko wrote the PDBQT" in w for w in res.report["warnings"])
+    assert any(l[17:20] == "PHE" for l in open(res.pdbqt))
+
+
+def test_table_only_reports_the_residues_it_cannot_type(tmp_path, monkeypatch):
+    t = dict(recwriter._table())
+    t["types"] = {k: v for k, v in t["types"].items() if k != "PHE"}
+    monkeypatch.setattr(recwriter, "_table", lambda: t)
+    p = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(p))
+    res = prepare_receptor(p, tmp_path / "o", ReceptorPrepOptions(pdbqt_writer="table"))
+    assert res.report["status"] == "degraded"
+    assert any("PHE" in d["residue"] for d in res.report["dropped_residues"])
+
+
+def test_compare_pdbqt_flags_a_type_disagreement_and_ignores_renames(tmp_path):
+    from dockchem.recprep import compare_pdbqt
+
+    def line(name, ad, res="ALA", num=1):
+        return (f"ATOM  {1:5d} {name:<4s} {res:>3s} A{num:4d}       0.000   0.000   0.000  1.00  0.00    +0.000 {ad:<2s}\n")
+    a, b, c = tmp_path / "a", tmp_path / "b", tmp_path / "c"
+    a.write_text(line("N", "N") + line("H", "HD"))
+    b.write_text(line("N", "N") + line("H1", "HD"))               # Meeko renames the N-terminal hydrogen
+    c.write_text(line("N", "NA") + line("H", "HD"))
+    assert compare_pdbqt(a, b)["result"] == "agree"
+    r = compare_pdbqt(a, c)
+    assert r["result"] == "disagree" and "A:ALA1" in r["examples"][0]
 
 
 def pdb_line(serial, name, res, num, xyz, el, chain="A"):

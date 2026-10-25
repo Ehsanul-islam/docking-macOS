@@ -61,9 +61,11 @@ class ReceptorPrepOptions:
     # Free edits applied before anything else, e.g. ["delete chain B", "delete resn SO4,GOL",
     # "delete within 3 of resn XYZ and water"] (see selection.py). Each one is logged in the report.
     edits: list[str] = field(default_factory=list)
-    # Who writes the PDBQT: Meeko, the built-in table writer (rigid only, see recwriter.py), or "auto" =
-    # Meeko, falling back to the table writer if Meeko fails.
-    pdbqt_writer: str = "auto"                  # auto | meeko | table
+    # Who writes the PDBQT. "auto" (default): the built-in table writer (rigid only, see recwriter.py), which
+    # cannot be broken by odd geometry; Meeko steps in when the table lacks rules for some residue, and
+    # otherwise runs as an independent cross-check (disagreements are reported, never fatal).
+    pdbqt_writer: str = "auto"                  # auto | table | meeko
+    crosscheck: bool = True
     # Structures the assessment calls unusable are refused with the reasons; True prepares them anyway.
     allow_unusable: bool = False
     alphafold: bool = False
@@ -86,6 +88,7 @@ class _Report:
         self.warnings: list[str] = []
         self.tools: list[dict] = []
         self.dropped: list[dict] = []        # residues absent from the PDBQT: makes the result "degraded"
+        self.pdbqt_info: dict = {}           # which writer produced the PDBQT and how the cross-check went
 
     def change(self, stage, residue, change, reason, tool):
         self.changes.append({"stage": stage, "residue": residue, "change": change,
@@ -523,27 +526,92 @@ def _drop_malformed(src: Path, dst: Path, rep) -> Path:
 
 
 def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
-    """Meeko first; if it fails and the table writer can do the job, use that and say so loudly."""
-    if opts.pdbqt_writer not in ("auto", "meeko", "table"):
-        raise InvalidInput(f"pdbqt_writer must be auto, meeko or table, not {opts.pdbqt_writer!r}")
-    if opts.pdbqt_writer != "table":
-        try:
-            return _meeko(pdb_path, base, opts, rep)
-        except ToolFailure as e:
-            if opts.pdbqt_writer == "meeko" or opts.flex_residues:
-                raise
-            rep.warn(f"Meeko failed ({e.message}); the receptor PDBQT was written by the built-in table writer")
-    elif opts.flex_residues:
-        raise InvalidInput("flexible residues need Meeko (pdbqt_writer='table' writes a rigid receptor only)")
+    """Table writer first (it cannot be broken by odd geometry), Meeko as fallback or cross-check."""
     from . import recwriter
+    mode = opts.pdbqt_writer
+    if mode not in ("auto", "table", "meeko"):
+        raise InvalidInput(f"pdbqt_writer must be auto, table or meeko, not {mode!r}")
+    if opts.flex_residues:
+        if mode == "table":
+            raise InvalidInput("flexible residues need Meeko (pdbqt_writer='table' writes a rigid receptor only)")
+        mode = "meeko"                       # the table writer has no torsion trees
+    if mode == "meeko":
+        rep.pdbqt_info = {"writer": "meeko", "crosscheck": "not applicable"}
+        return _meeko(pdb_path, base, opts, rep)
+
     out = Path(f"{base}.pdbqt")
     r = recwriter.write_pdbqt(pdb_path.read_text(), out)
+    if r["dropped"] and mode == "auto":
+        # The table lacks rules for something (modified residue, nucleic acid, ...). Meeko may know it.
+        trial = _Report()
+        alt_base = base.parent / "meeko_full" / "receptor"
+        alt_base.parent.mkdir(exist_ok=True)
+        try:
+            alt, _ = _meeko(pdb_path, alt_base, opts, trial)
+            if len(trial.dropped) < len(r["dropped"]):
+                import shutil
+                shutil.copy(alt, out)
+                rep.changes += trial.changes
+                rep.warnings += [w for w in trial.warnings if w not in rep.warnings]
+                rep.dropped += trial.dropped
+                rep.tools += trial.tools
+                rep.warn("the built-in table writer has no rules for: "
+                         + ", ".join(d["residue"] for d in r["dropped"][:5]) + "; Meeko wrote the PDBQT instead")
+                rep.pdbqt_info = {"writer": "meeko", "crosscheck": "not applicable (table writer incomplete)"}
+                return out, None
+        except ToolFailure:
+            pass
     for d in r["dropped"]:
         rep.warn(f"residue {d['residue']} left out of the PDBQT: {d['reason']}")
         rep.dropped.append(d)
     rep.tools.append(record("dockchem.recwriter", __version__, {"atoms": r["atoms"], "merged_hydrogens": r["merged_hydrogens"],
                                                                  "charges": "not written (Vina ignores them)"}))
+    rep.pdbqt_info = {"writer": "table", "atoms": r["atoms"]}
+    if mode == "auto" and opts.crosscheck:
+        rep.pdbqt_info["crosscheck"] = _crosscheck(pdb_path, out, base, opts, rep)
     return out, None
+
+
+def _crosscheck(pdb_path: Path, table_pdbqt: Path, base: Path, opts, rep) -> dict:
+    """Run Meeko independently and compare AutoDock types per residue. Never fatal."""
+    import shutil
+    work = base.parent / "meeko_crosscheck"
+    work.mkdir(exist_ok=True)
+    try:
+        throwaway = _Report()
+        meeko_out, _ = _meeko(pdb_path, work / "receptor", opts, throwaway)
+        result = compare_pdbqt(table_pdbqt, meeko_out)
+    except ToolFailure as e:
+        result = {"result": "unavailable", "reason": e.message}
+    except Exception as e:  # noqa: BLE001
+        result = {"result": "unavailable", "reason": f"{type(e).__name__}: {e}"}
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+    rep.tools.append(record("meeko", _ver("meeko"), {"role": "cross-check", "result": result["result"]}))
+    if result["result"] == "disagree":
+        rep.warn(f"Meeko and the built-in writer disagree on {result['n_residues_different']} residue(s), first: "
+                 f"{result['examples'][0]}")
+    return result
+
+
+def compare_pdbqt(table_path: Path, meeko_path: Path) -> dict:
+    """Per-residue comparison of AutoDock atom types (atom names differ: Meeko renames N-terminal H and water
+    atoms). Residues Meeko left out are not differences; the report lists them separately."""
+    import collections
+
+    def per_residue(path):
+        d = collections.defaultdict(collections.Counter)
+        for l in Path(path).read_text().splitlines():
+            if l.startswith(("ATOM", "HETATM")):
+                d[(l[21], l[22:27].strip(), l[17:20].strip())][l[77:79].strip()] += 1
+        return d
+    a, b = per_residue(table_path), per_residue(meeko_path)
+    shared = set(a) & set(b)
+    diff = [f"{k[0]}:{k[2]}{k[1]} table {dict(a[k])} vs Meeko {dict(b[k])}" for k in sorted(shared) if a[k] != b[k]]
+    return {"result": "disagree" if diff else "agree", "n_residues_compared": len(shared),
+            "n_residues_different": len(diff), "examples": diff[:10],
+            "only_in_table": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(a) - set(b))[:20],
+            "only_in_meeko": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(b) - set(a))[:20]}
 
 
 def _isolate_valence_failures(pdb: Path, attempt) -> dict:
@@ -1025,6 +1093,6 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "site_residues": sorted(site_res_ids),
         # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
         "status": "degraded" if rep.dropped else "ok", "dropped_residues": rep.dropped,
-        "assessment": assessment,
+        "assessment": assessment, "pdbqt": rep.pdbqt_info,
     }
     return ReceptorResult(final, rigid, flex, ligands, report)

@@ -20,7 +20,9 @@ from .ligand_templates import is_untrusted
 # Torsions above this make the Vina search less reliable (plan §9.3 "high torsion count").
 TORSION_WARN = 15
 # Elements Vina/Meeko handle without special care.
-COMMON_ELEMENTS = {"H", "C", "N", "O", "F", "P", "S", "Cl", "Br", "I"}
+COMMON_ELEMENTS = {"H", "C", "N", "O", "F", "P", "S", "Cl", "Br", "I", "B"}
+MIN_ATOM_SEPARATION = 0.7      # A: any closer and the embedding is broken, not strained
+EMBED_TIMEOUT = 30             # s per embedding attempt (up to 4 attempts)
 
 _PARAMS = FilterCatalogParams()
 _PARAMS.AddCatalog(FilterCatalogParams.FilterCatalogs.PAINS)
@@ -43,6 +45,9 @@ class LigandPrepOptions:
     keep_3d: bool = True             # preserve input coordinates (needed for redocking RMSD)
     rigid_macrocycles: bool = False
     pdbqt: bool = True
+    # Vina has no atom types for most metals and metalloids, and docking a metal complex as an ordinary
+    # molecule ignores its coordination bonds. Refused unless the caller opts in (a warning is kept).
+    allow_unusual_elements: bool = False
 
 
 @dataclass
@@ -165,20 +170,37 @@ def _stereo(mol, opts, steps, warnings):
     return isos
 
 
+def _min_separation(mol, cids) -> float:
+    import numpy as np
+    from scipy.spatial.distance import pdist
+    return min(float(pdist(mol.GetConformer(c).GetPositions()).min()) for c in cids) if mol.GetNumAtoms() > 1 else 9.0
+
+
 def _embed(mol, opts, steps, warnings):
     """Return (mol with Hs and conformer(s), ok)."""
     mh = Chem.AddHs(mol, addCoords=_has_3d(mol))
     if _has_3d(mol) and opts.keep_3d:
         steps.append("3D: preserved input coordinates")
         return mh
-    ps = AllChem.ETKDGv3()
-    ps.randomSeed = opts.seed
-    cids = list(AllChem.EmbedMultipleConfs(mh, opts.n_conformers, ps))
-    if not cids:
-        ps.useRandomCoords = True
+    cids, attempt = [], 0
+    for random_coords, seed in ((False, opts.seed), (True, opts.seed), (True, opts.seed + 1), (True, opts.seed + 2)):
+        ps = AllChem.ETKDGv3()
+        ps.randomSeed, ps.useRandomCoords = seed, random_coords
+        try:
+            ps.timeout = EMBED_TIMEOUT
+        except AttributeError:       # older RDKit
+            pass
         cids = list(AllChem.EmbedMultipleConfs(mh, opts.n_conformers, ps))
+        attempt += 1
+        if cids and _min_separation(mh, cids) >= MIN_ATOM_SEPARATION:
+            break
+        cids = []
     if not cids:
-        raise InvalidInput("3D embedding failed")
+        raise InvalidInput("3D embedding failed (no geometry without overlapping atoms; unusual bonding such as "
+                           "hypervalent centres or fullerenes cannot be embedded reliably)")
+    if attempt > 1:
+        warnings.append(f"3D embedding needed {attempt} attempts")
+    raw = [mh.GetConformer(c).GetPositions().copy() for c in cids]
     if AllChem.MMFFHasAllMoleculeParams(mh):
         AllChem.MMFFOptimizeMoleculeConfs(mh, maxIters=2000)
         steps.append(f"3D: ETKDGv3 (seed {opts.seed}) + MMFF94, {len(cids)} conformer(s)")
@@ -186,6 +208,17 @@ def _embed(mol, opts, steps, warnings):
         AllChem.UFFOptimizeMoleculeConfs(mh, maxIters=2000)
         warnings.append("MMFF94 parameters unavailable; used UFF")
         steps.append(f"3D: ETKDGv3 (seed {opts.seed}) + UFF, {len(cids)} conformer(s)")
+    if _min_separation(mh, cids) < MIN_ATOM_SEPARATION:
+        # Force fields mishandle hypervalent centres (SF5, pentavalent P) and can collapse atoms together.
+        for c, xyz in zip(cids, raw):
+            conf = mh.GetConformer(c)
+            for i, p in enumerate(xyz):
+                conf.SetAtomPosition(i, p.tolist())
+        if _min_separation(mh, cids) < MIN_ATOM_SEPARATION:
+            raise InvalidInput("3D geometry has overlapping atoms")
+        warnings.append("force-field minimisation collapsed atoms (hypervalent centre): using unrelaxed "
+                        "distance-geometry coordinates")
+        steps.append("3D: force-field result discarded, ETKDGv3 coordinates kept")
     return mh
 
 
@@ -194,6 +227,14 @@ def _to_pdbqt(mol, opts, warnings):
     kw = {"rigid_macrocycles": True} if opts.rigid_macrocycles else {}
     setups = MoleculePreparation(**kw).prepare(mol)
     text, ok, err = PDBQTWriterLegacy.write_string(setups[0])
+    if not ok and "charge" in str(err):
+        # Gasteiger charges are undefined for hypervalent centres (pentavalent P, SF5, ...). Vina does not use
+        # partial charges, so write zeros and say so.
+        setups = MoleculePreparation(charge_model="zero", **kw).prepare(mol)
+        text, ok, err = PDBQTWriterLegacy.write_string(setups[0])
+        if ok:
+            warnings.append("partial charges could not be computed (hypervalent atom): written as 0.000; "
+                            "Vina does not use them")
     if not ok:
         raise InvalidInput(f"Meeko failed: {err}")
     ntors = text.count("BRANCH") // 2
@@ -222,6 +263,14 @@ def prepare_ligand(source: str | Chem.Mol, name: str = "ligand",
             Chem.SanitizeMol(mol)
         had_3d = _has_3d(mol) and opts.keep_3d
         mol = _standardize(mol, opts, steps)
+        odd = sorted({a.GetSymbol() for a in mol.GetAtoms()} - COMMON_ELEMENTS)
+        if odd:
+            if not opts.allow_unusual_elements:
+                return [PreparedLigand(name, "failed", error=(
+                    f"contains {', '.join(odd)}: Vina has no reliable atom types for these elements, and a metal "
+                    "or metalloid complex cannot be docked as an ordinary molecule. Remove it, or set "
+                    "allow_unusual_elements to prepare it anyway."), steps=steps)]
+            warnings.append(f"uncommon element(s) {odd}: Vina typing may be unreliable (allowed by request)")
         if opts.protonate and not had_3d:
             states = _protonate(mol, opts, steps, warnings)
         else:
@@ -242,9 +291,6 @@ def prepare_ligand(source: str | Chem.Mol, name: str = "ligand",
             w, st = list(warnings), list(steps)
             try:
                 m3 = _embed(v, opts, st, w)
-                elems = {a.GetSymbol() for a in m3.GetAtoms()} - COMMON_ELEMENTS
-                if elems:
-                    w.append(f"uncommon element(s) {sorted(elems)}: Vina typing may be unreliable")
                 pq = _to_pdbqt(m3, opts, w) if opts.pdbqt else ""
                 results.append(PreparedLigand(
                     vname, "warning" if w else "prepared", smi, Chem.MolToInchiKey(v), m3, pq,
