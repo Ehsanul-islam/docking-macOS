@@ -113,3 +113,11 @@ def test_pdbqt_tolerates_renamed_water_atoms_oxt_and_flex_file(tmp_path):
                  + pdbqt(4, "OW", "HOH", 9, (8, 8, 8), "OA"))            # water atom renamed; OXT omitted
     f.write_text(pdbqt(2, "CA", "ALA", 1, (1.4, 0, 0), "C"))              # flexible part lives elsewhere
     assert S.check_pdbqt(prep, q, [], f) == 4
+
+
+def test_missing_amide_hydrogen_is_listed_but_not_for_proline_or_when_present():
+    t = (pdb(1, "N", "LYS", 74, (0, 0, 0), "N") + pdb(2, "CA", "LYS", 74, (1.4, 0, 0), "C")             # no H at all
+         + pdb(3, "N", "ALA", 75, (5, 0, 0), "N") + pdb(4, "H", "ALA", 75, (5, 1, 0), "H")                # fine
+         + pdb(5, "N", "PRO", 76, (9, 0, 0), "N")                                                          # Pro has none
+         + pdb(6, "N", "GLY", 77, (13, 0, 0), "N") + pdb(7, "H1", "GLY", 77, (13, 1, 0), "H"))           # ammonium H
+    assert S.missing_amide_hydrogens(t) == ["A:LYS74"]

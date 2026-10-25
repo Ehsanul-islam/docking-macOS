@@ -1168,6 +1168,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                     rep.warn(f"{n} hydrogen(s) removed because they sit on top of other atoms and could not be "
                              "repositioned without moving heavy atoms (listed in the Prep Report)")
         _clashes(final.read_text(), rep)
+        for label in stagecheck.missing_amide_hydrogens(final.read_text()):
+            rep.warn(f"{label} has no backbone hydrogen (chain start after a gap): its N-H donor is missing")
 
         # merge kept hetero groups back for Meeko
         if het_out:

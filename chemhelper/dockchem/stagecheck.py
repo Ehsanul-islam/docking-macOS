@@ -148,3 +148,20 @@ def _atoms_pdbqt(path: Path) -> dict:
             out[(l[21], l[22:27].strip(), l[12:16].strip())] = (
                 float(l[30:38]), float(l[38:46]), float(l[46:54]), l[17:20].strip(), l[77:79].strip())
     return out
+
+
+def missing_amide_hydrogens(text: str) -> list[str]:
+    """Residues whose backbone nitrogen carries no hydrogen at all (not Pro): typically the first residue after a
+    chain gap, where PDB2PQR places neither the amide H nor the N-terminal ammonium hydrogens. The donor is missing."""
+    per: dict = {}
+    for (c, n, name), (x, y, z, res, el) in _atoms(text).items():
+        d = per.setdefault((c, n), {"res": res, "names": set()})
+        d["names"].add(name)
+    out = []
+    for (c, n), d in per.items():
+        info = gemmi.find_tabulated_residue(d["res"])
+        if info is None or not info.is_amino_acid() or d["res"] == "PRO" or "N" not in d["names"]:
+            continue
+        if not d["names"] & {"H", "H1", "H2", "H3"}:
+            out.append(f"{c}:{d['res']}{n}")
+    return out
