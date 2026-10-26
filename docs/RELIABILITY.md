@@ -81,3 +81,28 @@ Not yet run: the PoseBusters subset (215 entries in the 300-entry set), flexible
 - **Fuzzing** (`tests/test_robustness.py`: 19 malformed-file kinds x pdb/cif, 60 seeded random mutations, malformed
   SMILES/selections/parameter types): found and fixed 5 bugs (sniff on a model-less file, stray bytes crashing assess,
   non-text parameters, lone-surrogate SMILES, and ligands with thousands of atoms hanging the helper).
+
+## Redocking accuracy, PoseBusters subset (215 entries, same method as the Astex run)
+
+Receptor from the PDB via the full pipeline, ligand from the benchmark's generated start conformer, box = crystal ligand
++ 6 A, unmodified Vina 1.2.7 (exhaustiveness 8, 1 core each, 9 modes, fixed seed), success = top pose within 2.0 A.
+
+| | PoseBusters 215 | Astex 85 | Both (300) |
+|---|---|---|---|
+| Docked and scored | 206 | 82 | 288 |
+| Refused up front (metal cofactor at the site) | 8 | 3 | 11 |
+| Failed (a stage check) | 1 | 0 | 1 |
+| Top-1 within 2 A, of scored | 99 / 206 = **48.1%** | 49 / 82 = 59.8% | 148 / 288 = **51.4%** |
+| Top-1, of all attempted | 46.0% | 57.6% | 49.3% |
+| Best of top 3 | 64.1% | 74.4% | |
+| Best of all 9 poses | 69.9% | 78.0% | |
+
+By ligand flexibility (PoseBusters): 0-5 torsions 54%, 6-10 torsions 52%, over 10 torsions 38% (73 entries).
+Vina seconds per entry: median 59, max 1,403 (large flexible ligands on one core).
+
+Notes: the PoseBusters set is newer and harder (more flexible ligands, more diverse proteins) than Astex, which accounts
+for most of the lower rate; scoring misses dominate (70% of entries have a correct pose somewhere in the 9, 48% rank it
+first). The failure is not preparation: no entry failed for a protein reason except one (7OLI: the PDB2PQR stage check
+rejected a C-OXT bond that PDB2PQR itself relocated, a false positive in our check, not fixed yet). The published Vina
+figure on this benchmark was not re-checked and differs in settings (box, search), so no comparison is claimed.
+No standard-route baseline was run on this set (it failed on 62% of the Astex entries).
