@@ -115,3 +115,26 @@ handled; they show how rarely a PDB entry is "ready" as downloaded (about 12% he
   ligand; docking accuracy was **not** measured on these entries (preparation only).
 - The set is skewed toward well-studied proteins and excludes entries over 100,000 atoms, so very large complexes are
   under-represented.
+
+## After the first round of fixes (commits 7ca48a5, 3e76ee1; the 108 affected entries re-run)
+
+| Outcome | Before | After |
+|---|---|---|
+| ok | 864 | **898** |
+| degraded | 79 | 64 |
+| unusable (refused) | 36 | 32 |
+| timeout | 14 | **7** |
+| failed | 9 | **1** |
+
+Transitions: degraded -> ok 18 (far sugars/stubs and blind-docking triage), unusable -> ok 4 (the deuterated structures,
+P4), failed -> ok 7 and failed -> degraded 1 (residues without a protonation template left out by name, P3),
+timeout -> ok 5 and timeout -> degraded 2 (fail-fast, time-bounded minimisation, P5).
+
+Fixed: P2 (blind-docking triage), P3, P4, P5 (partly), P7 (stretched hydrogens, not a table gap; 1PJX, 3F9M).
+Open: 7 timeouts, all very large cryo-EM complexes (8,000 to 12,000 residues, e.g. 10QQ, 9BZ0, 7NVL, 8SH9, 8BKZ, 6RD4,
+9NPX) - the remaining cost is PDB2PQR/PROPKA and the table on that many residues, not measured per stage yet; 8TOX
+(chain names, P8); P1 (metal cofactors: by design refused); P6 (copper has no type); P9 (4 writer/Meeko differences);
+P10 (warning volume, cysteine thiolates).
+Finding made while fixing P5: for 9QGG every minimisation variant (GB 100/200/500 iterations, vacuum) was rejected by
+the heavy-atom check (cysteine B:767 SG drifts 1.0 A); the earlier 490 s were spent on a result that was discarded.
+The repair then falls back to removing the clashing hydrogens. The cause of the drift was not found.
