@@ -48,6 +48,8 @@ class LigandPrepOptions:
     # Vina has no atom types for most metals and metalloids, and docking a metal complex as an ordinary
     # molecule ignores its coordination bonds. Refused unless the caller opts in (a warning is kept).
     allow_unusual_elements: bool = False
+    # Docking engines are built for small molecules; thousands of atoms never finish (a 5,000-carbon chain hung the helper).
+    max_heavy_atoms: int = 200
 
 
 @dataclass
@@ -277,6 +279,10 @@ def prepare_ligand(source: str | Chem.Mol, name: str = "ligand",
             return [PreparedLigand(name, "failed", error="RDKit could not parse/sanitize input")]
         if isinstance(source, Chem.Mol):
             Chem.SanitizeMol(mol)
+        if mol.GetNumHeavyAtoms() > opts.max_heavy_atoms:
+            return [PreparedLigand(name, "failed", error=(
+                f"{mol.GetNumHeavyAtoms()} heavy atoms, over the {opts.max_heavy_atoms} limit: this is not a small molecule "
+                "(peptide or macromolecule), and docking engines cannot search such a ligand. Raise max_heavy_atoms to try anyway."))]
         had_3d = _has_3d(mol) and opts.keep_3d
         mol = _standardize(mol, opts, steps)
         odd = sorted({a.GetSymbol() for a in mol.GetAtoms()} - COMMON_ELEMENTS)
@@ -340,8 +346,10 @@ def read_records(path: str | Path):
 
 def prepare_library(records, opts: LigandPrepOptions | None = None) -> dict:
     """Library mode (plan §6.3): dedupe by InChIKey, per-molecule status, failures never vanish."""
+    from . import cancel
     rows, prepared, seen = [], [], {}
     for name, src, err in records:
+        cancel.check()                                   # a long library can be cancelled between molecules
         if src is None:
             rows.append({"name": name, "status": "failed", "error": err, "warnings": [], "steps": []})
             continue

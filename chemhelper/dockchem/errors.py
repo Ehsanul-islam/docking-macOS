@@ -89,3 +89,10 @@ class FormatLimit(InvalidInput):
     """The input is valid but too large for the file formats the toolchain uses (PDB: 99,999 atoms)."""
     code = -32008
     kind = "FormatLimit"
+
+
+class InternalError(HelperError):
+    """A bug: something unexpected went wrong inside the helper. Never an expected rejection of bad input; those are
+    InvalidInput / UnusableStructure / FormatLimit / ToolFailure. `log` carries the traceback for the bug report."""
+    code = -32099
+    kind = "InternalError"

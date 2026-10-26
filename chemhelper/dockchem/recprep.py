@@ -18,7 +18,7 @@ from pathlib import Path
 
 import gemmi
 
-from . import hetatm, protonation
+from . import cancel, hetatm, protonation
 from . import stagecheck
 from .assess import assess_structure, truncated_segment_start_prolines
 from .errors import FormatLimit, HelperError, InvalidInput, ToolFailure, UnusableStructure
@@ -320,9 +320,40 @@ def _resolve_ligand_bond_orders(src: Path, lig: dict, pdb_path: Path, rep) -> di
     return {"status": "resolved", "source": r.source, "sdf": str(sdf), "warnings": r.warnings}
 
 
-def _run(cmd, cwd):
+def _run(cmd, cwd, timeout=None):
+    """Run a helper tool. Stops it (whole process group) when the job is cancelled or exceeds the time limit."""
     import os
-    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env={**os.environ, **OFFLINE_ENV})
+    import signal
+    import time
+
+    from . import cancel, limits
+    from .errors import Cancelled
+    cancel.check()
+    limit = limits.STAGE_TIMEOUT_S if timeout is None else timeout
+    proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                            env={**os.environ, **OFFLINE_ENV}, start_new_session=True)
+    deadline = time.time() + limit
+
+    def stop():
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            proc.kill()
+        proc.communicate()
+
+    while True:
+        try:
+            out, err = proc.communicate(timeout=0.5)
+            return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+        except subprocess.TimeoutExpired:
+            tok = cancel.current()
+            if tok is not None and tok.cancelled:
+                stop()
+                raise Cancelled("job cancelled")
+            if time.time() > deadline:
+                stop()
+                raise ToolFailure(f"{Path(str(cmd[0])).name} exceeded the {limit:.0f} s time limit and was stopped "
+                                  "(very large structure? select fewer chains)")
 
 
 def _pdbfixer(pdb_text, opts, rep):
@@ -497,6 +528,7 @@ def _minimize_bounded(sim, pdb, topology, unit) -> int:
     start = np.array(pdb.positions.value_in_unit(unit.nanometer))[heavy]
     t0, done = time.time(), 0
     while done < MINIMIZE_ITERATIONS:
+        cancel.check()
         sim.minimizeEnergy(maxIterations=MINIMIZE_CHUNK)
         done += MINIMIZE_CHUNK
         now = np.array(sim.context.getState(getPositions=True).getPositions().value_in_unit(unit.nanometer))[heavy]
@@ -985,6 +1017,8 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
     src, outdir = Path(src), Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
     rep = _Report()
+    from .limits import check_structure_text
+    check_structure_text(src)
     try:
         st = gemmi.read_structure(str(src))
     except Exception as e:  # noqa: BLE001
@@ -1188,6 +1222,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
 
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
+        cancel.check()
         fixed = _pdbfixer(poly.make_pdb_string(), opts, rep)
         stagecheck.check_moved_atoms("pdbfixer", poly.make_pdb_string(), fixed, limit=stagecheck.PDBFIXER_MOVE_LIMIT)
         (td / "fixed.pdb").write_text(fixed)
@@ -1287,6 +1322,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
                 if new in UNUSUAL_STATES:
                     rep.warn(f"unusual protonation {key[0]}:{new}{key[1]} ({UNUSUAL_STATES[new]})"
                              + (" - set by user override" if mine else ""))
+        cancel.check()
         final = outdir / "receptor_prepared.pdb"
         if opts.minimize:
             if not _minimize(prot, final, rep):
@@ -1330,6 +1366,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
             meeko_in = td / "for_meeko.pdb"
         else:
             meeko_in = final
+        cancel.check()
         defer_het = opts.pdbqt_writer != "meeko" and not opts.flex_residues
         meeko_in = _drop_untemplated(meeko_in, td / "meeko_filtered.pdb", rep, defer=defer_het)
         meeko_in = _drop_malformed(meeko_in, td / "meeko_sane.pdb", rep)

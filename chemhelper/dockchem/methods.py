@@ -24,6 +24,36 @@ def versions(params, srv):
     }}
 
 
+def _req(params, key):
+    """A required parameter, or InvalidInput (never a bare KeyError)."""
+    v = params.get(key)
+    if v is None or (isinstance(v, str) and not v.strip()):
+        raise InvalidInput(f"missing required parameter '{key}'")
+    return v
+
+
+def _text(params, key):
+    v = _req(params, key)
+    if not isinstance(v, str):
+        raise InvalidInput(f"parameter '{key}' must be text, not {type(v).__name__}")
+    try:
+        v.encode("utf-8")
+    except UnicodeEncodeError as e:
+        raise InvalidInput(f"parameter '{key}' contains characters that are not valid text") from e
+    return v
+
+
+def _path(params, key="path"):
+    """A required input file that exists, is readable and is not absurdly large."""
+    from .limits import check_input_file, check_structure_text
+    v = _req(params, key)
+    if not isinstance(v, str):
+        raise InvalidInput(f"parameter '{key}' must be a file path (text), not {type(v).__name__}")
+    p = check_input_file(v, what=f"'{key}'")
+    check_structure_text(p, what=f"'{key}'")
+    return str(p)
+
+
 def sleep_job(params, srv):
     """Cancellable test job exercising progress notifications."""
     import time
@@ -43,8 +73,9 @@ def ligand_inspect(params, srv):
     from rdkit import Chem
     from rdkit.Chem import Descriptors, rdMolDescriptors
     smi = params.get("smiles")
+    smi = _text(params, "smiles") if smi else smi
     if not smi:
-        raise InvalidInput("smiles required")
+        raise InvalidInput("smiles required (a text string)")
     mol = Chem.MolFromSmiles(smi)
     if mol is None:
         raise InvalidInput(f"cannot parse SMILES: {smi}")
@@ -61,13 +92,13 @@ def ligand_inspect(params, srv):
 
 
 def project_create(params, srv):
-    p = Project.create(params["path"], params.get("name", "Untitled"))
+    p = Project.create(_req(params, "path"), params.get("name", "Untitled"))
     return {"result": p.manifest(), "artifacts": [str(p.manifest_path)]}
 
 
 def project_import_input(params, srv):
-    p = Project.open(params["path"])
-    return {"result": p.import_input(params["source"])}
+    p = Project.open(_path(params))
+    return {"result": p.import_input(_path(params, "source"))}
 
 
 def _lig_opts(params):
@@ -84,11 +115,11 @@ def ligand_prepare(params, srv):
     from . import formats
     opts = _lig_opts(params)
     if "path" in params:
-        mols, warns = formats.read_molecules(params["path"])
+        mols, warns = formats.read_molecules(_path(params))
         results = [r for i, m in enumerate(mols)
                    for r in prepare_ligand(m, m.GetProp("_Name") if m.HasProp("_Name") and m.GetProp("_Name") else f"ligand_{i + 1}", opts)]
     elif "smiles" in params:
-        warns, results = [], prepare_ligand(params["smiles"], params.get("name", "ligand"), opts)
+        warns, results = [], prepare_ligand(_text(params, "smiles"), str(params.get("name", "ligand")), opts)
     else:
         raise InvalidInput("smiles or path required")
     artifacts = []
@@ -109,10 +140,10 @@ def library_prepare(params, srv):
     from pathlib import Path
     from .ligprep import prepare_library, read_records
     from rdkit import Chem
-    lib = prepare_library(read_records(params["path"]), _lig_opts(params))
+    lib = prepare_library(read_records(_path(params)), _lig_opts(params))
     artifacts = []
     if params.get("outdir"):
-        out = Path(params["outdir"]); out.mkdir(parents=True, exist_ok=True)
+        out = Path(_req(params, "outdir")); out.mkdir(parents=True, exist_ok=True)
         for p in lib["prepared"]:
             (out / f"{p.name}.pdbqt").write_text(p.pdbqt); artifacts.append(str(out / f"{p.name}.pdbqt"))
         import json
@@ -130,10 +161,11 @@ def receptor_prepare(params, srv):
         opts = ReceptorPrepOptions(**(params.get("options") or {}))
     except TypeError as e:
         raise InvalidInput(f"unknown receptor option: {e}") from e
+    path, outdir = _path(params), _req(params, "outdir")           # validate before announcing any progress
     if srv:
         srv.progress(params.get("job_id"), 0.0, "preparing receptor")
-    res = prepare_receptor(params["path"], params["outdir"], opts)
-    report = Path(params["outdir"]) / "prep_report.json"
+    res = prepare_receptor(path, outdir, opts)
+    report = Path(_req(params, "outdir")) / "prep_report.json"
     report.write_text(json.dumps(res.report, indent=2, default=str))
     arts = [str(res.pdb), str(res.pdbqt), str(report)] + ([str(res.flex_pdbqt)] if res.flex_pdbqt else [])
     arts += [l["path"] for l in res.ligands]
@@ -145,18 +177,18 @@ def ligand_from_structure(params, srv):
     from pathlib import Path
     from rdkit import Chem
     from . import ligand_templates as lt
-    r = lt.ligand_from_structure(params["path"], params["resname"], params.get("chain"), params.get("seq"),
+    r = lt.ligand_from_structure(_path(params), _req(params, "resname"), params.get("chain"), params.get("seq"),
                                  params.get("smiles"), params.get("charge"))
     artifacts = []
     if params.get("outdir"):
-        out = Path(params["outdir"]); out.mkdir(parents=True, exist_ok=True)
+        out = Path(_req(params, "outdir")); out.mkdir(parents=True, exist_ok=True)
         sdf = out / f"{params['resname']}.sdf"
         w = Chem.SDWriter(str(sdf)); w.write(r.mol); w.close()
         artifacts.append(str(sdf))
     return {"result": {"source": r.source, "smiles": Chem.MolToSmiles(Chem.RemoveHs(r.mol)),
                        "heavy_atoms": r.mol.GetNumHeavyAtoms(), "audit": r.audit},
             "warnings": r.warnings, "artifacts": artifacts,
-            "provenance": record("dockchem.ligand_templates", __version__, {"resname": params["resname"],
+            "provenance": record("dockchem.ligand_templates", __version__, {"resname": _req(params, "resname"),
                                                                             "source": r.source})}
 
 
@@ -164,7 +196,7 @@ def _session(params):
     import gemmi
     from .selection import EditSession
     try:
-        st = gemmi.read_structure(str(params["path"]))
+        st = gemmi.read_structure(_path(params))
     except Exception as e:  # noqa: BLE001
         raise InvalidInput(f"cannot read structure: {e}") from e
     s = EditSession(st, int(params.get("model", 1)))
@@ -174,7 +206,7 @@ def _session(params):
 
 def structure_assess(params, srv):
     from .assess import assess
-    a = assess(params["path"], int(params.get("model", 1)))
+    a = assess(_path(params), int(params.get("model", 1)))
     return {"result": a, "artifacts": [], "provenance": record("dockchem.assess", __version__, {"model": params.get("model", 1)})}
 
 
@@ -185,14 +217,14 @@ def selection_validate(params, srv):
         _split(cmd)
         parse(_split(cmd)[1])
     else:
-        parse(params["expr"])
+        parse(_req(params, "expr"))
     return {"result": {"ok": True}}
 
 
 def selection_preview(params, srv):
     """Stateless: the app sends the edit list so far (its undo stack) plus the command being considered."""
     s = _session(params)
-    e = s.preview(params["command"])
+    e = s.preview(_req(params, "command"))
     return {"result": {"atoms": e.n_atoms, "residues": e.n_residues, "residue_ids": e.residues,
                        "truncated": e.n_residues > len(e.residues), "warnings": e.warnings,
                        "current": s.summary()}}
@@ -214,17 +246,17 @@ def selection_apply(params, srv):
 
 def format_convert(params, srv):
     from . import formats
-    return formats.convert(params["source"], params["dest"], params.get("charge", 0))
+    return formats.convert(_path(params, "source"), _req(params, "dest"), params.get("charge", 0))
 
 
 def format_sniff(params, srv):
     from . import formats
-    return {"result": formats.sniff(params["path"])}
+    return {"result": formats.sniff(_path(params))}
 
 
 def poses_to_sdf(params, srv):
     from . import formats
-    r = formats.poses_to_sdf(params["pdbqt"], params["sdf"])
+    r = formats.poses_to_sdf(_path(params, "pdbqt"), _req(params, "sdf"))
     return {"result": {"poses": r["poses"]}, "artifacts": r["artifacts"]}
 
 

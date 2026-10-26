@@ -120,9 +120,11 @@ def assess(path: str | Path, model: int = 1) -> dict:
     """Assess a receptor file (PDB or mmCIF). Raises InvalidInput only for files that cannot be read at all;
     anything else, including garbage content, is a verdict."""
     from .formats import read_structure
+    from .limits import check_structure_text
     path = Path(path)
     findings: list[dict] = []
     try:
+        check_structure_text(path)
         st, _ = read_structure(path)
     except InvalidInput as e:
         return _result("unusable", [{"severity": "block", "code": "unreadable", "message": str(e)}], {})

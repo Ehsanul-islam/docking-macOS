@@ -162,3 +162,10 @@ def test_long_but_real_iodine_bonds_are_accepted():
     assert r  # polyiodide input does not crash; real I-I bonds (2.7 A) must not trip the check
     ok = prepare_ligand("IC(I)I", "iodoform")[0]
     assert ok.status in ("prepared", "warning")
+
+
+def test_macromolecule_sized_ligands_are_refused_up_front_not_hung_on():
+    for smi in ("C" * 5000, "c1ccccc1" * 200):
+        r = prepare_ligand(smi, "big")[0]
+        assert r.status == "failed" and "not a small molecule" in r.error
+    assert prepare_ligand("C" * 20, "ok")[0].status in ("prepared", "warning")

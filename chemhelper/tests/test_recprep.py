@@ -597,3 +597,48 @@ def test_too_large_to_protonate_is_refused_before_the_long_pdb2pqr_run(tmp_path,
     with pytest.raises(FormatLimit, match="heavy atoms would give a protonated model"):
         prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
     assert called == []                                                 # refused before PDB2PQR ran
+
+
+# ---- helper subprocesses: time limit and cancellation ------------------------------------------------------
+
+def test_a_helper_subprocess_that_runs_too_long_is_stopped_with_a_clear_message(tmp_path):
+    import time
+    from dockchem import recprep
+    from dockchem.errors import ToolFailure
+    t0 = time.time()
+    with pytest.raises(ToolFailure, match=r"sleep exceeded the 1 s time limit"):
+        recprep._run(["sleep", "30"], tmp_path, timeout=1)
+    assert time.time() - t0 < 6
+
+
+def test_cancelling_stops_a_running_helper_subprocess_and_kills_it(tmp_path):
+    import threading
+    import time
+    from dockchem import cancel, recprep
+    from dockchem.errors import Cancelled
+    tok = cancel.Token()
+    handle = cancel.bind(tok)
+    try:
+        threading.Timer(0.7, tok.cancel).start()
+        t0 = time.time()
+        with pytest.raises(Cancelled):
+            recprep._run(["sleep", "30"], tmp_path)
+        assert time.time() - t0 < 6
+    finally:
+        cancel.unbind(handle)
+
+
+def test_preparation_checks_for_cancellation_before_doing_expensive_work(tmp_path):
+    from dockchem import cancel
+    from dockchem.errors import Cancelled
+    src = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(src))
+    tok = cancel.Token()
+    tok.cancel()
+    handle = cancel.bind(tok)
+    try:
+        with pytest.raises(Cancelled):
+            prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    finally:
+        cancel.unbind(handle)
+    assert not (tmp_path / "o" / "receptor.pdbqt").exists()

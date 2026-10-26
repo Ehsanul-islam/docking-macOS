@@ -44,6 +44,8 @@ def sniff(path: str | Path) -> str:
         except Exception:  # noqa: BLE001
             return "unknown"
         n_res = 0
+        if len(st) == 0:
+            return "unknown"
         for ch in st[0]:
             for r in ch:
                 info = gemmi.find_tabulated_residue(r.name)

@@ -67,3 +67,17 @@ conformers, so four ligands could not be scored.
 
 Remaining large misses (> 8 A): 1HVY and 1W1P (clean receptors, not yet diagnosed), 1MMV and 1R9O (heme left out).
 Not yet run: the PoseBusters subset (215 entries in the 300-entry set), flexible-residue docking, other exhaustiveness.
+
+## Helper hardening (cancellation, limits, fuzzing)
+
+- **Cancellation works mid-job.** The server reads requests on one thread and runs them in order on a worker, so `cancel`
+  is seen while a job runs; jobs check a token at stage boundaries, every 25 minimisation iterations and between library
+  molecules, and helper subprocesses (PDB2PQR, Meeko) are killed (process group) on cancel. Before this, only the
+  `test.sleep` demo could be cancelled.
+- **Time limits:** each helper subprocess is stopped after 30 min (`DOCKCHEM_STAGE_TIMEOUT`); minimisation 4 min.
+- **Input guards** (`limits.py`): missing/empty/folder/unreadable/over 300 MB (`DOCKCHEM_MAX_INPUT_MB`) files, stray bytes
+  in coordinate records, wrong parameter types, ligands over 200 heavy atoms: all typed `InvalidInput`, never a crash.
+- **`InternalError`** (-32099, with traceback) now means "a bug", distinct from expected rejections.
+- **Fuzzing** (`tests/test_robustness.py`: 19 malformed-file kinds x pdb/cif, 60 seeded random mutations, malformed
+  SMILES/selections/parameter types): found and fixed 5 bugs (sniff on a model-less file, stray bytes crashing assess,
+  non-text parameters, lone-surrogate SMILES, and ligands with thousands of atoms hanging the helper).
