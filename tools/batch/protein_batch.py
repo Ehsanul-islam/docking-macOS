@@ -86,6 +86,8 @@ def work(item):
             return out
         rp = res.report
         cc = (rp.get("pdbqt") or {}).get("crosscheck") or {}
+        if not isinstance(cc, dict):        # e.g. "not applicable (table writer incomplete)" when Meeko wrote the PDBQT
+            cc = {"result": str(cc)[:60]}
         out.update(category="ok" if rp["status"] == "ok" else "degraded",
                    dropped=[d["residue"] + " :: " + d["reason"][:60] for d in rp["dropped_residues"]][:20],
                    n_dropped=len(rp["dropped_residues"]), n_warnings=len(rp["warnings"]),
