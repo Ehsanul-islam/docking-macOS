@@ -207,3 +207,20 @@ def test_backbone_stub_residue_is_a_fix_finding(base, tmp_path):
     a = assess(write(st, tmp_path))
     assert a["verdict"] == "fixable" and "backbone_stubs" in codes(a, "fix") and a["stats"]["backbone_stubs"] == 1
     assert "missing_atoms" not in codes(a)           # a stub is not counted as a rebuildable residue
+
+
+def test_deuterium_in_neutron_structures_is_hydrogen_not_a_clash(base, tmp_path):
+    """Neutron entries (9YFR, 6S2M, 5AE0, 5NW3) have O-D at 0.84 A; they were refused as 'distorted coordinates'."""
+    st = copy.deepcopy(base)
+    n = 0
+    for r in st[0][0]:
+        if r.name in ("SER", "THR", "TYR"):
+            o = next(a for a in r if a.name in ("OG", "OG1", "OH"))
+            d = gemmi.Atom()
+            d.name, d.element, d.pos = "D" + o.name[1:], gemmi.Element("D"), gemmi.Position(o.pos.x + 0.84, o.pos.y, o.pos.z)
+            r.add_atom(d)
+            n += 1
+    assert n >= 3
+    a = assess(write(st, tmp_path))
+    assert a["stats"]["distorted_residues"] == 0 and a["verdict"] != "unusable"
+    assert any(f["code"] == "has_hydrogens" for f in a["findings"])           # counted as hydrogens

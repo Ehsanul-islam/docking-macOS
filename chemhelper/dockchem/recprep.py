@@ -105,7 +105,7 @@ def _rid(chain, res) -> str:
 
 
 def _heavy(res) -> int:
-    return sum(1 for a in res if a.element.name != "H")
+    return sum(1 for a in res if not a.element.is_hydrogen)
 
 
 def _is_polymer(res) -> bool:
@@ -195,7 +195,7 @@ SITE_IMPACT_RADIUS = 8.0     # A: something left out this close to the site can 
 
 def _unsupported_reason(res) -> str | None:
     """Why a kept hetero group cannot be written to the receptor PDBQT, or None if it can."""
-    els = {a.element.name for a in res if a.element.name != "H"}
+    els = {a.element.name for a in res if not a.element.is_hydrogen}
     odd = els - ORGANIC
     if not odd:
         return None
@@ -205,8 +205,20 @@ def _unsupported_reason(res) -> str | None:
     return f"{res.name} is a metal complex ({', '.join(sorted(odd))}); metal cofactors cannot be represented yet"
 
 
+def _dropped_kind(label: str, reason: str) -> str:
+    """glycan | residue_defect (stub, distorted, no template) | cofactor_or_ion (could be part of a pocket)."""
+    name = re.sub(r"-?\d+[A-Za-z]?$", "", label.partition(":")[2])
+    if name in hetatm.GLYCANS:
+        return "glycan"
+    if reason.startswith(("backbone atoms missing", "impossible", "no protonation template")):
+        return "residue_defect"
+    return "cofactor_or_ion"
+
+
 def _annotate_dropped(rep, model, site_pos) -> None:
-    """Add distance_to_site / at_site to every left-out residue. Without a site nothing can be judged: unknown."""
+    """Add distance_to_site / at_site / kind to every left-out residue. With a site, distance decides. Without one
+    (blind docking) nothing can be located: sugars and single defective residues are only noted, but a left-out
+    cofactor or ion could be part of a pocket, so it still counts."""
     index = {}
     for ch in model:
         for res in ch:
@@ -215,12 +227,19 @@ def _annotate_dropped(rep, model, site_pos) -> None:
         chain, _, rest = d["residue"].partition(":")
         m = re.search(r"(-?\d+[A-Za-z]?)$", rest)
         found = index.get((chain, m.group(1))) if m else None
+        d["kind"] = _dropped_kind(d["residue"], d["reason"])
         if site_pos and found:
             dist = min(_min_dist(r, site_pos) for r in found)
             d["distance_to_site"] = round(dist, 1)
             d["at_site"] = dist <= SITE_IMPACT_RADIUS
         else:
             d["distance_to_site"], d["at_site"] = None, None
+
+
+def _is_degrading(d: dict) -> bool:
+    if d.get("at_site") is True:
+        return True
+    return d.get("at_site") is None and d.get("kind") == "cofactor_or_ion"
 
 
 def _find_reference(model, spec):
@@ -937,7 +956,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         rep.change("model", f"model {opts.model}", f"kept 1 of {n_models} models", "single model docked", "gemmi")
     model = st[0]
     assessment = assess_structure(st, 1, src.suffix.lower())
-    n_h = sum(1 for ch in model for r in ch for a in r if a.element.name == "H")
+    n_h = sum(1 for ch in model for r in ch for a in r if a.element.is_hydrogen)
     atoms_before = sum(len(r) for ch in model for r in ch)
     if n_h:
         st.remove_hydrogens()
@@ -1156,6 +1175,15 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         doomed = {tuple(k.split(":", 1)) for k in assessment["stats"].get("distorted_keys", [])}   # dropped later anyway
         stagecheck.check_moved_atoms("pdb2pqr", fixed, prot_text,
                                      {tuple(f["key"].split(":", 1)) for f in flips} | doomed)
+        bare = stagecheck.residues_without_hydrogens(prot_text)
+        if bare:
+            # Residues PDB2PQR has no template for (MLY, SEC, ASX, UNK, ...) come back without hydrogens. Leave them
+            # out by name, like other unsupported residues, rather than failing the whole entry.
+            prot_text = stagecheck.drop_residues(prot_text, bare)
+            prot.write_text(prot_text)
+            for c, n, res in bare:
+                rep.warn(f"{c}:{res}{n} left out: PDB2PQR has no protonation template for {res}")
+                rep.dropped.append({"residue": f"{c}:{res}{n}", "reason": f"no protonation template for {res}"})
         stagecheck.check_hydrogens("pdb2pqr", prot_text)
         reject = []
         for k, v in opts.flip_decisions.items():
@@ -1264,7 +1292,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         "site_residues": sorted(site_res_ids),
         # "degraded": the PDBQT is missing residues. The app must show this prominently (principle 2).
         # Left-out residues far from the site (sugars, stubs) do not change what is docked: noted, status stays ok.
-        "status": "degraded" if any(d.get("at_site") is not False for d in rep.dropped) else "ok",
+        "status": "degraded" if any(_is_degrading(d) for d in rep.dropped) else "ok",
         "dropped_residues": rep.dropped,
         "assessment": assessment, "pdbqt": rep.pdbqt_info, "chain_map": chain_map,
     }

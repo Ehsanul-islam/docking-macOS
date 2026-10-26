@@ -309,8 +309,8 @@ def test_residue_with_impossible_internal_geometry_is_dropped_by_name_not_a_vagu
     st.write_pdb(str(src))
     assert ("A", "9") in _malformed_residues(src.read_text())
     res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
-    assert res.report["status"] == "degraded"
-    assert any(d["residue"] == "A:ASN9" and "impossible geometry" in d["reason"]
+    assert res.report["status"] == "ok"                      # no site given: one defective residue is only noted
+    assert any(d["residue"] == "A:ASN9" and "impossible geometry" in d["reason"] and d["kind"] == "residue_defect"
                for d in res.report["dropped_residues"])
     assert any("A:ASN9 left out" in w for w in res.report["warnings"])
 
@@ -351,7 +351,7 @@ def test_backbone_stub_residue_is_left_out_by_name_instead_of_crashing_pdb2pqr(t
     src = tmp_path / "stub.pdb"
     st.write_pdb(str(src))
     res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
-    assert res.report["status"] == "degraded"
+    assert res.report["status"] == "ok"                      # no site given, so a stub is only noted
     assert any(d["residue"] == "A:CYS8" and "backbone atoms missing" in d["reason"] for d in res.report["dropped_residues"])
 
 
@@ -456,7 +456,7 @@ def test_far_left_out_sugar_is_noted_and_status_stays_ok(tmp_path):
     assert res.report["status"] == "ok"
 
 
-def test_without_a_site_nothing_can_be_judged_so_it_stays_degraded(tmp_path):
+def test_without_a_site_a_defective_residue_is_noted_but_does_not_degrade(tmp_path):
     st = peptide_structure()
     for r in st[0][0]:
         if r.seqid.num == 8:
@@ -466,4 +466,30 @@ def test_without_a_site_nothing_can_be_judged_so_it_stays_degraded(tmp_path):
     src = tmp_path / "stub.pdb"
     st.write_pdb(str(src))
     res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
-    assert res.report["dropped_residues"][0]["at_site"] is None and res.report["status"] == "degraded"
+    d = res.report["dropped_residues"][0]
+    assert d["at_site"] is None and d["kind"] == "residue_defect"
+    assert res.report["status"] == "ok"                 # blind docking: a single defective residue is only noted
+
+
+def test_residue_without_a_protonation_template_is_left_out_by_name_not_a_hard_failure(tmp_path):
+    """Real entries (3F9X, 6BHD, 9D1L: MLY; 7A0D: SEC; 3E2O: ASX; 3ED7, 9NVO, 7Z0H: UNK) used to fail the whole entry."""
+    st = peptide_structure("GSHDEKRCNQFYTALGSHDEK")
+    st[0][0][6].name = "MLY"                                    # a lysine-like residue PDB2PQR has no template for
+    src = tmp_path / "mly.pdb"
+    st.write_pdb(str(src))
+    from dockchem.assess import assess
+    a = assess(src)
+    assert "nonstandard_residues" in {f["code"] for f in a["findings"]} and a["stats"]["nonstandard_residues"] == 1
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert any(d["residue"] == "A:MLY7" and "no protonation template" in d["reason"] for d in res.report["dropped_residues"])
+    assert res.pdbqt.exists() and res.report["status"] == "ok"                         # no site: a single residue is noted
+
+
+def test_without_a_site_a_left_out_cofactor_or_ion_still_degrades(tmp_path):
+    from dockchem.recprep import _Report, _annotate_dropped, _dropped_kind, _is_degrading
+    assert _dropped_kind("A:NAG501", "x") == "glycan" and _dropped_kind("A:HEM9", "x metal") == "cofactor_or_ion"
+    assert _dropped_kind("A:LYS4", "backbone atoms missing (has N)") == "residue_defect"
+    rep = _Report()
+    rep.dropped = [{"residue": "A:HEM9", "reason": "metal complex"}, {"residue": "A:NAG501", "reason": "no match"}]
+    _annotate_dropped(rep, peptide_structure()[0], [])                      # no site
+    assert [_is_degrading(d) for d in rep.dropped] == [True, False]

@@ -93,7 +93,7 @@ def build_table(st: gemmi.Structure, model: int = 1) -> Table:
                 cols["element"].append(a.element.name.upper()); cols["altloc"].append("" if a.altloc == "\0" else a.altloc)
                 cols["b"].append(a.b_iso); cols["occ"].append(a.occ); cols["het"].append(het); cols["res_id"].append(g)
                 xyz.append((a.pos.x, a.pos.y, a.pos.z))
-                heavy += a.element.name != "H"
+                heavy += not a.element.is_hydrogen
             res_class.append(_residue_class(res.name, het, heavy))
             res_key.append((ch.name, res.name, res.seqid.num, res.seqid.icode.strip()))
             res_slices.append((start, len(cols["name"])))
@@ -260,7 +260,7 @@ def evaluate(t: Table, node, expr: str = "") -> np.ndarray:
         if w == "hetero":
             return t.het.copy()
         if w == "hydrogen":
-            return t.element == "H"
+            return np.isin(t.element, ["H", "D"])
         if w == "backbone":
             return np.isin(t.name, list(BACKBONE)) & np.array([t.res_class[g] == "protein" for g in t.res_id], bool)
         if w == "sidechain":

@@ -41,7 +41,7 @@ def _parent_element(hpos, res) -> str:
     """Element of the heavy atom a hydrogen is attached to (nearest within 1.3 A), else ''."""
     best, el = 1.3, ""
     for a in res:
-        if a.element.name != "H":
+        if not a.element.is_hydrogen:
             d = hpos.dist(a.pos)
             if d < best:
                 best, el = d, a.element.name
@@ -76,7 +76,7 @@ def write_pdbqt(pdb_text: str, out: Path) -> dict:
                 ad = table.get(a.name)
                 if ad is None and a.name == "OXT" and a.element.name == "O":
                     ad = "OA"                                   # C-terminal carboxylate oxygen
-                if ad is None and a.element.name == "H":
+                if ad is None and a.element.is_hydrogen:
                     parent = _parent_element(a.pos, res)        # AutoDock rule: polar H kept (HD), others merged
                     if parent == "C":
                         n_merged += 1

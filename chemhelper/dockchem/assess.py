@@ -30,6 +30,8 @@ MIN_ATOM_DISTANCE = 0.85               # A: no two atoms of one residue may be c
 DISTORTED_FRACTION_BLOCK = 0.08         # more than this share of residues distorted => unusable
 UNKNOWN_FRACTION_BLOCK = 0.10
 TRUNCATED_FRACTION_BLOCK = 0.60         # share of residues missing most side-chain atoms => unusable
+CANONICAL = {"ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE",
+             "PRO", "SER", "THR", "TRP", "TYR", "VAL"}
 PDB_ATOM_LIMIT = 99_999
 LARGE_ATOMS = 150_000
 LOW_RESOLUTION = 3.5
@@ -45,6 +47,16 @@ def _expected_heavy() -> dict[str, frozenset]:
             out[name] = frozenset(a for a in v.get("atom_name", []) if not a.startswith("H"))
     out.setdefault("HIS", out.get("HID", frozenset()))        # Meeko names His by tautomer only
     return out
+
+
+@lru_cache(maxsize=1)
+def _pdbfixer_substitutions() -> frozenset:
+    """Modified residues PDBFixer replaces by their canonical parent (MSE -> MET, ...)."""
+    try:
+        from pdbfixer.pdbfixer import substitutions
+        return frozenset(substitutions)
+    except Exception:  # noqa: BLE001
+        return frozenset(hetatm.MODIFIED)
 
 
 def _finding(findings, severity, code, message, residues=None):
@@ -78,7 +90,7 @@ def _distorted(res) -> str | None:
             if not lo <= x <= hi:
                 return f"{a}-{b} is {x:.2f} A (expected {lo:.2f}-{hi:.2f})"
     # Heavy atoms only: refinement programs place hydroxyl hydrogens 0.84 A from the oxygen, which is normal.
-    atoms = [a for a in d.values() if a.element.name != "H"]
+    atoms = [a for a in d.values() if not a.element.is_hydrogen]
     for i, a in enumerate(atoms):
         for b in atoms[i + 1:]:
             x = a.pos.dist(b.pos)
@@ -160,7 +172,7 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
                  "folded protein; results will be unreliable")
 
     # --- completeness -----------------------------------------------------------------------------
-    ca_only = [(c, r) for c, r in prot if sum(1 for a in r if a.element.name != "H") <= 1]
+    ca_only = [(c, r) for c, r in prot if sum(1 for a in r if not a.element.is_hydrogen) <= 1]
     if len(ca_only) / len(prot) > 0.9:
         _finding(findings, "block", "ca_only", "Calpha-only model: there are no side chains or backbone atoms "
                  "to dock into")
@@ -180,6 +192,13 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
         _finding(findings, "fix", "unknown_residues", f"{len(unk)} unidentified (UNK) residues will be left "
                  "out of the receptor", [_label(c, r) for c, r in unk])
 
+    mapped = _pdbfixer_substitutions()
+    odd = [(c, r) for c, r in prot if r.name != "UNK" and r.name not in CANONICAL and r.name not in mapped]
+    stats["nonstandard_residues"] = len(odd)
+    if odd:
+        names = sorted({r.name for _, r in odd})
+        _finding(findings, "fix", "nonstandard_residues", f"{len(odd)} residues of types without a protonation template "
+                 f"({', '.join(names[:6])}) will be left out of the receptor", [_label(c, r) for c, r in odd])
     stubs = [(c, r) for c, r in prot if "CA" not in {a.name for a in r}
              or len({a.name for a in r} & {"N", "C", "O"}) < 2]
     stats["backbone_stubs"] = len(stubs)
@@ -250,7 +269,7 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
     if alt:
         _finding(findings, "fix", "alternate_locations", f"{len(alt)} residues have alternate conformations; "
                  "the highest-occupancy one is kept", [_label(c, r) for c, r in alt])
-    n_h = sum(1 for ch in m for r in ch for a in r if a.element.name == "H")
+    n_h = sum(1 for ch in m for r in ch for a in r if a.element.is_hydrogen)
     if n_h:
         _finding(findings, "note", "has_hydrogens", f"{n_h} hydrogens in the input are removed and re-added "
                  "consistently")
@@ -263,7 +282,7 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
         for r in ch:
             if r.name in hetatm.WATER or _is_aa(r) and r.het_flag != "H" or _is_na(r):
                 continue
-            het.setdefault(r.name, [0, sum(1 for a in r if a.element.name != "H")])[0] += 1
+            het.setdefault(r.name, [0, sum(1 for a in r if not a.element.is_hydrogen)])[0] += 1
     kinds = {}
     for name, (n, heavy_n) in het.items():
         kinds.setdefault(hetatm.classify(name, heavy_n), []).append(f"{name} x{n}")

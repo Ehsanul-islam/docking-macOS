@@ -59,10 +59,10 @@ def check_moved_atoms(stage: str, before: str, after: str, allowed_moved: set | 
         problems.append("residues lost: " + ", ".join(f"{c}:{n}" for c, n in sorted(lost)))
     by_res_a, by_res_b = {}, {}
     for k, v in a.items():
-        if v[4] != "H" and not k[2].startswith("H"):
+        if v[4] not in ("H", "D") and not k[2].startswith(("H", "D")):
             by_res_a.setdefault((k[0], k[1]), {})[k[2]] = v
     for k, v in b.items():
-        if v[4] != "H" and not k[2].startswith("H"):
+        if v[4] not in ("H", "D") and not k[2].startswith(("H", "D")):
             by_res_b.setdefault((k[0], k[1]), {})[k[2]] = v
     for rk, atoms_a in by_res_a.items():
         if rk in exempt or rk not in by_res_b:
@@ -85,6 +85,29 @@ def check_moved_atoms(stage: str, before: str, after: str, allowed_moved: set | 
     return worst
 
 
+def residues_without_hydrogens(text: str) -> list[tuple]:
+    """(chain, number, name) of amino-acid-named residues that carry no hydrogen after protonation: PDB2PQR keeps
+    residues it has no template for (MLY, SEC, ASX, UNK, ...) but does not protonate them."""
+    per = {}
+    for (c, n, name), (x, y, z, res, el) in _atoms(text).items():
+        d = per.setdefault((c, n, res), 0)
+        per[(c, n, res)] = d + (el in ("H", "D"))
+    out = []
+    for (c, n, res), h in per.items():
+        info = gemmi.find_tabulated_residue(res)
+        if h == 0 and (info is None or info.is_amino_acid()) and res not in ("HOH", "WAT"):
+            if info is not None or res == "UNK":
+                out.append((c, n, res))
+    return out
+
+
+def drop_residues(text: str, keys: list[tuple]) -> str:
+    """Remove the given (chain, number, name) residues from PDB text."""
+    gone = {(c, n) for c, n, _ in keys}
+    return "\n".join(l for l in text.splitlines()
+                     if not (l.startswith(("ATOM", "HETATM")) and (l[21], l[22:27].strip()) in gone)) + "\n"
+
+
 def check_hydrogens(stage: str, text: str):
     """Every amino-acid residue of a protonated model must carry hydrogens, and none may be non-finite."""
     problems = []
@@ -92,7 +115,7 @@ def check_hydrogens(stage: str, text: str):
     for (c, n, name), (x, y, z, res, el) in _atoms(text).items():
         if not all(map(math.isfinite, (x, y, z))):
             problems.append(f"{c}:{res}{n}.{name} has non-finite coordinates")
-        per.setdefault((c, n, res), [0, 0])[0 if el == "H" else 1] += 1
+        per.setdefault((c, n, res), [0, 0])[0 if el in ("H", "D") else 1] += 1
     for (c, n, res), (h, heavy) in per.items():
         info = gemmi.find_tabulated_residue(res)
         if info is not None and info.is_amino_acid() and h == 0:
@@ -121,7 +144,7 @@ def check_pdbqt(prepared_pdb: str, pdbqt: Path, dropped: list[dict], flex: Path 
             problems.append(f"{k[0]}:{res}{k[1]}.{k[2]} has non-finite coordinates")
     heavy_in, heavy_out = {}, {}
     for k, (_, _, _, res, el) in prepared.items():
-        if el != "H":
+        if el not in ("H", "D"):
             heavy_in.setdefault((k[0], k[1]), (res, set()))[1].add(k[2])
     for k, (_, _, _, res, ad) in out.items():
         if ad not in ("HD", "H"):
@@ -162,6 +185,6 @@ def missing_amide_hydrogens(text: str) -> list[str]:
         info = gemmi.find_tabulated_residue(d["res"])
         if info is None or not info.is_amino_acid() or d["res"] == "PRO" or "N" not in d["names"]:
             continue
-        if not d["names"] & {"H", "H1", "H2", "H3"}:
+        if not d["names"] & {"H", "H1", "H2", "H3", "D", "D1", "D2", "D3"}:
             out.append(f"{c}:{d['res']}{n}")
     return out
