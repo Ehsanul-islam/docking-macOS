@@ -75,6 +75,8 @@ def check_moved_atoms(stage: str, before: str, after: str, allowed_moved: set | 
             if d > limit:
                 problems.append(f"{rk[0]}:{res}{rk[1]}.{name} moved {d:.2f} A")
         for n1, n2 in itertools.combinations(sorted(atoms_a.keys() & atoms_b.keys()), 2):
+            if "OXT" in (n1, n2):          # PDB2PQR places the terminal oxygen itself; its bond is not an input bond
+                continue
             d0 = math.dist(atoms_a[n1][:3], atoms_a[n2][:3])
             if d0 < BOND_LIMIT:
                 d1 = math.dist(atoms_b[n1][:3], atoms_b[n2][:3])

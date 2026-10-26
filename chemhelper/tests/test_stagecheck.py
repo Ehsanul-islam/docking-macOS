@@ -121,3 +121,13 @@ def test_missing_amide_hydrogen_is_listed_but_not_for_proline_or_when_present():
          + pdb(5, "N", "PRO", 76, (9, 0, 0), "N")                                                          # Pro has none
          + pdb(6, "N", "GLY", 77, (13, 0, 0), "N") + pdb(7, "H1", "GLY", 77, (13, 1, 0), "H"))           # ammonium H
     assert S.missing_amide_hydrogens(t) == ["A:LYS74"]
+
+
+def test_relocated_terminal_oxygen_is_not_a_broken_bond():
+    """7OLI: PDB2PQR re-placed an input OXT and the C-OXT bond 'changed'; the stage check rejected the whole entry."""
+    before = residue("GLU", GLU + [("OXT", (2.6, 2.3, 0.0))])
+    after = residue("GLU", GLU + [("OXT", (3.5, 1.9, 0.9))])
+    S.check_moved_atoms("pdb2pqr", before, after)
+    broken = residue("GLU", [(n, (x + 1.2, y, z) if n == "CD" else (x, y, z)) for n, (x, y, z) in GLU] + [("OXT", (2.6, 2.3, 0.0))])
+    with pytest.raises(ToolFailure, match="bond CD-OE1 changed|bond CG-CD changed"):
+        S.check_moved_atoms("pdb2pqr", before, broken)                  # real breaks are still caught
