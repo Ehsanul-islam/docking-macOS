@@ -19,3 +19,10 @@ receptor, prepare the ligand(s), box, engine config. Presets: fast (exhaustivene
 (64, 20 modes). Site: automatic (largest drug-like ligand), a named ligand, a box, or residues; no site = blind docking, said
 plainly with a warning. Refuses unusable structures with the reasons. Returns every decision plus `vina.conf`, receptor
 and ligand PDBQT files. Measured on 3ERT: 9 s to a docking-ready folder; Vina (fast preset) 22 s.
+
+## CPU cores (`cores`, `dockchem/resources.py`)
+One setting, default 2, limits everything that runs in parallel: Vina `--cpu` (written into `vina.conf`), OpenMM minimisation
+threads, RDKit conformer-generation threads, and the thread environment (`OMP_NUM_THREADS` etc.) of PDB2PQR/Meeko subprocesses.
+Any request may carry `cores`; otherwise `DOCKCHEM_CORES`, otherwise 2. Whole numbers >= 1 only; more than the machine has is
+clamped with a warning. `system.resources` returns total / performance cores, default and range for a UI slider; every
+response's provenance records the cores used. Not yet parallel: library preparation runs one molecule at a time.

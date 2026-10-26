@@ -13,7 +13,7 @@ import sys
 import threading
 import traceback
 
-from . import __version__, cancel
+from . import __version__, cancel, resources
 from .errors import HelperError, InternalError, InvalidInput
 from .methods import METHODS
 
@@ -56,7 +56,11 @@ class Server:
             token.cancel()
         self.tokens[job_id] = token
         handle = cancel.bind(token)
+        core_handle, core_warning = None, None
         try:
+            if "cores" in params:
+                n, core_warning = resources.validate(params["cores"])
+                core_handle = resources.bind(n)
             if not isinstance(req, dict) or req.get("jsonrpc") != "2.0" or not isinstance(method, str):
                 raise InvalidInput("malformed JSON-RPC request")
             fn = METHODS.get(method)
@@ -67,6 +71,9 @@ class Server:
             out = fn(params, self)
             result = {"result": None, "warnings": [], "provenance": {}, "artifacts": []}
             result.update(out)
+            if core_warning:
+                result["warnings"] = list(result.get("warnings") or []) + [core_warning]
+            result["provenance"] = {**(result.get("provenance") or {}), "cores": resources.cores()}
             return {"jsonrpc": "2.0", "id": rid, "result": result}
         except HelperError as e:
             return {"jsonrpc": "2.0", "id": rid, "error": e.to_rpc()}
@@ -76,6 +83,8 @@ class Server:
             return {"jsonrpc": "2.0", "id": rid, "error": InternalError(
                 f"internal error in {method}: {type(e).__name__}: {e}", log=tb[-2000:]).to_rpc()}
         finally:
+            if core_handle is not None:
+                resources.unbind(core_handle)
             cancel.unbind(handle)
             self.tokens.pop(job_id, None)
 

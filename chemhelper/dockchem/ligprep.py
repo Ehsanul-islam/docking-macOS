@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import resources
 from rdkit import Chem
 from rdkit.Chem import AllChem, QED, Descriptors, Lipinski, rdMolDescriptors
 from rdkit.Chem.FilterCatalog import FilterCatalog, FilterCatalogParams
@@ -203,6 +204,7 @@ def _embed(mol, opts, steps, warnings):
     for random_coords, seed in ((False, opts.seed), (True, opts.seed), (True, opts.seed + 1), (True, opts.seed + 2)):
         ps = AllChem.ETKDGv3()
         ps.randomSeed, ps.useRandomCoords = seed, random_coords
+        ps.numThreads = resources.cores()
         try:
             ps.timeout = EMBED_TIMEOUT
         except AttributeError:       # older RDKit

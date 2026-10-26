@@ -20,7 +20,7 @@ from pathlib import Path
 import gemmi
 import numpy as np
 
-from . import hetatm
+from . import hetatm, resources
 from .assess import assess
 from .errors import InvalidInput, UnusableStructure
 from .ligprep import LigandPrepOptions, prepare_library, prepare_ligand, read_records
@@ -175,8 +175,8 @@ def quick_prep(receptor, ligand, outdir, preset: str = "standard", site: dict | 
     conf.write_text("\n".join([f"receptor = {rec.pdbqt}", f"center_x = {center[0]}", f"center_y = {center[1]}",
                                f"center_z = {center[2]}", f"size_x = {size[0]}", f"size_y = {size[1]}", f"size_z = {size[2]}",
                                f"exhaustiveness = {pr['exhaustiveness']}", f"num_modes = {pr['num_modes']}",
-                               f"seed = {seed}", "cpu = 0"]) + "\n")
-    out["engine"] = {"scoring": "vina", **{k: pr[k] for k in ("exhaustiveness", "num_modes")}, "seed": seed,
+                               f"seed = {seed}", f"cpu = {resources.cores()}"]) + "\n")
+    out["engine"] = {"scoring": "vina", "cores": resources.cores(), **{k: pr[k] for k in ("exhaustiveness", "num_modes")}, "seed": seed,
                      "config": str(conf), "preset_label": pr["label"]}
     out["ready_to_dock"] = True
     out["seconds"] = round(time.time() - t0, 1)

@@ -316,6 +316,7 @@ METHODS = {
     "library.prepare": library_prepare,
     "receptor.prepare": receptor_prepare,
     "ligand.from_structure": ligand_from_structure,
+    "system.resources": lambda params, srv: {"result": __import__("dockchem.resources", fromlist=["x"]).describe()},
     "structure.assess": structure_assess,
     "quickprep.run": quickprep_run,
     "complex.image2d": complex_image2d,

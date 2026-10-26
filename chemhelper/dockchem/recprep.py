@@ -18,7 +18,7 @@ from pathlib import Path
 
 import gemmi
 
-from . import cancel, hetatm, protonation
+from . import cancel, hetatm, protonation, resources
 from . import stagecheck
 from .assess import assess_structure, truncated_segment_start_prolines
 from .errors import FormatLimit, HelperError, InvalidInput, ToolFailure, UnusableStructure
@@ -331,7 +331,7 @@ def _run(cmd, cwd, timeout=None):
     cancel.check()
     limit = limits.STAGE_TIMEOUT_S if timeout is None else timeout
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-                            env={**os.environ, **OFFLINE_ENV}, start_new_session=True)
+                            env={**os.environ, **OFFLINE_ENV, **resources.thread_env()}, start_new_session=True)
     deadline = time.time() + limit
 
     def stop():
@@ -573,7 +573,7 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep, k: float = RESTRAINT_K) -> bool:
                 rest.addParticle(atom.index, pdb.positions[atom.index].value_in_unit(unit.nanometer))
         system.addForce(rest)
         sim = app.Simulation(topology, system, mm.VerletIntegrator(0.001),
-                             mm.Platform.getPlatformByName("CPU"))
+                             mm.Platform.getPlatformByName("CPU"), {"Threads": str(resources.cores())})
         sim.context.setPositions(pdb.positions)
         _minimize_bounded(sim, pdb, topology, unit)
         buf = io.StringIO()
