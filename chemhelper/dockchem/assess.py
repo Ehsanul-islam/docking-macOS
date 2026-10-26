@@ -59,6 +59,23 @@ def _pdbfixer_substitutions() -> frozenset:
         return frozenset(hetatm.MODIFIED)
 
 
+def truncated_segment_start_prolines(chain) -> list:
+    """Prolines that start a chain segment (chain start or after a gap) without their ring atoms CG/CD. PDB2PQR crashes
+    on these ("'NoneType' object has no attribute 'coords'": 1UOU, 9NPX); the ring cannot be rebuilt reliably."""
+    out, prev = [], None
+    for r in chain:
+        if not (_is_aa(r) and r.het_flag != "H"):
+            prev = None
+            continue
+        if r.name == "PRO" and {"CG", "CD"} - {a.name for a in r}:
+            c, n = (prev.find_atom("C", "*") if prev else None), r.find_atom("N", "*")
+            contiguous = prev is not None and not (c and n and c.pos.dist(n.pos) > 2.0)
+            if not contiguous:
+                out.append(r)
+        prev = r
+    return out
+
+
 def _finding(findings, severity, code, message, residues=None):
     f = {"severity": severity, "code": code, "message": message}
     if residues:
@@ -201,6 +218,7 @@ def assess_structure(st: gemmi.Structure, model: int = 1, suffix: str = "") -> d
                  f"({', '.join(names[:6])}) will be left out of the receptor", [_label(c, r) for c, r in odd])
     stubs = [(c, r) for c, r in prot if "CA" not in {a.name for a in r}
              or len({a.name for a in r} & {"N", "C", "O"}) < 2]
+    stubs += [(ch, r) for ch in m for r in truncated_segment_start_prolines(ch) if all(r is not x for _, x in stubs)]
     stats["backbone_stubs"] = len(stubs)
     if stubs:
         _finding(findings, "fix", "backbone_stubs", f"{len(stubs)} residues have (almost) no backbone and cannot be "

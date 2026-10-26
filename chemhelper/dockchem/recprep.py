@@ -20,7 +20,7 @@ import gemmi
 
 from . import hetatm, protonation
 from . import stagecheck
-from .assess import assess_structure
+from .assess import assess_structure, truncated_segment_start_prolines
 from .errors import HelperError, InvalidInput, ToolFailure, UnusableStructure
 from .provenance import record
 from . import __version__
@@ -472,6 +472,7 @@ def _geometry_problem(before: str, after: str) -> str:
     return ""
 
 
+PDBFIXER_FALLBACK_MAX_RESIDUES = 1500   # PDBFixer needs minutes beyond this; fail with a clear message instead
 MINIMIZE_ITERATIONS = 500
 MINIMIZE_CHUNK = 25                 # iterations between checks
 MINIMIZE_BUDGET_S = 240             # wall-clock cap for one minimisation (a 1,350-residue run took 490 s)
@@ -1133,12 +1134,15 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         if ch.name not in chains:
             continue
         pc = gemmi.Chain(ch.name)
+        no_ring = {(r.seqid.num, r.seqid.icode) for r in truncated_segment_start_prolines(ch)}
         for res in ch:
             if _is_polymer(res):
                 if res.name in hetatm.MODIFIED and opts.nonstandard == "remove":
                     rep.change("nonstandard", _rid(ch.name, res), "removed", "user chose to remove", "gemmi")
                     continue
                 stub = _is_backbone_stub(res) if gemmi.find_tabulated_residue(res.name) else None
+                if not stub and (res.seqid.num, res.seqid.icode) in no_ring:
+                    stub = "proline at a chain start without its ring atoms CG/CD (PDB2PQR crashes on it)"
                 if stub:
                     rep.warn(f"{_rid(ch.name, res)} left out: {stub}")
                     rep.dropped.append({"residue": _rid(ch.name, res), "reason": stub})
@@ -1191,6 +1195,11 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         except ToolFailure as first:
             if opts.rebuild_missing_atoms != "pdb2pqr":
                 raise
+            n_res = len({(l[21], l[22:27]) for l in fixed.splitlines() if l.startswith("ATOM")})
+            if n_res > PDBFIXER_FALLBACK_MAX_RESIDUES:
+                raise ToolFailure(f"PDB2PQR failed and the structure ({n_res} residues) is too large for the slower "
+                                  f"PDBFixer fallback (limit {PDBFIXER_FALLBACK_MAX_RESIDUES}); select the chains you need "
+                                  "(a reference ligand or 'delete chain ...') and try again", log=first.log) from first
             # PDB2PQR dies on some truncated residues (e.g. an N-terminal Pro without its ring). Let PDBFixer
             # complete the heavy atoms and give PDB2PQR whole residues.
             import dataclasses

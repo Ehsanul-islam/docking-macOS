@@ -377,8 +377,7 @@ def test_too_many_long_chain_names_is_a_clear_error(tmp_path):
         _alias_chains(st, ReceptorPrepOptions(), _Report())
 
 
-def test_pdb2pqr_crash_on_truncated_n_terminal_proline_falls_back_to_pdbfixer_rebuild(tmp_path):
-    """Real entry 1UOU starts with a Pro whose ring (CG, CD) is missing; PDB2PQR raises AttributeError on it."""
+def _peptide_with_ringless_start_proline(tmp_path):
     st = peptide_structure("PSHDEKRCNQFYTALGSHDEK")
     r = st[0][0][0]
     for i in reversed(range(len(r))):
@@ -386,11 +385,86 @@ def test_pdb2pqr_crash_on_truncated_n_terminal_proline_falls_back_to_pdbfixer_re
             del r[i]
     src = tmp_path / "p.pdb"
     st.write_pdb(str(src))
+    return src
+
+
+def test_ringless_proline_at_a_chain_start_is_left_out_by_name_before_pdb2pqr_can_crash(tmp_path):
+    """Real entries 1UOU and 9NPX start with a Pro that has no CG/CD; PDB2PQR raises AttributeError on it."""
+    from dockchem.assess import assess
+    src = _peptide_with_ringless_start_proline(tmp_path)
+    a = assess(src)
+    assert a["stats"]["backbone_stubs"] == 1 and "backbone_stubs" in {f["code"] for f in a["findings"]}
     res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
-    assert res.report["status"] == "ok" and res.pdbqt.exists()
-    assert any("missing heavy atoms were added by PDBFixer" in w for w in res.report["warnings"])
-    pro = [l for l in open(res.pdb) if l[17:20] == "PRO" and l[22:26].strip() == "1"]
-    assert {"CG", "CD"} <= {l[12:16].strip() for l in pro}
+    d = res.report["dropped_residues"]
+    assert len(d) == 1 and d[0]["residue"] == "A:PRO1" and "without its ring" in d[0]["reason"]
+    assert res.pdbqt.exists() and not any("PDBFixer" in w for w in res.report["warnings"])
+
+
+def test_a_complete_or_internal_proline_is_never_flagged(tmp_path):
+    from dockchem.assess import truncated_segment_start_prolines
+    assert truncated_segment_start_prolines(peptide_structure("PSHDEKRCNQFYTALGSHDEK")[0][0]) == []     # complete ring
+    st = peptide_structure("GPSHDEKRCNQFYTALGSHDEK")
+    r = st[0][0][1]
+    for i in reversed(range(len(r))):
+        if r[i].name in ("CG", "CD"):
+            del r[i]
+    assert truncated_segment_start_prolines(st[0][0]) == []                         # internal, contiguous: not a chain start
+
+
+def test_unknown_pdb2pqr_crash_falls_back_to_pdbfixer_rebuild_for_small_structures(tmp_path, monkeypatch):
+    from dockchem import recprep
+    from dockchem.errors import ToolFailure
+    calls = []
+    real = recprep._pdb2pqr
+
+    def flaky(*a, **k):
+        calls.append(1)
+        if len(calls) == 1:
+            raise ToolFailure("PDB2PQR failed", log="boom")
+        return real(*a, **k)
+    monkeypatch.setattr(recprep, "_pdb2pqr", flaky)
+    src = tmp_path / "p.pdb"
+    peptide_structure("GSHDEKRCNQFYTALGSHDEK").write_pdb(str(src))
+    res = prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert len(calls) == 2 and any("missing heavy atoms were added by PDBFixer" in w for w in res.report["warnings"])
+
+
+def test_pdb2pqr_crash_on_a_huge_structure_fails_fast_with_advice_instead_of_a_long_fallback(tmp_path, monkeypatch):
+    from dockchem import recprep
+    from dockchem.errors import ToolFailure
+    monkeypatch.setattr(recprep, "PDBFIXER_FALLBACK_MAX_RESIDUES", 5)
+    monkeypatch.setattr(recprep, "_pdb2pqr", lambda *a, **k: (_ for _ in ()).throw(ToolFailure("PDB2PQR failed", log="boom")))
+    src = tmp_path / "p.pdb"
+    peptide_structure("GSHDEKRCNQFYTALGSHDEK").write_pdb(str(src))
+    with pytest.raises(ToolFailure, match="too large for the slower PDBFixer fallback.*select the chains"):
+        prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+
+
+def test_minimisation_stops_early_when_a_heavy_atom_drifts_instead_of_finishing_a_doomed_run(tmp_path, monkeypatch):
+    """9QGG: every minimisation variant was rejected for a cysteine sulfur moving 1 A, after 490 s of work."""
+    from dockchem import recprep
+    src = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(src))
+    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
+    monkeypatch.setattr(recprep, "MAX_HEAVY_SHIFT", 1e-6)                   # any movement counts as drift
+    rep = recprep._Report()
+    assert recprep._minimize(base.pdb, tmp_path / "out.pdb", rep) is False
+    assert any("within 25 iterations" in w and "stopped early" in w for w in rep.warnings)
+    assert not (tmp_path / "out.pdb").exists()
+
+
+def test_minimisation_respects_the_time_budget(tmp_path, monkeypatch):
+    from dockchem import recprep
+    src = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(src))
+    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
+    monkeypatch.setattr(recprep, "MINIMIZE_BUDGET_S", -1)                   # budget already spent after one chunk
+    calls = []
+    orig = recprep._minimize_bounded
+    monkeypatch.setattr(recprep, "_minimize_bounded", lambda *a: calls.append(orig(*a)) or calls[-1])
+    rep = recprep._Report()
+    recprep._minimize(base.pdb, tmp_path / "out.pdb", rep)
+    assert calls == [recprep.MINIMIZE_CHUNK]                                # stopped after the first chunk
 
 
 # ---- site-aware triage of what cannot be written to the receptor ------------------------------------
@@ -493,30 +567,3 @@ def test_without_a_site_a_left_out_cofactor_or_ion_still_degrades(tmp_path):
     rep.dropped = [{"residue": "A:HEM9", "reason": "metal complex"}, {"residue": "A:NAG501", "reason": "no match"}]
     _annotate_dropped(rep, peptide_structure()[0], [])                      # no site
     assert [_is_degrading(d) for d in rep.dropped] == [True, False]
-
-
-def test_minimisation_stops_early_when_a_heavy_atom_drifts_instead_of_finishing_a_doomed_run(tmp_path, monkeypatch):
-    """9QGG: every minimisation variant was rejected for a cysteine sulfur moving 1 A, after 490 s of work."""
-    from dockchem import recprep
-    src = tmp_path / "p.pdb"
-    peptide_structure().write_pdb(str(src))
-    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
-    monkeypatch.setattr(recprep, "MAX_HEAVY_SHIFT", 1e-6)                   # any movement counts as drift
-    rep = recprep._Report()
-    assert recprep._minimize(base.pdb, tmp_path / "out.pdb", rep) is False
-    assert any("within 25 iterations" in w and "stopped early" in w for w in rep.warnings)
-    assert not (tmp_path / "out.pdb").exists()
-
-
-def test_minimisation_respects_the_time_budget(tmp_path, monkeypatch):
-    from dockchem import recprep
-    src = tmp_path / "p.pdb"
-    peptide_structure().write_pdb(str(src))
-    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
-    monkeypatch.setattr(recprep, "MINIMIZE_BUDGET_S", -1)                   # budget already spent after one chunk
-    calls = []
-    orig = recprep._minimize_bounded
-    monkeypatch.setattr(recprep, "_minimize_bounded", lambda *a: calls.append(orig(*a)) or calls[-1])
-    rep = recprep._Report()
-    recprep._minimize(base.pdb, tmp_path / "out.pdb", rep)
-    assert calls == [recprep.MINIMIZE_CHUNK]                                # stopped after the first chunk
