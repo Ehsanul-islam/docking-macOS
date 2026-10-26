@@ -1,4 +1,5 @@
 """RPC method registry. Phase 0 exposes system + project + a ligand smoke method."""
+import json
 import platform
 import sys
 
@@ -244,6 +245,52 @@ def selection_apply(params, srv):
             "provenance": record("dockchem.selection", __version__, {"edits": s.commands()})}
 
 
+def quickprep_run(params, srv):
+    from .quickprep import quick_prep
+    path, outdir = _path(params, "receptor"), _req(params, "outdir")
+    ligand = _req(params, "ligand")
+    if isinstance(ligand, str) and len(ligand) < 4096 and "\n" not in ligand:
+        import os
+        if os.path.sep in ligand and not os.path.exists(ligand):
+            raise InvalidInput(f"ligand file not found: {ligand}")
+    res = quick_prep(path, ligand, outdir, params.get("preset", "standard"), params.get("site"), int(params.get("seed", 42)),
+                     bool(params.get("allow_unusable", False)), params.get("receptor_options"), params.get("ligand_options"))
+    return {"result": res, "warnings": res["warnings"], "artifacts": [res["engine"]["config"], res["receptor"]["pdbqt"]] + res["ligands"]["files"],
+            "provenance": record("dockchem.quickprep", __version__, {"preset": res["preset"], "site": res["site"]["how"]})}
+
+
+def complex_image2d(params, srv):
+    """Profile + 2D interaction image for one docked pose (receptor: prepared PDB with hydrogens)."""
+    import re
+    from pathlib import Path
+    from rdkit import Chem
+    from . import formats, interactions, render2d
+    rec, pose, out = _path(params, "receptor"), _path(params, "pose"), Path(_req(params, "out"))
+    idx = int(params.get("pose_index", 1))
+    style = params.get("style", "reference")
+    if style not in render2d.THEMES:
+        raise InvalidInput(f"style must be one of {', '.join(render2d.THEMES)}")
+    affinity = params.get("affinity")
+    if pose.lower().endswith(".pdbqt"):
+        mols, _ = formats.read_pdbqt_poses(pose)
+        scores = [float(x) for x in re.findall(r"REMARK VINA RESULT:\s+(-?\d+\.\d+)", Path(pose).read_text())]
+        if affinity is None and len(scores) >= idx:
+            affinity = scores[idx - 1]
+    else:
+        mols = [m for m in Chem.SDMolSupplier(pose, removeHs=False) if m is not None]
+    if not 1 <= idx <= len(mols):
+        raise InvalidInput(f"pose_index {idx} is out of range (the file has {len(mols)} poses)")
+    prof = interactions.profile(Path(rec).read_text(), mols[idx - 1], params.get("target_name", ""),
+                                params.get("compound", "ligand"), affinity, params.get("score_label", "AutoDock Vina binding affinity"))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    n = render2d.draw(prof, out, style=style, dpi=int(params.get("dpi", 300)))
+    js = out.with_suffix(".json")
+    js.write_text(json.dumps(prof, indent=1))
+    return {"result": {"counts": interactions.counts(prof), "residues_drawn": n, "style": style},
+            "artifacts": [str(out), str(js)],
+            "provenance": record("dockchem.render2d", __version__, {"style": style, "pose_index": idx})}
+
+
 def format_convert(params, srv):
     from . import formats
     return formats.convert(_path(params, "source"), _req(params, "dest"), params.get("charge", 0))
@@ -270,6 +317,8 @@ METHODS = {
     "receptor.prepare": receptor_prepare,
     "ligand.from_structure": ligand_from_structure,
     "structure.assess": structure_assess,
+    "quickprep.run": quickprep_run,
+    "complex.image2d": complex_image2d,
     "selection.validate": selection_validate,
     "selection.preview": selection_preview,
     "selection.apply": selection_apply,
