@@ -259,6 +259,44 @@ def quickprep_run(params, srv):
             "provenance": record("dockchem.quickprep", __version__, {"preset": res["preset"], "site": res["site"]["how"]})}
 
 
+def dock_engine(params, srv):
+    from . import docking
+    e = docking.find_engine(params.get("engine"))
+    return {"result": {"engine": e, "version": docking.engine_version(e)}}
+
+
+def dock_run(params, srv):
+    """Batch docking. Either quickprep_dir (a quickprep.run output folder) or receptor + ligands + center + size."""
+    import json
+    from pathlib import Path
+    from . import docking
+    outdir = _req(params, "outdir")
+    if params.get("quickprep_dir"):
+        qd = Path(_req(params, "quickprep_dir"))
+        summ = qd / "quickprep_summary.json"
+        if not summ.is_file():
+            raise InvalidInput(f"{qd} is not a quick-prep folder (no quickprep_summary.json)")
+        q = json.loads(summ.read_text())
+        conf = docking.parse_config(q["engine"]["config"])
+        receptor, ligands = q["receptor"]["pdbqt"], q["ligands"]["files"]
+        center = [float(conf[f"center_{a}"]) for a in "xyz"]
+        size = [float(conf[f"size_{a}"]) for a in "xyz"]
+        exh, modes, seed = int(conf["exhaustiveness"]), int(conf["num_modes"]), int(conf["seed"])
+    else:
+        receptor, ligands = _path(params, "receptor"), _req(params, "ligands")
+        if not isinstance(ligands, list) or not all(isinstance(x, str) for x in ligands):
+            raise InvalidInput("ligands must be a list of PDBQT file paths")
+        center, size = _req(params, "center"), _req(params, "size")
+        exh, modes, seed = int(params.get("exhaustiveness", 32)), int(params.get("num_modes", 9)), int(params.get("seed", 42))
+    job = params.get("job_id")
+    prog = (lambda f, m: srv.progress(job, f, m)) if srv else None
+    res = docking.run_batch(receptor, ligands, outdir, center, size, exh, modes, seed, params.get("scoring", "vina"),
+                            params.get("engine"), float(params.get("timeout_s", docking.DEFAULT_TIMEOUT_S)),
+                            bool(params.get("resume", True)), bool(params.get("write_sdf", True)), prog)
+    return {"result": res, "artifacts": [res["csv"], str(Path(outdir) / "results.json")],
+            "provenance": record("dockchem.docking", __version__, {"cores": res["cores"], "ligands": res["ligands"]})}
+
+
 def complex_image2d(params, srv):
     """Profile + 2D interaction image for one docked pose (receptor: prepared PDB with hydrogens)."""
     import re
@@ -319,6 +357,8 @@ METHODS = {
     "system.resources": lambda params, srv: {"result": __import__("dockchem.resources", fromlist=["x"]).describe()},
     "structure.assess": structure_assess,
     "quickprep.run": quickprep_run,
+    "dock.engine": dock_engine,
+    "dock.run": dock_run,
     "complex.image2d": complex_image2d,
     "selection.validate": selection_validate,
     "selection.preview": selection_preview,

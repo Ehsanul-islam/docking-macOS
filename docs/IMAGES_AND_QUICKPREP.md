@@ -26,3 +26,16 @@ threads, RDKit conformer-generation threads, and the thread environment (`OMP_NU
 Any request may carry `cores`; otherwise `DOCKCHEM_CORES`, otherwise 2. Whole numbers >= 1 only; more than the machine has is
 clamped with a warning. `system.resources` returns total / performance cores, default and range for a UI slider; every
 response's provenance records the cores used. Not yet parallel: library preparation runs one molecule at a time.
+
+## Batch docking (`dock.run`, `dock.engine`, `dockchem/docking.py`)
+Runs the Vina engine over many prepared ligands against one receptor and box. Input: a quick-prep folder
+(`quickprep_dir`) or `receptor` + `ligands` (PDBQT paths) + `center` + `size`. The core budget (`cores`, default 2) is split:
+many ligands run one core each side by side, a single ligand gets all cores. A failed or timed-out ligand (default limit
+1 h each) never stops the batch. Cancel kills the running engines and keeps finished results. A run folder holds
+`results.csv` / `results.json` (ranked, best predicted binding affinity first, failures listed after), `poses/` (PDBQT and
+SDF), `logs/`, `results/` (one JSON per ligand: a re-run resumes where it stopped, refused if the receptor, box, search
+or engine changed), and `run.json`. Progress notifications carry "n/total, minutes left". The engine is found via an
+explicit path, `DOCKCHEM_VINA`, a bundled `build/engine/vina`, or `vina` on PATH; otherwise a clear error.
+Vina and Vinardo scoring; AutoDock4 scoring is refused for now. Verified here with a fake engine (scheduling, ranking,
+failures, timeout, cancel, resume, validation) and with the real Vina 1.2.7 Linux binary; not verified on macOS or with
+the Swift app, which still has only a stub for this.
