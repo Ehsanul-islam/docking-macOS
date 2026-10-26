@@ -567,3 +567,33 @@ def test_without_a_site_a_left_out_cofactor_or_ion_still_degrades(tmp_path):
     rep.dropped = [{"residue": "A:HEM9", "reason": "metal complex"}, {"residue": "A:NAG501", "reason": "no match"}]
     _annotate_dropped(rep, peptide_structure()[0], [])                      # no site
     assert [_is_degrading(d) for d in rep.dropped] == [True, False]
+
+
+def test_output_larger_than_the_pdb_format_gets_a_precise_message_and_no_fallback(tmp_path, monkeypatch):
+    """6RD4, 7NVL, 8SH9, 10QQ, 8BKZ, 9BZ0: PDB2PQR works, then cannot write 108,445 atoms into a PDB file."""
+    from types import SimpleNamespace
+    from dockchem import recprep
+    from dockchem.errors import FormatLimit
+    monkeypatch.setattr(recprep, "_run", lambda *a, **k: SimpleNamespace(
+        returncode=1, stdout="", stderr="RuntimeError: Cannot write PDB-format output: atom count 108445 exceeds 99999"))
+    calls = []
+    real = recprep._pdb2pqr
+    monkeypatch.setattr(recprep, "_pdb2pqr", lambda *a, **k: calls.append(1) or real(*a, **k))
+    src = tmp_path / "p.pdb"
+    peptide_structure("GSHDEKRCNQFYTALGSHDEK").write_pdb(str(src))
+    with pytest.raises(FormatLimit, match=r"108,445 atoms.*99,999.*Select fewer chains"):
+        prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert len(calls) == 1                                              # the PDBFixer fallback was not attempted
+
+
+def test_too_large_to_protonate_is_refused_before_the_long_pdb2pqr_run(tmp_path, monkeypatch):
+    from dockchem import recprep
+    from dockchem.errors import FormatLimit
+    monkeypatch.setattr(recprep, "PDB_FORMAT_ATOM_LIMIT", 100)
+    called = []
+    monkeypatch.setattr(recprep, "_pdb2pqr", lambda *a, **k: called.append(1))
+    src = tmp_path / "p.pdb"
+    peptide_structure("GSHDEKRCNQFYTALGSHDEK").write_pdb(str(src))
+    with pytest.raises(FormatLimit, match="heavy atoms would give a protonated model"):
+        prepare_receptor(src, tmp_path / "o", ReceptorPrepOptions())
+    assert called == []                                                 # refused before PDB2PQR ran

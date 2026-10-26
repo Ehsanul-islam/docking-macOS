@@ -21,7 +21,7 @@ import gemmi
 from . import hetatm, protonation
 from . import stagecheck
 from .assess import assess_structure, truncated_segment_start_prolines
-from .errors import HelperError, InvalidInput, ToolFailure, UnusableStructure
+from .errors import FormatLimit, HelperError, InvalidInput, ToolFailure, UnusableStructure
 from .provenance import record
 from . import __version__
 
@@ -379,6 +379,13 @@ def _pdb2pqr(pdb_path: Path, opts, rep, workdir: Path) -> Path:
     cmd += [str(pdb_path), str(workdir / "protonated.pqr")]
     r = _run(cmd, workdir)
     if r.returncode != 0 or not out.exists():
+        m = re.search(r"atom count (\d+) exceeds (\d+)", r.stdout + r.stderr)
+        if m:
+            # Not a crash: the protonated model does not fit the PDB file format. No fallback can help.
+            raise FormatLimit(f"the protonated model would have {int(m.group(1)):,} atoms, more than the PDB file format "
+                              f"can hold ({int(m.group(2)):,}). Select fewer chains (give a reference ligand so only "
+                              "the chains around the site are prepared, or use 'delete chain ...') and try again",
+                              log=r.stdout + r.stderr)
         raise ToolFailure("PDB2PQR failed", log=r.stdout + r.stderr)
     log = r.stdout + r.stderr
     for m in re.finditer(r"Unable to debump (\w+) (\w) (\d+)", log):
@@ -472,6 +479,8 @@ def _geometry_problem(before: str, after: str) -> str:
     return ""
 
 
+PDB_FORMAT_ATOM_LIMIT = 99_999          # PDB files cannot number more atoms
+HYDROGEN_FACTOR = 1.90                  # atoms after protonation per heavy atom, lower bound (6RD4: 2.02)
 PDBFIXER_FALLBACK_MAX_RESIDUES = 1500   # PDBFixer needs minutes beyond this; fail with a clear message instead
 MINIMIZE_ITERATIONS = 500
 MINIMIZE_CHUNK = 25                 # iterations between checks
@@ -1184,6 +1193,12 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         (td / "fixed.pdb").write_text(fixed)
         rep.tools.append(record("pdbfixer", _ver("pdbfixer"), {"rebuild_missing_atoms": opts.rebuild_missing_atoms}))
         before = _residue_names(fixed)
+        n_heavy = sum(1 for l in fixed.splitlines() if l.startswith(("ATOM", "HETATM")) and l[76:78].strip() not in ("H", "D"))
+        if n_heavy * HYDROGEN_FACTOR > PDB_FORMAT_ATOM_LIMIT:
+            raise FormatLimit(f"{n_heavy:,} heavy atoms would give a protonated model of about {int(n_heavy * 2):,} atoms, more "
+                              f"than the PDB file format can hold ({PDB_FORMAT_ATOM_LIMIT:,}). Select fewer chains (give a "
+                              "reference ligand so only the chains around the site are prepared, or use 'delete chain ...') "
+                              "and try again")
         bad_dec = {k: v for k, v in opts.flip_decisions.items() if str(v).lower() not in ("accept", "reject")}
         if bad_dec:
             raise InvalidInput(f"flip_decisions must be 'accept' or 'reject': {bad_dec}")

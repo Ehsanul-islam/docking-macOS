@@ -83,3 +83,9 @@ class UnusableStructure(InvalidInput):
         d = super().to_rpc()
         d["data"]["assessment"] = self.assessment
         return d
+
+
+class FormatLimit(InvalidInput):
+    """The input is valid but too large for the file formats the toolchain uses (PDB: 99,999 atoms)."""
+    code = -32008
+    kind = "FormatLimit"
