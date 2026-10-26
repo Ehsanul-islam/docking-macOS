@@ -138,3 +138,17 @@ P10 (warning volume, cysteine thiolates).
 Finding made while fixing P5: for 9QGG every minimisation variant (GB 100/200/500 iterations, vacuum) was rejected by
 the heavy-atom check (cysteine B:767 SG drifts 1.0 A); the earlier 490 s were spent on a result that was discarded.
 The repair then falls back to removing the clashing hydrogens. The cause of the drift was not found.
+
+## Round 2: the "timeouts" (commits 484f16f, 9071537)
+
+Profiling 9NPX showed the timeouts were two different problems, neither of them slow science:
+- **9NPX and 1UOU: PDB2PQR crashes on a proline at a chain start that has no ring atoms (CG, CD).** My first fix for 1UOU
+  (rebuild everything with PDBFixer, then retry) took 10+ minutes on 5,800 residues. Now such a proline is detected before
+  PDB2PQR (also an assessment finding), left out by name, and the entry prepares (9NPX: ok in 431 s, was a timeout).
+  The PDBFixer fallback stays for unknown crashes but refuses structures over 1,500 residues with advice.
+- **6RD4, 7NVL, 8SH9, 10QQ, 8BKZ, 9BZ0 (cryo-EM, 54,000 to 70,000 heavy atoms): PDB2PQR finishes, then cannot write the
+  result** ("atom count 108445 exceeds 99999", a PDB file format limit after hydrogens are added; 6RD4 checked directly).
+  Now refused before PDB2PQR with a `FormatLimit` error (-32008) that says to select chains; those entries cost 400-700 s
+  before failing, now a few seconds. Real fix for such complexes is the chain selection (a reference ligand) or an mmCIF
+  path end to end (the helper tools are the limit), which is a design decision.
+- 8TOX still fails with a clear message (more chains than free one-letter names).
