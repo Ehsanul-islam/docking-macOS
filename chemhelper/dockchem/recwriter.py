@@ -37,15 +37,19 @@ def supported_residues() -> set[str]:
     return set(_table()["types"])
 
 
+PARENT_MAX = 1.65     # A: a hydrogen is attached to the nearest heavy atom within this (X-H is 1.0-1.35 A, but
+                      # restrained repair can stretch it; the AutoDock type depends on the element only)
+
+
 def _parent_element(hpos, res) -> str:
-    """Element of the heavy atom a hydrogen is attached to (nearest within 1.3 A), else ''."""
-    best, el = 1.3, ""
-    for a in res:
-        if not a.element.is_hydrogen:
-            d = hpos.dist(a.pos)
-            if d < best:
-                best, el = d, a.element.name
-    return el
+    """Element of the heavy atom a hydrogen is attached to: the nearest one within PARENT_MAX, if it is clearly
+    nearer than the runner-up (otherwise ''), so a stretched but unambiguous hydrogen is still typed."""
+    dists = sorted((hpos.dist(a.pos), a.element.name) for a in res if not a.element.is_hydrogen)
+    if not dists or dists[0][0] > PARENT_MAX:
+        return ""
+    if len(dists) > 1 and dists[1][0] - dists[0][0] < 0.25:
+        return ""
+    return dists[0][1]
 
 
 def write_pdbqt(pdb_text: str, out: Path) -> dict:

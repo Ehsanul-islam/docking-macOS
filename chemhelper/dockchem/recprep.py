@@ -459,15 +459,44 @@ def _geometry_problem(before: str, after: str) -> str:
                 out[(l[21], l[22:27].strip(), l[12:16].strip())] = (float(l[30:38]), float(l[38:46]), float(l[46:54]))
         return out
     b, a = heavy(before), heavy(after)
-    worst = max((math.dist(b[k], a[k]) for k in b if k in a), default=0.0)
+    shifts = {k: math.dist(b[k], a[k]) for k in b if k in a}
+    worst_key = max(shifts, key=shifts.get) if shifts else None
+    worst = shifts[worst_key] if worst_key else 0.0
     if worst > MAX_HEAVY_SHIFT:
-        return f"heavy atom moved {worst:.2f} A (limit {MAX_HEAVY_SHIFT})"
+        return f"heavy atom {worst_key[0]}:{worst_key[1]}.{worst_key[2]} moved {worst:.2f} A (limit {MAX_HEAVY_SHIFT})"
     for (ch, num), _ in {(k[0], k[1]): 0 for k in a}.items():
         for (n1, n2), (lo, hi) in BOND_RANGE.items():
             p, q = a.get((ch, num, n1)), a.get((ch, num, n2))
             if p and q and not lo <= math.dist(p, q) <= hi:
                 return f"implausible {n1}-{n2} bond ({math.dist(p, q):.2f} A) at {ch}:{num}"
     return ""
+
+
+MINIMIZE_ITERATIONS = 500
+MINIMIZE_CHUNK = 25                 # iterations between checks
+MINIMIZE_BUDGET_S = 240             # wall-clock cap for one minimisation (a 1,350-residue run took 490 s)
+
+
+def _minimize_bounded(sim, pdb, topology, unit) -> int:
+    """Minimise in small chunks; stop at once if a heavy atom drifts past the limit (the result would be rejected
+    anyway; 9QGG spent 490 s to reach that verdict) or when the time budget is used up. Returns iterations done."""
+    import time
+
+    import numpy as np
+    heavy = [a.index for a in topology.atoms() if a.element is not None and a.element.symbol != "H"]
+    start = np.array(pdb.positions.value_in_unit(unit.nanometer))[heavy]
+    t0, done = time.time(), 0
+    while done < MINIMIZE_ITERATIONS:
+        sim.minimizeEnergy(maxIterations=MINIMIZE_CHUNK)
+        done += MINIMIZE_CHUNK
+        now = np.array(sim.context.getState(getPositions=True).getPositions().value_in_unit(unit.nanometer))[heavy]
+        shift = float(np.sqrt(((now - start) ** 2).sum(axis=1)).max()) * 10
+        if shift > MAX_HEAVY_SHIFT:
+            raise ValueError(f"result rejected, a heavy atom moved {shift:.2f} A within {done} iterations "
+                             f"(limit {MAX_HEAVY_SHIFT}); stopped early")
+        if time.time() - t0 > MINIMIZE_BUDGET_S:
+            break
+    return done
 
 
 def _minimize(pdb_in: Path, pdb_out: Path, rep, k: float = RESTRAINT_K) -> bool:
@@ -504,7 +533,7 @@ def _minimize(pdb_in: Path, pdb_out: Path, rep, k: float = RESTRAINT_K) -> bool:
         sim = app.Simulation(topology, system, mm.VerletIntegrator(0.001),
                              mm.Platform.getPlatformByName("CPU"))
         sim.context.setPositions(pdb.positions)
-        sim.minimizeEnergy(maxIterations=500)
+        _minimize_bounded(sim, pdb, topology, unit)
         buf = io.StringIO()
         final_pos = sim.context.getState(getPositions=True).getPositions()
         app.PDBFile.writeFile(topology, final_pos, buf, keepIds=True)
@@ -628,6 +657,9 @@ def _drop_malformed(src: Path, dst: Path, rep) -> Path:
     return dst
 
 
+CROSSCHECK_MAX_RESIDUES = 2500      # the optional Meeko cross-check is skipped above this size
+
+
 def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
     """Table writer first (it cannot be broken by odd geometry), Meeko as fallback or cross-check."""
     from . import recwriter
@@ -674,7 +706,11 @@ def _write_pdbqt(pdb_path: Path, base: Path, opts, rep):
     rep.pdbqt_info = {"writer": "table", "atoms": r["atoms"]}
     _settle_pending_het(rep, out, r["atoms"])
     if mode == "auto" and opts.crosscheck:
-        rep.pdbqt_info["crosscheck"] = _crosscheck(pdb_path, out, base, opts, rep)
+        n_res = len({(l[21], l[22:27]) for l in pdb_path.read_text().splitlines() if l.startswith(("ATOM", "HETATM"))})
+        if n_res > CROSSCHECK_MAX_RESIDUES:
+            rep.pdbqt_info["crosscheck"] = {"result": "skipped", "reason": f"{n_res} residues (limit {CROSSCHECK_MAX_RESIDUES})"}
+        else:
+            rep.pdbqt_info["crosscheck"] = _crosscheck(pdb_path, out, base, opts, rep)
     return out, None
 
 

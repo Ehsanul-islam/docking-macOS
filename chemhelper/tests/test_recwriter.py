@@ -215,3 +215,20 @@ def test_settle_pending_with_meeko_writer_reports_everything_as_left_out():
     rep.pending_het = {("A", "318", "NAP"): (DATA / "NAP_1T40.pdb").read_text().splitlines()}
     _settle_pending_het(rep, None)
     assert rep.dropped and rep.dropped[0]["reason"] == "no bundled Meeko template"
+
+
+def test_stretched_hydrogens_are_still_typed_by_their_parent_element(tmp_path):
+    """1PJX LYS43 HD2 sat 1.33 A from CD and 3F9M GLU4 H2 1.51 A from N; both fell through to 'no rule' and the whole
+    entry was handed to Meeko."""
+    text = (pdb_line(1, "N", "GLY", 1, (0, 0, 0), "N") + pdb_line(2, "H2", "GLY", 1, (0.0, 1.51, 0.0), "H")        # N-H 1.51
+            + pdb_line(3, "CA", "GLY", 1, (1.4, 0, 0), "C") + pdb_line(4, "HA2", "GLY", 1, (1.4, -1.33, 0.4), "H"))   # C-H 1.33
+    r = recwriter.write_pdbqt(text, tmp_path / "o.pdbqt")
+    got = {l[12:16].strip(): l[77:79].strip() for l in open(tmp_path / "o.pdbqt")}
+    assert r["dropped"] == [] and got == {"N": "N", "H2": "HD", "CA": "C"} and r["merged_hydrogens"] == 1
+
+
+def test_a_hydrogen_equidistant_from_two_heavy_atoms_is_not_guessed(tmp_path):
+    text = (pdb_line(1, "N", "GLY", 1, (0, 0, 0), "N") + pdb_line(2, "CA", "GLY", 1, (2.0, 0, 0), "C")
+            + pdb_line(3, "HX", "GLY", 1, (1.0, 0.9, 0.0), "H"))
+    r = recwriter.write_pdbqt(text, tmp_path / "o.pdbqt")
+    assert r["dropped"] and "HX" in r["dropped"][0]["reason"]

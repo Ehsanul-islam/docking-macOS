@@ -493,3 +493,30 @@ def test_without_a_site_a_left_out_cofactor_or_ion_still_degrades(tmp_path):
     rep.dropped = [{"residue": "A:HEM9", "reason": "metal complex"}, {"residue": "A:NAG501", "reason": "no match"}]
     _annotate_dropped(rep, peptide_structure()[0], [])                      # no site
     assert [_is_degrading(d) for d in rep.dropped] == [True, False]
+
+
+def test_minimisation_stops_early_when_a_heavy_atom_drifts_instead_of_finishing_a_doomed_run(tmp_path, monkeypatch):
+    """9QGG: every minimisation variant was rejected for a cysteine sulfur moving 1 A, after 490 s of work."""
+    from dockchem import recprep
+    src = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(src))
+    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
+    monkeypatch.setattr(recprep, "MAX_HEAVY_SHIFT", 1e-6)                   # any movement counts as drift
+    rep = recprep._Report()
+    assert recprep._minimize(base.pdb, tmp_path / "out.pdb", rep) is False
+    assert any("within 25 iterations" in w and "stopped early" in w for w in rep.warnings)
+    assert not (tmp_path / "out.pdb").exists()
+
+
+def test_minimisation_respects_the_time_budget(tmp_path, monkeypatch):
+    from dockchem import recprep
+    src = tmp_path / "p.pdb"
+    peptide_structure().write_pdb(str(src))
+    base = prepare_receptor(src, tmp_path / "base", ReceptorPrepOptions(crosscheck=False))
+    monkeypatch.setattr(recprep, "MINIMIZE_BUDGET_S", -1)                   # budget already spent after one chunk
+    calls = []
+    orig = recprep._minimize_bounded
+    monkeypatch.setattr(recprep, "_minimize_bounded", lambda *a: calls.append(orig(*a)) or calls[-1])
+    rep = recprep._Report()
+    recprep._minimize(base.pdb, tmp_path / "out.pdb", rep)
+    assert calls == [recprep.MINIMIZE_CHUNK]                                # stopped after the first chunk
