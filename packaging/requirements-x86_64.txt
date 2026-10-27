@@ -1,0 +1,32 @@
+# Pinned packages for the bundled Python 3.12 on x86_64. Every entry has a macOS wheel (checked 2026-10-27).
+# NOTE: PyPI has no Intel-Mac wheel of the newest RDKit; this pin differs from arm64 and must pass the equivalence/redock checks.
+certifi==2026.10.23
+charset-normalizer==3.5.2
+contourpy==1.4.0
+cycler==0.12.1
+dimorphite-dl==2.1.0
+fonttools==4.67.0
+gemmi==0.7.5
+idna==3.20
+kiwisolver==1.5.1
+legacy-cgi==2.6.4
+loguru==0.7.3
+matplotlib==3.11.2
+meeko==0.8.0
+mmcif-pdbx==2.1.0
+numpy==2.5.4
+openmm==8.6.1
+packaging==26.3
+pdb2pqr==3.8.0
+pillow==13.0.0
+propka==3.5.1
+pyparsing==3.3.3
+python-dateutil==3.0.0
+rdkit==2025.9.3
+requests==2.34.2
+scipy==1.18.1
+six==1.17.0
+typing-extensions==4.16.0
+tzdata==2026.5
+urllib3==2.8.0
+pdbfixer==1.12.0   # pure Python, built from source once (no wheel on PyPI)

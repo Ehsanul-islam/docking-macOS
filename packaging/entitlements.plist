@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Hardened runtime with NO extra entitlements: every Mach-O in the bundle is re-signed with the same identity,
+       so library validation passes. Add an entitlement only when a run under the hardened runtime proves it is
+       needed, and record why here. Candidates, in the order to try:
+         com.apple.security.cs.allow-unsigned-executable-memory   (a library that maps executable memory)
+         com.apple.security.cs.disable-library-validation          (only if a component cannot be signed by us)
+         com.apple.security.network.client                          (only if the app is sandboxed; see PACKAGING.md) -->
+</dict>
+</plist>

@@ -100,9 +100,12 @@ final class HelperLocatorTests: XCTestCase {
                               fileExists: { _ in true })
         let launch = l.launch()
         XCTAssertEqual(launch.executable.path, "/App/Contents/Resources/python/bin/python3")
+        let cached = HelperLocator(resourceDirectory: res, environment: [:], cacheDirectory: URL(fileURLWithPath: "/C"), fileExists: { _ in true })
+        XCTAssertEqual(cached.launch().environment["MPLCONFIGDIR"], "/C/matplotlib")
         XCTAssertEqual(launch.environment["DOCKCHEM_VINA"], "/App/Contents/Resources/engine/vina")
         XCTAssertEqual(launch.environment["PYTHONHOME"], "/App/Contents/Resources/python")
         XCTAssertEqual(launch.arguments, ["-m", "dockchem.server"])
+        XCTAssertEqual(launch.environment["PYTHONDONTWRITEBYTECODE"], "1")
     }
 
     func testFallsBackToEnvironmentThenToSystemPython() {

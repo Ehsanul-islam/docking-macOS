@@ -3,7 +3,7 @@ name = "dockchem"
 version = "0.1.0"
 description = "Chemistry helper for the macOS docking app (JSON-RPC over stdio)"
 requires-python = ">=3.11"
-dependencies = ["matplotlib", "pillow", "numpy", "rdkit", "gemmi", "meeko", "scipy", "prody", "dimorphite_dl", "pdb2pqr", "propka", "pdbfixer", "openmm"]
+dependencies = ["matplotlib", "pillow", "numpy", "rdkit", "gemmi", "meeko", "scipy", "dimorphite_dl", "pdb2pqr", "propka", "pdbfixer", "openmm"]
 
 [project.optional-dependencies]
 test = ["pytest"]

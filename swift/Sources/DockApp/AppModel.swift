@@ -14,7 +14,8 @@ final class AppModel {
     private let locator: HelperLocator
 
     init() {
-        let locator = HelperLocator(resourceDirectory: Bundle.main.resourceURL)
+        let cache = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Dock")
+        let locator = HelperLocator(resourceDirectory: Bundle.main.resourceURL, cacheDirectory: cache)
         let client = HelperClient(launch: locator.launch())
         let settings = Self.load()
         self.locator = locator

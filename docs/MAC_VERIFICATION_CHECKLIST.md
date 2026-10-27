@@ -108,6 +108,8 @@ EOF
 
 ## 8. Packaging, signing, notarization (plan D-2)
 
+Scripts and decisions: `docs/PACKAGING.md` (`packaging/build_app.sh`, `verify_bundle.sh`, `make_dmg.sh`). `verify_bundle.sh` covers the first four boxes below; its output is what to send back.
+
 - [ ] The helper runs from the bundle with a **relocatable** Python (no dependence on `/usr/local`, Homebrew or the build venv): copy the `.app` to a clean user account / second Mac and run §6.
 - [ ] Every Mach-O in the bundle (Python, `.so`, `.dylib`, `vina`) is signed with the hardened runtime: `codesign --verify --deep --strict --verbose=2 Dock.app`.
 - [ ] `xcrun notarytool submit … --wait` returns *Accepted*; `spctl -a -vv Dock.app` says *accepted, source=Notarized Developer ID*; staple with `xcrun stapler staple`.

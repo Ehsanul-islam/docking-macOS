@@ -5,16 +5,21 @@ import Foundation
 public struct HelperLocator: Sendable {
     public var resourceDirectory: URL?
     public var environment: [String: String]
+    /// Writable folder for caches (matplotlib fonts etc.); the bundle itself must never be written to.
+    public var cacheDirectory: URL?
     public var fileExists: @Sendable (String) -> Bool
 
     public init(resourceDirectory: URL? = nil, environment: [String: String] = ProcessInfo.processInfo.environment,
+                cacheDirectory: URL? = nil,
                 fileExists: @escaping @Sendable (String) -> Bool = { FileManager.default.isExecutableFile(atPath: $0) }) {
-        self.resourceDirectory = resourceDirectory; self.environment = environment; self.fileExists = fileExists
+        self.resourceDirectory = resourceDirectory; self.environment = environment
+        self.cacheDirectory = cacheDirectory; self.fileExists = fileExists
     }
 
     /// Bundled Python first, then $DOCKCHEM_PYTHON, then `python3` from the path (development).
     public func launch() -> HelperClient.Launch {
-        var env: [String: String] = [:]
+        var env: [String: String] = ["PYTHONDONTWRITEBYTECODE": "1"]     // never write .pyc into a signed bundle
+        if let cache = cacheDirectory { env["MPLCONFIGDIR"] = cache.appendingPathComponent("matplotlib").path }
         if let engine = enginePath() { env["DOCKCHEM_VINA"] = engine }
         if let r = resourceDirectory {
             let py = r.appendingPathComponent("python/bin/python3").path
