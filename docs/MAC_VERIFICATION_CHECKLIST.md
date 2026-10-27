@@ -30,10 +30,9 @@ swift test  --package-path swift
 - [ ] Both succeed with 0 failures. CI (`macos-14`) runs the same `swift test`; local result should match.
 - [ ] Record the Swift version (`swift --version`).
 
-## 2b. App UI smoke test (the SwiftUI code has never been compiled; expect fixes)
+## 2b. App UI smoke test (the SwiftUI code compiles and its logic tests pass on GitHub's macos-14 runner since c3d6907; it has never been *run*)
 
-`swift build --package-path swift` must compile `Sources/DockApp` (it is excluded from the Linux build). Fix any
-compiler errors first; send them back verbatim. Then, with `DOCKCHEM_VINA` set and the Python helper installed:
+With the local Xcode/Swift version, `swift build --package-path swift` must also compile `Sources/DockApp`; send any compiler errors back verbatim. Then, with `DOCKCHEM_VINA` set and the Python helper installed:
 
 ```bash
 swift run --package-path swift DockApp
