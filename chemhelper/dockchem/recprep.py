@@ -158,9 +158,17 @@ def _alias_chains(st, opts, rep):
     if not long_:
         return opts, {}
     free = [c for c in ALIAS_POOL if c not in {ch.name for ch in model}]
+    if len(long_) > len(free) and opts.chains is not None:
+        # more long names than letters: only the chains the user picked need a one-letter name, the rest are left out
+        unused = [c for c in long_ if c not in opts.chains]
+        for name in unused:
+            model.remove_chain(name)
+            rep.change("chains", name, "left out", "multi-letter chain name does not fit the PDB format and the "
+                       "chain was not selected", "dockchem")
+        long_ = [c for c in long_ if c in opts.chains]
     if len(long_) > len(free):
         raise InvalidInput(f"{len(long_)} chains with multi-letter names but only {len(free)} free one-letter names: "
-                           "delete chains you do not need first (e.g. edits=['delete chain XYZ'])")
+                           "choose the chains to dock with the chains option (e.g. chains=['AAA']) so the rest can be left out")
     mapping = dict(zip(long_, free))
     for ch in model:
         if ch.name in mapping:

@@ -377,6 +377,18 @@ def test_too_many_long_chain_names_is_a_clear_error(tmp_path):
         _alias_chains(st, ReceptorPrepOptions(), _Report())
 
 
+def test_unselected_long_chains_are_left_out_when_letters_run_out(tmp_path):
+    """8TOX: more multi-letter chains than free letters; choosing the chain to dock must be enough."""
+    from dockchem.recprep import _alias_chains, _Report
+    st = peptide_structure()
+    st[0][0].name = "AAA"
+    for i in range(70):
+        st[0].add_chain(gemmi.Chain(f"X{i:02d}"))
+    rep = _Report()
+    opts, mapping = _alias_chains(st, ReceptorPrepOptions(chains=["AAA"]), rep)
+    assert list(opts.chains) == [mapping["AAA"]] and len(st[0]) == 1
+
+
 def _peptide_with_ringless_start_proline(tmp_path):
     st = peptide_structure("PSHDEKRCNQFYTALGSHDEK")
     r = st[0][0][0]

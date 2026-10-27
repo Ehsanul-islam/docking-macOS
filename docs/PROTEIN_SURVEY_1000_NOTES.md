@@ -151,7 +151,7 @@ Profiling 9NPX showed the timeouts were two different problems, neither of them 
   Now refused before PDB2PQR with a `FormatLimit` error (-32008) that says to select chains; those entries cost 400-700 s
   before failing, now a few seconds. Real fix for such complexes is the chain selection (a reference ligand) or an mmCIF
   path end to end (the helper tools are the limit), which is a design decision.
-- 8TOX still fails with a clear message (more chains than free one-letter names).
+- 8TOX: fixed for the case where the user picks chains (unselected multi-letter chains are left out when letters run out); without a chain choice it still fails with a message saying to pick chains. Not re-run on the real entry.
 (1UOU belongs to the earlier 300-structure set, not this one. New in the final comparison: 9QGG CYX767, the same cysteine
 whose sulfur drifted during minimisation, is typed `S` by the table writer (no SG-SG partner within 2.52 A) but `SA` by
 Meeko, so Meeko sees a second bonded neighbour there; consistent with a metal or ligand next to that sulfur. Open under P9.)
