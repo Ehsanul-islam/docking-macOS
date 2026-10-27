@@ -297,17 +297,15 @@ def dock_run(params, srv):
             "provenance": record("dockchem.docking", __version__, {"cores": res["cores"], "ligands": res["ligands"]})}
 
 
-def complex_image2d(params, srv):
-    """Profile + 2D interaction image for one docked pose (receptor: prepared PDB with hydrogens)."""
+def _pose_profile(params):
+    """Interaction profile of one docked pose (receptor: prepared PDB with hydrogens). Shared by the 2D image and the
+    3D viewer so both always show the same interactions."""
     import re
     from pathlib import Path
     from rdkit import Chem
-    from . import formats, interactions, render2d
-    rec, pose, out = _path(params, "receptor"), _path(params, "pose"), Path(_req(params, "out"))
+    from . import formats, interactions
+    rec, pose = _path(params, "receptor"), _path(params, "pose")
     idx = int(params.get("pose_index", 1))
-    style = params.get("style", "reference")
-    if style not in render2d.THEMES:
-        raise InvalidInput(f"style must be one of {', '.join(render2d.THEMES)}")
     affinity = params.get("affinity")
     if pose.lower().endswith(".pdbqt"):
         mols, _ = formats.read_pdbqt_poses(pose)
@@ -320,6 +318,18 @@ def complex_image2d(params, srv):
         raise InvalidInput(f"pose_index {idx} is out of range (the file has {len(mols)} poses)")
     prof = interactions.profile(Path(rec).read_text(), mols[idx - 1], params.get("target_name", ""),
                                 params.get("compound", "ligand"), affinity, params.get("score_label", "AutoDock Vina binding affinity"))
+    return prof, idx
+
+
+def complex_image2d(params, srv):
+    """Profile + 2D interaction image for one docked pose (receptor: prepared PDB with hydrogens)."""
+    from pathlib import Path
+    from . import interactions, render2d
+    out = Path(_req(params, "out"))
+    style = params.get("style", "reference")
+    if style not in render2d.THEMES:
+        raise InvalidInput(f"style must be one of {', '.join(render2d.THEMES)}")
+    prof, idx = _pose_profile(params)
     out.parent.mkdir(parents=True, exist_ok=True)
     n = render2d.draw(prof, out, style=style, dpi=int(params.get("dpi", 300)))
     js = out.with_suffix(".json")
@@ -327,6 +337,16 @@ def complex_image2d(params, srv):
     return {"result": {"counts": interactions.counts(prof), "residues_drawn": n, "style": style},
             "artifacts": [str(out), str(js)],
             "provenance": record("dockchem.render2d", __version__, {"style": style, "pose_index": idx})}
+
+
+def complex_interactions(params, srv):
+    """The same interactions as the 2D diagram, with 3D coordinates, for the viewer to draw."""
+    from . import interactions
+    prof, idx = _pose_profile(params)
+    return {"result": {"pose_index": idx, "affinity": prof.get("affinity"), "counts": interactions.counts(prof),
+                       "interactions": prof["interactions"], "vdw_contacts": prof.get("vdw_contacts", []),
+                       "ligand_molblock": prof["ligand_molblock"]},
+            "provenance": record("dockchem.interactions", __version__, {"pose_index": idx})}
 
 
 def format_convert(params, srv):
@@ -360,6 +380,7 @@ METHODS = {
     "dock.engine": dock_engine,
     "dock.run": dock_run,
     "complex.image2d": complex_image2d,
+    "complex.interactions": complex_interactions,
     "selection.validate": selection_validate,
     "selection.preview": selection_preview,
     "selection.apply": selection_apply,
