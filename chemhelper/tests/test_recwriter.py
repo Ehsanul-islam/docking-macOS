@@ -232,3 +232,23 @@ def test_a_hydrogen_equidistant_from_two_heavy_atoms_is_not_guessed(tmp_path):
             + pdb_line(3, "HX", "GLY", 1, (1.0, 0.9, 0.0), "H"))
     r = recwriter.write_pdbqt(text, tmp_path / "o.pdbqt")
     assert r["dropped"] and "HX" in r["dropped"][0]["reason"]
+
+
+def test_compare_pdbqt_separates_polar_hydrogen_count_from_real_type_conflicts(tmp_path):
+    """Meeko re-adds hydrogens the built-in writer found absent from the prepared model; that is not a type conflict."""
+    from dockchem.recprep import compare_pdbqt
+
+    def line(name, ad, res="TYR"):
+        return f"ATOM  {1:5d} {name:<4s} {res:>3s} A{73:4d}       0.000   0.000   0.000  1.00  0.00    +0.000 {ad:<2s}\n"
+    a, b = tmp_path / "a", tmp_path / "b"
+    a.write_text(line("N", "N") + line("H", "HD"))
+    b.write_text(line("N", "N") + line("H", "HD") + line("HH", "HD"))
+    r = compare_pdbqt(a, b)
+    assert r["result"] == "agree" and r["n_residues_hydrogen_count_differs"] == 1
+
+
+def test_cyx_sulfur_bound_to_another_residue_is_an_acceptor(tmp_path):
+    """9QGG: Cys767 SG is covalently linked to the carbonyl carbon of Ala76 of another chain; Meeko types it SA."""
+    text = cyx(1, 1, (0, 0, 0)) + pdb_line(3, "C", "ALA", 76, (1.33, 0, 0), "C")
+    recwriter.write_pdbqt(text, tmp_path / "o.pdbqt")
+    assert {l[77:79].strip() for l in open(tmp_path / "o.pdbqt") if l[12:16].strip() == "SG"} == {"SA"}

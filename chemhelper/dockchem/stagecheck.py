@@ -190,3 +190,29 @@ def missing_amide_hydrogens(text: str) -> list[str]:
         if not d["names"] & {"H", "H1", "H2", "H3", "D", "D1", "D2", "D3"}:
             out.append(f"{c}:{d['res']}{n}")
     return out
+
+
+# Polar side-chain hydrogens a protonated residue must carry, by residue name (state-specific names for His/Asp/Glu/Lys).
+POLAR_SIDECHAIN_H = {
+    "ARG": {"HE", "HH11", "HH12", "HH21", "HH22"}, "LYS": {"HZ1", "HZ2", "HZ3"}, "LYN": {"HZ2", "HZ3"},
+    "ASN": {"HD21", "HD22"}, "GLN": {"HE21", "HE22"}, "TRP": {"HE1"}, "HID": {"HD1"}, "HIE": {"HE2"},
+    "HIP": {"HD1", "HE2"}, "ASH": {"HD2"}, "GLH": {"HE2"}, "SER": {"HG"}, "THR": {"HG1"}, "TYR": {"HH"},
+    "CYS": {"HG"},
+}
+
+
+def missing_sidechain_hydrogens(text: str) -> list[str]:
+    """'A:ARG134 (HH11)': residues whose heavy atoms are all present but which lack polar hydrogens the residue
+    state requires - a donor that is silently absent from the docking receptor."""
+    per: dict = {}
+    for (c, n, name), (x, y, z, res, el) in _atoms(text).items():
+        per.setdefault((c, n), {"res": res, "names": set()})["names"].add(name)
+    out = []
+    for (c, n), d in per.items():
+        need = POLAR_SIDECHAIN_H.get(d["res"])
+        if not need:
+            continue
+        miss = sorted(h for h in need if h not in d["names"])
+        if miss:
+            out.append(f"{c}:{d['res']}{n} ({','.join(miss)})")
+    return out

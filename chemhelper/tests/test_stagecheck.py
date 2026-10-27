@@ -131,3 +131,11 @@ def test_relocated_terminal_oxygen_is_not_a_broken_bond():
     broken = residue("GLU", [(n, (x + 1.2, y, z) if n == "CD" else (x, y, z)) for n, (x, y, z) in GLU] + [("OXT", (2.6, 2.3, 0.0))])
     with pytest.raises(ToolFailure, match="bond CD-OE1 changed|bond CG-CD changed"):
         S.check_moved_atoms("pdb2pqr", before, broken)                  # real breaks are still caught
+
+
+def test_missing_polar_sidechain_hydrogens_are_named():
+    def row(i, name, res, num, el):
+        return (f"ATOM  {i:5d} {name:<4s} {res:>3s} A{num:4d}       0.000   0.000   0.000  1.00  0.00          {el:>2s}\n")
+    arg = "".join(row(i, n, "ARG", 134, n[0]) for i, n in enumerate(["N", "CA", "NE", "HE", "HH12", "HH21", "HH22"]))
+    tyr = "".join(row(20 + i, n, "TYR", 5, n[0]) for i, n in enumerate(["N", "CA", "OH", "HH"]))
+    assert S.missing_sidechain_hydrogens(arg + tyr) == ["A:ARG134 (HH11)"]

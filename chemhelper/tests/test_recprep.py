@@ -654,3 +654,11 @@ def test_preparation_checks_for_cancellation_before_doing_expensive_work(tmp_pat
     finally:
         cancel.unbind(handle)
     assert not (tmp_path / "o" / "receptor.pdbqt").exists()
+
+
+def test_routine_messages_are_tagged_as_notices_and_problems_as_warnings():
+    from dockchem.recprep import warning_severity
+    assert warning_severity("unusual protonation A:HIP5 (doubly protonated)") == "notice"
+    assert warning_severity("metal A:ZN301 retained: Vina models metal interactions poorly") == "notice"
+    assert warning_severity("A:CYS8 left out of the PDBQT: backbone atoms missing") == "warning"
+    assert warning_severity("chain break between A:ALA5 and A:GLY9") == "warning"

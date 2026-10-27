@@ -24,6 +24,7 @@ from .errors import InvalidInput
 
 TABLE = Path(__file__).parent / "data" / "receptor_atom_types.json"
 BOND_ALLOWANCE = 1.2    # Meeko bonds two atoms closer than this x the sum of covalent radii
+SG_LINK_MAX = 2.1      # A: SG to a C/N/O of another residue counts as a covalent link (S-C is about 1.8)
 SS_MAX = BOND_ALLOWANCE * 2 * 1.05      # A: SG-SG distance Meeko reads as a disulfide (S radius 1.05)
 _METALS = {"ZN": "Zn", "MN": "Mn", "MG": "Mg", "CA": "Ca", "FE": "Fe"}
 
@@ -65,6 +66,18 @@ def write_pdbqt(pdb_text: str, out: Path) -> dict:
     def in_disulfide(chain, seqid, pos):
         return any((c, s) != (chain, seqid) and pos.dist(p) < SS_MAX for c, s, p in sg)
 
+    ns = gemmi.NeighborSearch(model, st.cell, 5).populate()
+
+    def thioether_link(chain, seqid, pos):
+        """SG covalently bound to an atom of another residue (a thioester or thioether cross-link, as in 9QGG):
+        Meeko reads that as two heavy neighbours too."""
+        for m in ns.find_atoms(pos, "\0", radius=SG_LINK_MAX):
+            cra = m.to_cra(model)
+            if (cra.chain.name, cra.residue.seqid) != (chain, seqid) and not cra.atom.element.is_hydrogen \
+                    and cra.atom.element.name in ("C", "N", "O") and cra.atom.pos.dist(pos) < SG_LINK_MAX:
+                return True
+        return False
+
     lines, dropped, n_merged, serial = [], [], 0, 0
     for ch in model:
         for res in ch:
@@ -91,7 +104,7 @@ def write_pdbqt(pdb_text: str, out: Path) -> dict:
                     missing = a.name
                     break
                 if res.name == "CYX" and a.name == "SG":        # two heavy neighbours (CB, SG) => acceptor
-                    ad = "SA" if in_disulfide(ch.name, res.seqid, a.pos) else "S"
+                    ad = "SA" if in_disulfide(ch.name, res.seqid, a.pos) or thioether_link(ch.name, res.seqid, a.pos) else "S"
                 rows.append((a, ad))
             if missing:
                 dropped.append({"residue": label, "reason": f"no atom-type rule for {res.name}.{missing}"})

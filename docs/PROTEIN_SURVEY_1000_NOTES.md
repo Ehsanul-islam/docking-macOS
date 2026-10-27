@@ -155,3 +155,14 @@ Profiling 9NPX showed the timeouts were two different problems, neither of them 
 (1UOU belongs to the earlier 300-structure set, not this one. New in the final comparison: 9QGG CYX767, the same cysteine
 whose sulfur drifted during minimisation, is typed `S` by the table writer (no SG-SG partner within 2.52 A) but `SA` by
 Meeko, so Meeko sees a second bonded neighbour there; consistent with a metal or ligand next to that sulfur. Open under P9.)
+
+## Follow-up polish (after the survey)
+- **P9 diagnosed (4QYN, 6R2W, 8RUP, 9QGG).** The table writer reproduces the PDB2PQR model exactly; Meeko writes extra polar
+  hydrogens where PDB2PQR's output lacked them (a clash-stripped Tyr OH, Arg HH11, a chain-start Cys). Two changes:
+  (1) a hydrogen-count-only difference is reported separately (`n_residues_hydrogen_count_differs`) and no longer counts
+  as a disagreement; (2) a new check `missing_sidechain_hydrogens` warns, by residue and atom name, about polar side-chain
+  hydrogens that are really absent (the actual defect). Over 56 prepared structures it fired in 4 (13 residues).
+  9QGG Cys767 SG is covalently linked to Ala76 C of another chain; the writer now types such a sulfur SA, as Meeko does.
+- **P10:** `warning_details` in the Prep Report tags routine messages (renamed chains, unusual protonation, retained metals,
+  low-pLDDT pocket residues, flip notes) as `notice` and everything else as `warning`; `warnings` is unchanged.
+- Full suite: 382 passed.

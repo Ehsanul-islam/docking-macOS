@@ -100,6 +100,15 @@ class _Report:
             self.warnings.append(msg)
 
 
+# Messages that record a routine, expected step rather than a possible problem for the docking result. They stay in
+# `warnings` (nothing is hidden) and are tagged "notice" in `warning_details` so a UI can fold them away.
+NOTICE_PREFIXES = ("chains renamed", "unusual protonation", "metal ", "pocket residue", "flip decision")
+
+
+def warning_severity(msg: str) -> str:
+    return "notice" if msg.startswith(NOTICE_PREFIXES) else "warning"
+
+
 def _rid(chain, res) -> str:
     return f"{chain}:{res.name}{res.seqid.num}{res.seqid.icode.strip()}"
 
@@ -833,17 +842,20 @@ def compare_pdbqt(table_path: Path, meeko_path: Path) -> dict:
         return d
     a, b = per_residue(table_path), per_residue(meeko_path)
     shared = set(a) & set(b)
-    conflicts, extra = [], []
+    conflicts, extra, hydrogen_only = [], [], []
     for k in sorted(shared):
         missing_in_table = b[k] - a[k]          # atom types Meeko wrote that the table did not
         only_table = a[k] - b[k]                # atoms the table wrote that Meeko left out (terminal atoms)
         label = f"{k[0]}:{k[2]}{k[1]}"
-        if missing_in_table:
+        if missing_in_table and set(missing_in_table) <= {"HD"} and not set(only_table) - {"HD"}:
+            hydrogen_only.append(f"{label} polar H table {a[k]['HD']} vs Meeko {b[k]['HD']}")
+        elif missing_in_table:
             conflicts.append(f"{label} table {dict(a[k])} vs Meeko {dict(b[k])}")
         elif only_table:
             extra.append(f"{label} +{dict(only_table)}")
     return {"result": "disagree" if conflicts else "agree", "n_residues_compared": len(shared),
             "n_residues_different": len(conflicts), "examples": conflicts[:10],
+            "n_residues_hydrogen_count_differs": len(hydrogen_only), "hydrogen_examples": hydrogen_only[:10],
             "n_residues_table_has_extra_atoms": len(extra), "extra_atoms_examples": extra[:5],
             "only_in_table": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(a) - set(b))[:20],
             "only_in_meeko": sorted(f"{k[0]}:{k[2]}{k[1]}" for k in set(b) - set(a))[:20]}
@@ -1356,6 +1368,10 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
         _clashes(final.read_text(), rep)
         for label in stagecheck.missing_amide_hydrogens(final.read_text()):
             rep.warn(f"{label} has no backbone hydrogen (chain start after a gap): its N-H donor is missing")
+        lacking = stagecheck.missing_sidechain_hydrogens(final.read_text())
+        if lacking:
+            rep.warn(f"{len(lacking)} residue(s) lack polar side-chain hydrogens that PDB2PQR did not place "
+                     f"(donors missing from the receptor), first: {', '.join(lacking[:6])}")
 
         # merge kept hetero groups back for Meeko
         if het_out:
@@ -1392,6 +1408,7 @@ def prepare_receptor(src: str | Path, outdir: str | Path,
     report = {
         "source": src.name, "options": {k: v for k, v in vars(opts).items()},
         "changes": rep.changes, "warnings": rep.warnings, "tools": rep.tools,
+        "warning_details": [{"message": w, "severity": warning_severity(w)} for w in rep.warnings],
         "atoms_before": atoms_before, "atoms_after": atoms_after,
         "net_charge_estimate": charge, "chains": chains, "list_version": hetatm.LIST_VERSION,
         "site_residues": sorted(site_res_ids),
