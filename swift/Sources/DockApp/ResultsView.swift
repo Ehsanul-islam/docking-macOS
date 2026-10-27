@@ -3,7 +3,7 @@ import SwiftUI
 import AppKit
 import DockCore
 
-struct ResultsView: View {
+@MainActor struct ResultsView: View {
     @Environment(AppModel.self) private var model
     let session: QuickDockSession
     let result: DockRunResult
@@ -53,7 +53,7 @@ struct ResultsView: View {
     }
 }
 
-struct PoseView: View {
+@MainActor struct PoseView: View {
     let session: QuickDockSession
     let ligand: DockedLigand
     @Binding var pose: Int

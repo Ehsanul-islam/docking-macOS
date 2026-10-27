@@ -2,7 +2,7 @@
 import SwiftUI
 import DockCore
 
-struct SettingsView: View {
+@MainActor struct SettingsView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {

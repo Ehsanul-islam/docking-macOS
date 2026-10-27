@@ -41,12 +41,12 @@ struct MoleculeView: NSViewRepresentable {
         init(controller: ViewerController, directory: URL) { self.controller = controller; self.directory = directory }
 
         // page -> app
-        func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
+        nonisolated func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
             guard JSONSerialization.isValidJSONObject(message.body),
                   let data = try? JSONSerialization.data(withJSONObject: message.body),
                   let json = try? JSONDecoder().decode(JSONValue.self, from: data),
                   let event = ViewerEvent(json) else { return }
-            controller.handle(event)
+            MainActor.assumeIsolated { controller.handle(event) }       // WebKit delivers on the main thread
         }
 
         // app -> page
@@ -57,22 +57,24 @@ struct MoleculeView: NSViewRepresentable {
         }
 
         // the viewer page is local: nothing else may be loaded into it
-        func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
+        nonisolated func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction,
                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             if let url = action.request.url, url.isFileURL, url.path.hasPrefix(directory.path) { decisionHandler(.allow) }
             else { decisionHandler(.cancel) }
         }
 
         // the web content process can be killed under memory pressure: reload and let the controller resend
-        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-            controller.pageReloaded()
-            webView.reload()
+        nonisolated func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            MainActor.assumeIsolated {
+                controller.pageReloaded()
+                webView.reload()
+            }
         }
     }
 }
 
 /// The viewer with its fallbacks: not installed, or the engine reported an error.
-struct ViewerPanel: View {
+@MainActor struct ViewerPanel: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {

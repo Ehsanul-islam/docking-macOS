@@ -4,7 +4,7 @@ import AppKit
 import UniformTypeIdentifiers
 import DockCore
 
-struct ContentView: View {
+@MainActor struct ContentView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
@@ -46,7 +46,7 @@ struct ContentView: View {
 
 // MARK: structure
 
-struct ReceptorCard: View {
+@MainActor struct ReceptorCard: View {
     @Bindable var session: QuickDockSession
     @State private var choosing = false
     @State private var targeted = false
@@ -86,7 +86,7 @@ struct ReceptorCard: View {
     }
 }
 
-struct AssessmentView: View {
+@MainActor struct AssessmentView: View {
     let assessment: Assessment
 
     var body: some View {
@@ -134,7 +134,7 @@ struct AssessmentView: View {
 
 // MARK: ligand
 
-struct LigandCard: View {
+@MainActor struct LigandCard: View {
     @Bindable var session: QuickDockSession
     @State private var choosing = false
 
@@ -162,7 +162,7 @@ struct LigandCard: View {
 
 // MARK: options
 
-struct OptionsCard: View {
+@MainActor struct OptionsCard: View {
     @Bindable var session: QuickDockSession
     @State private var siteKind = SiteKind.auto
     @State private var ligandName = ""
@@ -238,7 +238,7 @@ struct OptionsCard: View {
 
 // MARK: run
 
-struct RunBar: View {
+@MainActor struct RunBar: View {
     @Environment(AppModel.self) private var model
     let session: QuickDockSession
 
@@ -268,7 +268,7 @@ struct RunBar: View {
 
 // MARK: messages
 
-struct MessagesView: View {
+@MainActor struct MessagesView: View {
     @Environment(AppModel.self) private var model
     @Bindable var session: QuickDockSession
     @State private var showWarnings = false
@@ -299,7 +299,7 @@ struct MessagesView: View {
     }
 }
 
-struct ErrorView: View {
+@MainActor struct ErrorView: View {
     let error: UserFacingError
     @Bindable var session: QuickDockSession
 
