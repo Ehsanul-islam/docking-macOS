@@ -13,4 +13,7 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install ./chemhelper      # lets the Swift tests talk to the real helper instead of skipping
       - run: swift test --package-path swift

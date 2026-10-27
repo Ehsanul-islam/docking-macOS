@@ -18,10 +18,42 @@ final class DockCoreTests: XCTestCase {
     func testCancelTerminatesProcessQuickly() async throws {
         let runner = EngineRunner()
         let start = Date()
-        async let status = runner.run(executable: URL(fileURLWithPath: "/bin/sleep"), arguments: ["30"]) { _ in }
-        try await Task.sleep(nanoseconds: 200_000_000)
+        let task = Task { try await runner.run(executable: URL(fileURLWithPath: "/bin/sleep"), arguments: ["30"]) { _ in } }
+        try await Task.sleep(nanoseconds: 300_000_000)
         runner.cancel()
-        _ = try await status
+        do { _ = try await task.value; XCTFail("expected cancellation") } catch { XCTAssertEqual(error as? EngineRunnerError, .cancelled) }
         XCTAssertLessThan(Date().timeIntervalSince(start), 2.0)
+    }
+
+    func testCancellingTheTaskStopsTheProcess() async throws {
+        let runner = EngineRunner()
+        let start = Date()
+        let task = Task { try await runner.run(executable: URL(fileURLWithPath: "/bin/sleep"), arguments: ["30"]) { _ in } }
+        try await Task.sleep(nanoseconds: 300_000_000)
+        task.cancel()
+        do { _ = try await task.value; XCTFail("expected cancellation") } catch { XCTAssertEqual(error as? EngineRunnerError, .cancelled) }
+        XCTAssertLessThan(Date().timeIntervalSince(start), 2.0)
+    }
+
+    func testCancelBeforeStartNeverLaunches() async throws {
+        let runner = EngineRunner()
+        runner.cancel()          // nothing running yet: harmless
+        let status = try await runner.run(executable: URL(fileURLWithPath: "/bin/echo"), arguments: ["hi"]) { _ in }
+        XCTAssertEqual(status, 0)   // a stale cancel from before the run must not poison the next run
+    }
+
+    func testOutputArrivesAsWholeLinesAndExitStatusIsReturned() async throws {
+        final class Box: @unchecked Sendable { var lines: [String] = []; let l = NSLock()
+            func add(_ s: String) { l.lock(); lines.append(s); l.unlock() } }
+        let box = Box()
+        let status = try await EngineRunner().run(executable: URL(fileURLWithPath: "/bin/sh"),
+            arguments: ["-c", "printf 'one\ntwo\rthree'; exit 3"]) { box.add($0) }
+        XCTAssertEqual(status, 3)
+        XCTAssertEqual(box.lines, ["one", "two", "three"])
+    }
+
+    func testMissingExecutableThrows() async {
+        do { _ = try await EngineRunner().run(executable: URL(fileURLWithPath: "/nonexistent/vina"), arguments: []) { _ in }
+             XCTFail("expected an error") } catch { }
     }
 }
