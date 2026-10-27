@@ -7,6 +7,6 @@ let package = Package(
     products: [.library(name: "DockCore", targets: ["DockCore"])],
     targets: [
         .target(name: "DockCore"),
-        .testTarget(name: "DockCoreTests", dependencies: ["DockCore"]),
+        .testTarget(name: "DockCoreTests", dependencies: ["DockCore"], resources: [.copy("Fixtures")]),
     ]
 )
