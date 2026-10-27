@@ -92,3 +92,26 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(died.log, "oom")
     }
 }
+
+final class HelperLocatorTests: XCTestCase {
+    func testBundledPythonAndEngineWinOverEverythingElse() {
+        let res = URL(fileURLWithPath: "/App/Contents/Resources")
+        let l = HelperLocator(resourceDirectory: res, environment: ["DOCKCHEM_PYTHON": "/dev/py", "DOCKCHEM_VINA": "/dev/vina"],
+                              fileExists: { _ in true })
+        let launch = l.launch()
+        XCTAssertEqual(launch.executable.path, "/App/Contents/Resources/python/bin/python3")
+        XCTAssertEqual(launch.environment["DOCKCHEM_VINA"], "/App/Contents/Resources/engine/vina")
+        XCTAssertEqual(launch.environment["PYTHONHOME"], "/App/Contents/Resources/python")
+        XCTAssertEqual(launch.arguments, ["-m", "dockchem.server"])
+    }
+
+    func testFallsBackToEnvironmentThenToSystemPython() {
+        let env = HelperLocator(resourceDirectory: nil, environment: ["DOCKCHEM_PYTHON": "/opt/py", "DOCKCHEM_VINA": "/opt/vina"],
+                                fileExists: { $0.hasPrefix("/opt") })
+        XCTAssertEqual(env.launch().executable.path, "/opt/py")
+        XCTAssertEqual(env.enginePath(), "/opt/vina")
+        let none = HelperLocator(resourceDirectory: nil, environment: [:], fileExists: { _ in false })
+        XCTAssertEqual(none.launch().executable.path, "/usr/bin/env")
+        XCTAssertNil(none.enginePath())
+    }
+}

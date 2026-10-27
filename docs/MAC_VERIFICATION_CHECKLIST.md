@@ -30,6 +30,24 @@ swift test  --package-path swift
 - [ ] Both succeed with 0 failures. CI (`macos-14`) runs the same `swift test`; local result should match.
 - [ ] Record the Swift version (`swift --version`).
 
+## 2b. App UI smoke test (the SwiftUI code has never been compiled; expect fixes)
+
+`swift build --package-path swift` must compile `Sources/DockApp` (it is excluded from the Linux build). Fix any
+compiler errors first; send them back verbatim. Then, with `DOCKCHEM_VINA` set and the Python helper installed:
+
+```bash
+swift run --package-path swift DockApp
+```
+
+- [ ] Window opens; Settings (⌘,) shows cores (default 2) and the engine status.
+- [ ] Drop `pdb_structures_50/1STP.pdb`: an assessment appears ("Ready to dock", 121 residues, 2.6 Å).
+- [ ] Ligand `CC1C2C(CCCCC(=O)O)SC1C(=O)N2`, preset Fast, **Dock**: progress bar moves, then a result table with one row.
+- [ ] Select the row: the 2D interaction image appears; the pose stepper changes it.
+- [ ] **Cancel** during a Thorough run: it stops within a few seconds; **Dock** works again.
+- [ ] A missing/garbage file shows a red message with a readable explanation, not a crash.
+- [ ] Drag a ligand file onto the ligand field; "New run" clears the window.
+- [ ] Dark mode and keyboard navigation (Tab, Return = Dock) behave.
+
 ## 3. Build the engine (Vina)
 
 ```bash

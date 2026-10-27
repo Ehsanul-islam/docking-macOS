@@ -84,6 +84,9 @@ final class QuickDockSessionTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: d.csvPath))
         XCTAssertFalse(s.guardrails.isEmpty)                         // blind docking at exhaustiveness 8
         XCTAssertTrue(s.guardrails.contains { $0.id == "blind-undersampled" })
+        let png = try await s.interactionImage(for: try XCTUnwrap(d.ranked.first))
+        let bytes = try Data(contentsOf: png)
+        XCTAssertEqual(Array(bytes.prefix(4)), [0x89, 0x50, 0x4E, 0x47])        // a PNG
         s.reset()
         XCTAssertEqual(s.phase, .idle)
     }

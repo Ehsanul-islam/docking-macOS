@@ -157,6 +157,21 @@ public final class QuickDockSession {
         return d
     }
 
+    /// 2D interaction diagram for one pose of one docked ligand (poses are numbered from 1). Returns the PNG path;
+    /// the same call is cached on disk, so asking again for the same pose and style is instant.
+    public func interactionImage(for ligand: DockedLigand, pose: Int = 1, style: String = "reference") async throws -> URL {
+        guard let prepared else { throw UserFacingError(title: "Nothing to draw", detail: "Prepare and dock first.") }
+        let safe = ligand.name.map { $0.isLetter || $0.isNumber || $0 == "-" ? $0 : "_" }
+        let out = workDirectory.appendingPathComponent("images/\(String(safe))_pose\(pose)_\(style).png")
+        if FileManager.default.fileExists(atPath: out.path) { return out }
+        var p: [String: JSONValue] = ["receptor": .string(prepared.receptorPDB), "pose": .string(ligand.posesPDBQT),
+                                      "pose_index": .int(pose), "out": .string(out.path), "style": .string(style),
+                                      "compound": .string(ligand.name), "dpi": .int(200)]
+        if pose >= 1, pose <= ligand.scores.count { p["affinity"] = .double(ligand.scores[pose - 1]) }
+        _ = try await helper.call("complex.image2d", p)
+        return out
+    }
+
     /// Stops whatever is running. The helper stops its tools within a few seconds; partial results are kept
     /// on disk and a later run resumes from them.
     public func cancel() { task?.cancel() }
