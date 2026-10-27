@@ -10,6 +10,8 @@ final class AppModel {
         didSet { Self.save(settings) }
     }
     private(set) var session: QuickDockSession
+    let viewer: ViewerController
+    let viewerDirectory: URL?
     private let client: HelperClient
     private let locator: HelperLocator
 
@@ -21,6 +23,8 @@ final class AppModel {
         self.locator = locator
         self.client = client
         self.settings = settings
+        self.viewer = ViewerController(helper: client)
+        self.viewerDirectory = ViewerLocator(resourceDirectory: Bundle.main.resourceURL).directory()
         self.session = QuickDockSession(helper: client, workDirectory: Self.newRunDirectory(), settings: settings)
     }
 
@@ -34,6 +38,7 @@ final class AppModel {
 
     func newRun() {
         session.reset()
+        viewer.clear()
         session = QuickDockSession(helper: client, workDirectory: Self.newRunDirectory(), settings: settings)
     }
 

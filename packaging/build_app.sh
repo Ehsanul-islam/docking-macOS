@@ -62,6 +62,10 @@ find "$RES/python" -type d \( -name tests -o -name test -o -name testing \) -pat
 # PYTHONDONTWRITEBYTECODE for the same reason)
 as_arch "$ARCH" "$PY" -m compileall -q -j 0 "$RES/python/lib" || true
 cp "$VINA_BIN" "$RES/engine/vina"; chmod +x "$RES/engine/vina"
+# 3D viewer page (Mol* + our shell); tests and source maps stay out
+mkdir -p "$RES/viewer"
+rsync -a --exclude test --exclude '*.map' --exclude README.md "$ROOT/viewer/" "$RES/viewer/"
+[ -f "$RES/viewer/index.html" ] && [ -f "$RES/viewer/vendor/molstar.js" ] || die "viewer files missing from the bundle"
 lipo -archs "$RES/engine/vina" | grep -qw "$ARCH" || die "engine binary is not built for $ARCH"
 cp "$OUT/sbom-python.txt" "$RES/sbom-python.txt"
 du -sh "$APP" "$RES/python" "$RES/engine" | sed 's/^/size: /'

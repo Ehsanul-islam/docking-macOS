@@ -26,6 +26,8 @@ done < <(macho_files "$APP")
 # 2. Nothing may reference the build machine.
 if grep -rIl --exclude='*.pyc' -e "$ROOT" -e '/Users/' "$RES/python/bin" "$RES/engine" 2>/dev/null | grep -q .; then bad "build paths inside bin/ or engine/"; else ok "no build paths in bin/ or engine/"; fi
 
+[ -f "$RES/viewer/index.html" ] && [ -f "$RES/viewer/vendor/molstar.js" ] && ok "3D viewer files present" || bad "3D viewer files missing"
+
 # 3. Architecture of everything must match.
 archs=$(macho_files "$APP" | xargs -0 -n1 lipo -archs 2>/dev/null | tr ' ' '\n' | sort -u | tr '\n' ' ')
 echo "info: architectures present: $archs"

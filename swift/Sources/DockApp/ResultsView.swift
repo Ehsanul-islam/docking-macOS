@@ -4,6 +4,7 @@ import AppKit
 import DockCore
 
 struct ResultsView: View {
+    @Environment(AppModel.self) private var model
     let session: QuickDockSession
     let result: DockRunResult
     @State private var selection: DockedLigand.ID?
@@ -38,7 +39,17 @@ struct ResultsView: View {
                 Text(result.scoresAre).font(.footnote).foregroundStyle(.secondary)
             }
         }
-        .onChange(of: selection) { _, _ in pose = 1 }
+        .onChange(of: selection) { _, _ in pose = 1; show() }
+        .onChange(of: pose) { _, _ in show() }
+        .onChange(of: model.viewer.poseIndex) { _, i in if let i, i != pose { pose = i } }
+        .task { show() }
+    }
+
+    /// Keeps the 3D view on the selected ligand and pose.
+    private func show() {
+        guard let sel = selected, sel.status == .docked, let prepared = session.prepared else { return }
+        let name = session.receptor?.deletingPathExtension().lastPathComponent ?? ""
+        Task { await model.viewer.showResult(prepared: prepared, ligand: sel, pose: pose, structureName: name) }
     }
 }
 

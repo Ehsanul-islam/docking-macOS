@@ -44,6 +44,7 @@ swift run --package-path swift DockApp
 - [ ] Ligand `CC1C2C(CCCCC(=O)O)SC1C(=O)N2`, preset Fast, **Dock**: progress bar moves, then a result table with one row.
 - [ ] Select the row: the 2D interaction image appears; the pose stepper changes it.
 - [ ] **Cancel** during a Thorough run: it stops within a few seconds; **Dock** works again.
+- [ ] The right-hand pane shows the Mol* view (dark/light follows the toggle at the toolbar's bottom): the protein appears when a file is chosen; after Dock, the selected ligand's pose, pocket, interactions and box appear; the 1–9 chips and the table switch poses; Save image writes a PNG. If the pane stays empty, enable Safari's Develop menu and inspect the web view (debug builds are inspectable); WebGL2 must be available.
 - [ ] A missing/garbage file shows a red message with a readable explanation, not a crash.
 - [ ] Drag a ligand file onto the ligand field; "New run" clears the window.
 - [ ] Dark mode and keyboard navigation (Tab, Return = Dock) behave.

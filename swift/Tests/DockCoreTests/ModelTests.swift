@@ -118,3 +118,17 @@ final class HelperLocatorTests: XCTestCase {
         XCTAssertNil(none.enginePath())
     }
 }
+
+final class ViewerLocatorTests: XCTestCase {
+    func testBundleWinsThenEnvironmentThenWorkingDirectory() {
+        let res = URL(fileURLWithPath: "/App/Contents/Resources"), cwd = URL(fileURLWithPath: "/repo")
+        let all = ViewerLocator(resourceDirectory: res, environment: ["DOCK_VIEWER_DIR": "/dev/viewer"], workingDirectory: cwd, fileExists: { _ in true })
+        XCTAssertEqual(all.directory()?.path, "/App/Contents/Resources/viewer")
+        let env = ViewerLocator(resourceDirectory: res, environment: ["DOCK_VIEWER_DIR": "/dev/viewer"], workingDirectory: cwd,
+                                fileExists: { $0.hasPrefix("/dev") || $0.hasPrefix("/repo") })
+        XCTAssertEqual(env.directory()?.path, "/dev/viewer")
+        let dev = ViewerLocator(resourceDirectory: nil, environment: [:], workingDirectory: cwd, fileExists: { $0.hasPrefix("/repo") })
+        XCTAssertEqual(dev.directory()?.path, "/repo/viewer")
+        XCTAssertNil(ViewerLocator(resourceDirectory: nil, environment: [:], workingDirectory: cwd, fileExists: { _ in false }).directory())
+    }
+}

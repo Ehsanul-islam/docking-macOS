@@ -9,24 +9,37 @@ struct ContentView: View {
 
     var body: some View {
         let session = model.session
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                ReceptorCard(session: session)
-                LigandCard(session: session)
-                OptionsCard(session: session)
-                RunBar(session: session)
-                MessagesView(session: session)
-                if let result = session.result {
-                    ResultsView(session: session, result: result)
+        HSplitView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ReceptorCard(session: session)
+                    LigandCard(session: session)
+                    OptionsCard(session: session)
+                    RunBar(session: session)
+                    MessagesView(session: session)
+                    if let result = session.result {
+                        ResultsView(session: session, result: result)
+                    }
                 }
+                .padding(20)
             }
-            .padding(20)
+            .frame(minWidth: 380, idealWidth: 440, maxWidth: 560)
+
+            ViewerPanel()
+                .frame(minWidth: 380)
         }
         .toolbar {
             ToolbarItem {
                 Button("New run") { model.newRun() }
                     .disabled(session.isBusy)
             }
+        }
+        .onChange(of: session.receptor) { _, url in
+            if let url { model.viewer.showStructure(at: url) }
+        }
+        .onChange(of: session.prepared) { _, prepared in
+            guard let prepared else { return }
+            model.viewer.showPrepared(prepared, structureName: session.receptor?.deletingPathExtension().lastPathComponent ?? "")
         }
     }
 }

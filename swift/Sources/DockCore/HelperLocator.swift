@@ -45,3 +45,27 @@ public struct HelperLocator: Sendable {
         return nil
     }
 }
+
+/// Finds the 3D viewer page: inside the app bundle, or (development) next to the sources.
+public struct ViewerLocator: Sendable {
+    public var resourceDirectory: URL?
+    public var environment: [String: String]
+    public var workingDirectory: URL
+    public var fileExists: @Sendable (String) -> Bool
+
+    public init(resourceDirectory: URL? = nil, environment: [String: String] = ProcessInfo.processInfo.environment,
+                workingDirectory: URL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath),
+                fileExists: @escaping @Sendable (String) -> Bool = { FileManager.default.fileExists(atPath: $0) }) {
+        self.resourceDirectory = resourceDirectory; self.environment = environment
+        self.workingDirectory = workingDirectory; self.fileExists = fileExists
+    }
+
+    /// The directory holding index.html, or nil if the viewer is not installed.
+    public func directory() -> URL? {
+        var candidates: [URL] = []
+        if let r = resourceDirectory { candidates.append(r.appendingPathComponent("viewer")) }
+        if let e = environment["DOCK_VIEWER_DIR"] { candidates.append(URL(fileURLWithPath: e)) }
+        candidates.append(workingDirectory.appendingPathComponent("viewer"))
+        return candidates.first { fileExists($0.appendingPathComponent("index.html").path) }
+    }
+}

@@ -41,7 +41,7 @@ What each script does:
 - `build_app.sh <arch>` – release build of `DockApp`; `Info.plist`; unpacks Python into `Resources/python`;
   installs the pinned wheels (`--only-binary`, `--no-deps`, then `pip check`); deletes pip's console scripts (their
   shebangs hold build paths) and test/doc trees; byte-compiles (the app sets `PYTHONDONTWRITEBYTECODE`, because
-  writing into a signed bundle breaks the seal); copies Vina; writes an SBOM (`sbom-python.txt`); signs.
+  writing into a signed bundle breaks the seal); copies Vina and the 3D viewer (`viewer/`, tests and source maps excluded); writes an SBOM (`sbom-python.txt`); signs.
 - `sign_bundle.sh` – signs every Mach-O inside out with the hardened runtime and secure timestamp, then the app;
   `SIGN_IDENTITY=-` signs ad hoc for local runs.
 - `verify_bundle.sh` – deep/strict signature check; no link outside the system or bundle (`otool -L`); no build paths;
