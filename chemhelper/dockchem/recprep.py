@@ -891,12 +891,14 @@ def _isolate_valence_failures(pdb: Path, attempt) -> dict:
 
 def _meeko(pdb_path: Path, base: Path, opts, rep):
     """Run mk_prepare_receptor. Ladder: as-is -> without OXT on rejected C-termini -> delete (named)."""
-    exe = Path(sys.executable).parent / "mk_prepare_receptor.py"
-    exe = str(exe) if exe.exists() else "mk_prepare_receptor.py"
+    # Run Meeko through this interpreter instead of its console script: the script's shebang points at whichever
+    # Python installed it, which does not exist inside a relocated app bundle.
+    exe = [sys.executable, "-c", "import sys; from meeko.cli.mk_prepare_receptor import main; "
+           "sys.argv[0] = 'mk_prepare_receptor'; sys.exit(main())"]
     flex = [a for f in opts.flex_residues for a in ("-f", f)]
 
     def attempt(path: Path, extra=()):
-        return _run([exe, "-i", str(path), "-o", str(base), "-p", *flex, *extra], base.parent)
+        return _run([*exe, "-i", str(path), "-o", str(base), "-p", *flex, *extra], base.parent)
 
     def failing(res):
         return sorted(set(re.findall(r"No template matched for residue_key='([^']+)'", res.stdout + res.stderr)))

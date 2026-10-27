@@ -147,7 +147,7 @@ public final class QuickDockSession {
         p["quickprep_dir"] = .string(prepDir.path)
         p["outdir"] = .string(runDir.path)
         let r = try await helper.call("dock.run", p) { [weak self] prog in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 guard let self, case .docking = self.phase else { return }
                 self.phase = .docking(fraction: prog.fraction, message: prog.message)
             }

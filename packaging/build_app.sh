@@ -44,10 +44,14 @@ as_arch "$ARCH" "$PY" -c 'import sys; assert sys.version_info[:2] == (3, 12), sy
 
 echo "==> 4/6 Chemistry packages (pinned, wheels only; pdbfixer is pure Python and built once)"
 LOCK="$ROOT/packaging/requirements-$ARCH.txt"
-grep -v '^pdbfixer' "$LOCK" | grep -v '^#' > "$OUT/dl/wheels.txt"
+grep -v -e '^pdbfixer' -e '^prody' "$LOCK" | grep -v '^#' > "$OUT/dl/wheels.txt"
 as_arch "$ARCH" "$PY" -m pip install --no-cache-dir --no-deps --only-binary=:all: -r "$OUT/dl/wheels.txt"
-as_arch "$ARCH" "$PY" -m pip wheel --no-deps --no-cache-dir -w "$OUT/dl" "$(grep '^pdbfixer' "$LOCK" | sed 's/ .*//')"
-as_arch "$ARCH" "$PY" -m pip install --no-cache-dir --no-deps "$OUT"/dl/pdbfixer-*.whl
+# no macOS wheels exist for these two (pdbfixer is pure Python, prody needs a compiler, which Xcode provides);
+# Meeko's receptor preparation imports ProDy, so it is required
+for pkg in pdbfixer prody; do
+  as_arch "$ARCH" "$PY" -m pip wheel --no-deps --no-cache-dir -w "$OUT/dl" "$(grep "^$pkg" "$LOCK" | sed 's/ .*//')"
+done
+as_arch "$ARCH" "$PY" -m pip install --no-cache-dir --no-deps "$OUT"/dl/pdbfixer-*.whl "$OUT"/dl/[Pp]ro[Dd]y-*.whl
 as_arch "$ARCH" "$PY" -m pip install --no-cache-dir --no-deps "$ROOT/chemhelper"
 as_arch "$ARCH" "$PY" -m pip check
 as_arch "$ARCH" "$PY" -m pip freeze > "$OUT/sbom-python.txt"

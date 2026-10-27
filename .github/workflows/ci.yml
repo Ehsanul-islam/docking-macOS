@@ -16,4 +16,5 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: pip install ./chemhelper      # lets the Swift tests talk to the real helper instead of skipping
+      - run: swift build --package-path swift --product DockApp   # compiles the SwiftUI app itself
       - run: swift test --package-path swift

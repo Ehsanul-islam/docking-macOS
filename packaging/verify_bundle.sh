@@ -39,7 +39,7 @@ reply=$(printf '{"jsonrpc":"2.0","id":1,"method":"system.versions","params":{}}\
         DOCKCHEM_VINA="$RES/engine/vina" HTTPS_PROXY=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 \
         "$PY" -m dockchem.server 2>"$TMP/err" | head -1)
 echo "$reply" | grep -q '"result"' && ok "helper answers from inside the bundle" || { bad "helper did not answer"; head -5 "$TMP/err"; }
-env -i "$PY" -c "import rdkit, openmm, gemmi, meeko, pdbfixer, pdb2pqr, propka, scipy, matplotlib, PIL; print('imports ok')" 2>"$TMP/err2" | grep -q 'imports ok' && ok "all chemistry packages import" || { bad "an import failed"; head -5 "$TMP/err2"; }
+env -i "$PY" -c "import rdkit, openmm, gemmi, meeko, prody, pdbfixer, pdb2pqr, propka, scipy, matplotlib, PIL; print('imports ok')" 2>"$TMP/err2" | grep -q 'imports ok' && ok "all chemistry packages import" || { bad "an import failed"; head -5 "$TMP/err2"; }
 "$RES/engine/vina" --version 2>&1 | grep -qi 'AutoDock Vina' && ok "engine runs: $("$RES/engine/vina" --version 2>&1 | head -1)" || bad "engine does not run"
 
 # 5. The bundle must not change while running (a signed bundle that writes into itself breaks its own seal).

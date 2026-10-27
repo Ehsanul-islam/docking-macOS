@@ -30,3 +30,4 @@ typing-extensions==4.16.0
 tzdata==2026.5
 urllib3==2.8.0
 pdbfixer==1.12.0   # pure Python, built from source once (no wheel on PyPI)
+prody==2.6.1   # C extension, no macOS wheel: built once from source by build_app.sh (needs Xcode command line tools)

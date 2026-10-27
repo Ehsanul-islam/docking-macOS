@@ -9,8 +9,8 @@ Scripts live in `packaging/`. They run on macOS only and **have not been run yet
 | Plan item | Decision | Why |
 |---|---|---|
 | D-2 Python packaging | python-build-standalone CPython 3.12, one bundle **per architecture** | A universal Python needs every `.so` merged with `lipo`; two single-architecture apps are simpler and each is testable. The engine can still be universal. |
-| §15.2 [VERIFY] wheels | *checked 2026-10-27*: macOS wheels exist for arm64 **and** x86_64 for matplotlib, pillow, numpy, scipy, rdkit, gemmi, meeko, openmm, pdb2pqr, propka, dimorphite_dl (cp312). `pdbfixer` has no wheel (pure Python): built once from its sdist. | `pip download --platform macosx_14_0_{arm64,x86_64}` |
-| Unused dependency | `prody` removed from `chemhelper/pyproject.toml` | Nothing imports it, and it has no macOS cp312 wheel. |
+| §15.2 [VERIFY] wheels | *checked 2026-10-27*: macOS wheels exist for arm64 **and** x86_64 for matplotlib, pillow, numpy, scipy, rdkit, gemmi, meeko, openmm, pdb2pqr, propka, dimorphite_dl (cp312). `pdbfixer` (pure Python) and `prody` (C extension) have no macOS wheel: built once from source. | `pip download --platform macosx_14_0_{arm64,x86_64}` |
+| ProDy | **Required** (an earlier note here called it unused: wrong). Meeko's receptor preparation imports it. No macOS wheel exists, so `build_app.sh` builds it once from source with Xcode's compiler. | Caught by CI: Meeko failed without it. |
 | Entitlements | hardened runtime, **none** extra | All nested code is re-signed with one identity, so library validation passes. Add one only when a hardened run proves it needed. |
 | Channel | notarized DMG (plan §15.3). Mac App Store deferred. | The sandbox and bundled interpreters need separate investigation. |
 
@@ -54,6 +54,8 @@ sets `PYTHONHOME`, `PYTHONNOUSERSITE`, `PYTHONDONTWRITEBYTECODE`, and puts matpl
 The helper was also run here with an empty environment and a read-only home directory: it and the 2D image renderer work.
 
 ## Not verified yet
+
+Meeko is now run through the bundled interpreter (`python -c`), not its console script, whose shebang would point outside the bundle.
 
 Everything that touches macOS: the script run itself, signing, notarization, Gatekeeper on a clean Mac, bundle size
 (the wheels alone download as 86 MB arm64 / 96 MB x86_64; installed size is unmeasured), start-up time of the
